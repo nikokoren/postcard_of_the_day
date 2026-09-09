@@ -1,0 +1,70 @@
+name: Refresh Postcard Pool
+
+on:
+  schedule:
+    # 03:40 UTC on the 1st. The pool is a cache of catalogue metadata;
+    # it only needs refreshing when a collection grows, a scan is
+    # withdrawn, or there is more of the pool left to measure.
+    - cron: "40 3 1 * *"
+  workflow_dispatch:
+    inputs:
+      pages:
+        description: "Max search pages per source (100 records each)"
+        required: false
+        default: "400"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-postcard-pool
+  cancel-in-progress: false
+
+jobs:
+  harvest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 20
+
+      - name: Install Pillow
+        run: pip install --quiet pillow
+
+      - name: Harvest the postcard pool
+        run: python3 harvest.py --pages "${{ github.event.inputs.pages || 400 }}"
+
+      - name: Prove the schedule still behaves
+        run: python3 daily.py --selftest
+
+      - name: Regenerate the plugin settings
+        run: python3 make_settings.py
+
+      - name: Rebuild today's picks against the new pool
+        run: python3 daily.py
+
+      - name: Commit and push
+        run: |
+          git config user.name "GitHub Action"
+          git config user.email "action@github.com"
+          git add pool.json quality.json dimensions.json \
+                  trmnl/settings.yml postcard.json today.json
+
+          if git diff --staged --quiet; then
+            echo "Pool unchanged, nothing to commit"
+          else
+            git commit -m "Refresh postcard pool [$(date -u +'%Y-%m-%d')]"
+            for attempt in 1 2 3; do
+              if git push; then
+                echo "Pushed."
+                exit 0
+              fi
+              echo "Push rejected, rebasing on origin (attempt $attempt)"
+              git pull --rebase origin "$GITHUB_REF_NAME" || exit 1
+              sleep $((attempt * 5))
+            done
+            echo "Could not push after 3 attempts"
+            exit 1
+          fi

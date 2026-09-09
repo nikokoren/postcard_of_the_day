@@ -1,0 +1,236 @@
+{% comment %}
+  A working example, self-contained: paste the whole file into the
+  plugin's markup. A private plugin has no loader for {% raw %}{% include %}{% endraw %}, so the
+  top half is trmnl/selection.liquid verbatim -- keep them in step if you
+  edit one. The layout below it is yours to change.
+{% endcomment %}
+
+{% comment %}
+  Selection logic only -- no layout, no styling. Drop this at the top of
+  your markup and everything below it can use `pick` and `card_image`.
+
+  It resolves three settings -- Orientation, Country, Era -- against
+  today.json:
+
+    several chosen  -> a card matching one value from each axis the
+                       reader set, rotating a day at a time over the
+                       combinations that exist
+    some chosen     -> the axes they left alone are not constrained
+    none chosen     -> today's card from the whole catalogue
+
+  That last line is the rule the whole thing is built around: an
+  untouched settings panel means the full catalogue, never an empty
+  screen.
+
+  `day_index` is the day number the schedule turns on, so the rotation
+  holds all day and moves on by itself at midnight UTC.
+
+  Two things this is careful about, both found by running it rather than
+  reading it: a settings keyname and a feed key of the same name collide
+  (hence orientation_options/country_options/era_options in the feed),
+  and `split` leaves a trailing empty string on some engines, which is
+  why nothing here indexes straight into a split array.
+{% endcomment %}
+
+{% assign settings = trmnl.plugin_settings.custom_fields_values %}
+{% assign SEP = "__" %}
+
+{% comment %}
+  A multi-select arrives as an array, a single choice as a string, and
+  an untouched field as nothing at all. Normalise all three to a list.
+{% endcomment %}
+{% assign chosen_orientation = settings.orientation %}
+{% if chosen_orientation == nil %}{% assign chosen_orientation = "" | split: "," %}{% endif %}
+{% if chosen_orientation.first == nil %}{% assign chosen_orientation = chosen_orientation | split: "," %}{% endif %}
+
+{% assign chosen_country = settings.country %}
+{% if chosen_country == nil %}{% assign chosen_country = "" | split: "," %}{% endif %}
+{% if chosen_country.first == nil %}{% assign chosen_country = chosen_country | split: "," %}{% endif %}
+
+{% assign chosen_era = settings.era %}
+{% if chosen_era == nil %}{% assign chosen_era = "" | split: "," %}{% endif %}
+{% if chosen_era.first == nil %}{% assign chosen_era = chosen_era | split: "," %}{% endif %}
+
+{% comment %}
+  A boolean field arrives as the STRING "true" or "false", so it has to
+  be compared, not just tested -- {% raw %}{% if show_caption %}{% endraw %} is true even when the
+  reader turned it off. An untouched field arrives as nothing, so the
+  default matters: the caption is on unless switched off, the credit off
+  unless switched on. A fresh install shows a captioned card.
+{% endcomment %}
+{% assign want_caption = true %}
+{% if settings.show_caption == "false" %}{% assign want_caption = false %}{% endif %}
+
+{% assign want_place = true %}
+{% if settings.show_place == "false" %}{% assign want_place = false %}{% endif %}
+
+{% assign want_credit = false %}
+{% if settings.show_credit == "true" %}{% assign want_credit = true %}{% endif %}
+
+{% comment %}
+  What the reader saw -> the keys this feed uses. keys_by_label carries
+  every spelling a setting might come back as, because TRMNL sends a
+  value derived from the label rather than the label itself.
+
+  Each axis ends up as a comma-terminated string. An axis nobody set
+  becomes "all", which constrains nothing -- that is what makes an
+  untouched panel mean the whole catalogue.
+{% endcomment %}
+{% assign o_keys = "" %}
+{% for label in chosen_orientation %}
+  {% assign lbl = label | strip %}
+  {% assign k = keys_by_label[lbl] %}
+  {% if k %}{% assign o_keys = o_keys | append: k | append: "," %}{% endif %}
+{% endfor %}
+{% if o_keys == "" %}{% assign o_keys = "all," %}{% endif %}
+
+{% assign c_keys = "" %}
+{% for label in chosen_country %}
+  {% assign lbl = label | strip %}
+  {% assign k = keys_by_label[lbl] %}
+  {% if k %}{% assign c_keys = c_keys | append: k | append: "," %}{% endif %}
+{% endfor %}
+{% if c_keys == "" %}{% assign c_keys = "all," %}{% endif %}
+
+{% assign e_keys = "" %}
+{% for label in chosen_era %}
+  {% assign lbl = label | strip %}
+  {% assign k = keys_by_label[lbl] %}
+  {% if k %}{% assign e_keys = e_keys | append: k | append: "," %}{% endif %}
+{% endfor %}
+{% if e_keys == "" %}{% assign e_keys = "all," %}{% endif %}
+
+{% assign o_list = o_keys | split: "," %}
+{% assign c_list = c_keys | split: "," %}
+{% assign e_list = e_keys | split: "," %}
+
+{% comment %} Every combination the reader asked for that the feed actually carries. {% endcomment %}
+{% assign wanted = "" %}
+{% for o in o_list %}{% if o != "" %}
+  {% for c in c_list %}{% if c != "" %}
+    {% for e in e_list %}{% if e != "" %}
+      {% capture cell %}{{ o }}{{ SEP }}{{ c }}{{ SEP }}{{ e }}{% endcapture %}
+      {% if cell_keys contains cell %}
+        {% assign wanted = wanted | append: cell | append: "," %}
+      {% endif %}
+    {% endif %}{% endfor %}
+  {% endif %}{% endfor %}
+{% endif %}{% endfor %}
+
+{% comment %}
+  Nothing matched, so loosen one axis at a time rather than dropping
+  straight to the whole catalogue. Someone asking for portrait cards
+  from Morocco before 1900 has asked for something thin on the ground,
+  and should still get a card from Morocco.
+{% endcomment %}
+{% assign n = 0 %}
+{% assign wanted_list = wanted | split: "," %}
+{% for k in wanted_list %}{% if k != "" %}{% assign n = n | plus: 1 %}{% endif %}{% endfor %}
+
+{% if n == 0 %}
+  {% for o in o_list %}{% if o != "" %}
+    {% for c in c_list %}{% if c != "" %}
+      {% capture cell %}{{ o }}{{ SEP }}{{ c }}{{ SEP }}all{% endcapture %}
+      {% if cell_keys contains cell %}{% assign wanted = wanted | append: cell | append: "," %}{% endif %}
+    {% endif %}{% endfor %}
+  {% endif %}{% endfor %}
+  {% assign wanted_list = wanted | split: "," %}
+  {% for k in wanted_list %}{% if k != "" %}{% assign n = n | plus: 1 %}{% endif %}{% endfor %}
+{% endif %}
+
+{% if n == 0 %}
+  {% for c in c_list %}{% if c != "" %}
+    {% capture cell %}all{{ SEP }}{{ c }}{{ SEP }}all{% endcapture %}
+    {% if cell_keys contains cell %}{% assign wanted = wanted | append: cell | append: "," %}{% endif %}
+  {% endif %}{% endfor %}
+  {% assign wanted_list = wanted | split: "," %}
+  {% for k in wanted_list %}{% if k != "" %}{% assign n = n | plus: 1 %}{% endif %}{% endfor %}
+{% endif %}
+
+{% if n == 0 %}
+  {% for e in e_list %}{% if e != "" %}
+    {% capture cell %}all{{ SEP }}all{{ SEP }}{{ e }}{% endcapture %}
+    {% if cell_keys contains cell %}{% assign wanted = wanted | append: cell | append: "," %}{% endif %}
+  {% endif %}{% endfor %}
+  {% assign wanted_list = wanted | split: "," %}
+  {% for k in wanted_list %}{% if k != "" %}{% assign n = n | plus: 1 %}{% endif %}{% endfor %}
+{% endif %}
+
+{% if n == 0 %}
+  {% assign wanted_list = default | split: "," %}
+  {% assign n = 1 %}
+{% endif %}
+
+{% comment %} Today's cell: the nth non-empty entry, n rotating by day. {% endcomment %}
+{% assign i = day_index | modulo: n %}
+{% assign j = 0 %}
+{% assign chosen_key = default %}
+{% for k in wanted_list %}
+  {% if k != "" %}
+    {% if j == i %}{% assign chosen_key = k %}{% endif %}
+    {% assign j = j | plus: 1 %}
+  {% endif %}
+{% endfor %}
+{% assign pick = picks[chosen_key] %}
+{% if pick == nil %}{% assign pick = picks[default] %}{% endif %}
+
+{% comment %}
+  pick.image is already sized for the largest panel there is (1872x1404,
+  the X) and every smaller screen scales it down for free, so it is safe
+  to use as-is. It asks for the colour scan rather than a greyscale one:
+  a colour panel can then show the colour, and a monochrome one loses
+  nothing -- converting the colour file to luminance lands within 1/255
+  of the archive's own greyscale version.
+{% endcomment %}
+{% assign card_image = pick.image %}
+
+{% comment %}
+  From here on:
+    card_image      the postcard, ready to use at any panel size
+    pick.title      the card's own caption, trimmed to fit
+    pick.date       "1907" or "1900-1906"
+    pick.place      "Athens, Region of Attica, Greece"
+    pick.country    "Greece"
+    pick.publisher  who printed it, when the archive knows
+    pick.credit     the holding institution and collection
+    pick.rights     the rights statement
+    pick.source_url the catalogue record
+    want_caption    whether to draw the caption block at all
+    want_place      whether that block includes the place line
+    want_credit     whether to print the credit
+{% endcomment %}
+
+{% comment %} ---------- layout ---------- {% endcomment %}
+
+<div class="layout">
+  <img class="image image-dither image--contain w--max-full h--max-full"
+       src="{{ card_image }}">
+
+  {% comment %}
+    The whole caption is one conditional, so switching it off leaves the
+    card alone on the screen rather than an empty box on top of it.
+  {% endcomment %}
+  {% if want_caption %}
+    <div class="absolute bottom--2 left--2 z--2 p--2 w--max-[80cqw] lg:w--max-[75cqw] bg--canvas outline outline--strong">
+      <div class="flex flex--col gap--xsmall">
+        <div class="content">
+          <span class="title title--small">{{ pick.title }}</span>
+
+          {% if want_place and pick.place != "" %}
+            <span class="label label--small">{{ pick.place }} &middot; {{ pick.date }}</span>
+          {% else %}
+            <span class="label label--small">{{ pick.date }}</span>
+          {% endif %}
+
+          {% if pick.publisher != "" %}
+            <span class="label label--small">Printed by {{ pick.publisher }}</span>
+          {% endif %}
+
+          {% if want_credit %}
+            <span class="label label--small">{{ pick.credit }}</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+</div>

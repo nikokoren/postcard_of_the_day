@@ -1,0 +1,45 @@
+name: Preview upcoming postcards
+
+# Renders the next N days as a contact sheet at the panel's own grey
+# depth, so "is this actually interesting to look at" can be answered by
+# looking rather than by reading metrics. Nothing is committed; the sheet
+# comes back as an artifact.
+
+on:
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "How many days ahead"
+        required: false
+        default: "24"
+      cell:
+        description: "Cell key, e.g. landscape__france__era-1900-1914"
+        required: false
+        default: "all__all__all"
+      levels:
+        description: "Grey levels: 2 = 1-bit, 4 = 2-bit, 16 = 4-bit"
+        required: false
+        default: "4"
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Pillow
+        run: pip install --quiet pillow
+
+      - name: Render the contact sheet
+        run: |
+          python3 preview.py \
+            --days "${{ github.event.inputs.days || 24 }}" \
+            --cell "${{ github.event.inputs.cell || 'all__all__all' }}" \
+            --levels "${{ github.event.inputs.levels || 4 }}" \
+            --out preview.png
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: postcard-preview
+          path: preview.png

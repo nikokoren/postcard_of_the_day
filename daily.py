@@ -1,0 +1,579 @@
+#!/usr/bin/env python3
+"""
+Pick the day's postcard.
+
+Runs every morning. Reads pool.json, works out which card each
+combination of settings gets today, and writes two files:
+
+  postcard.json  the day's card for the full catalogue, on its own
+  today.json     one card per *cell* -- orientation x country x era --
+                 which is what the TRMNL recipe polls
+
+Nothing here talks to an archive's search API. The pool is already on
+disk, so a bad day at the Library of Congress cannot blank the screen;
+the worst it can do is leave yesterday's file in place.
+
+The same card shows all day, and no card comes back until the pool has
+been all the way through. Both fall out of the same trick: the day
+number picks a position, and a hash of the card id sorts the pool into
+a shuffle that is stable everywhere and reshuffles each time round.
+
+Usage:
+    python3 daily.py                    # write today's files
+    python3 daily.py --date 2026-12-25  # any day, for checking
+    python3 daily.py --no-check         # skip the image liveness probe
+    python3 daily.py --selftest         # prove the schedule behaves
+"""
+
+import argparse
+import collections
+import hashlib
+import http.client
+import json
+import os
+import re
+import sys
+import time
+import urllib.error
+import urllib.request
+from datetime import date, timedelta
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+POOL_PATH = os.path.join(HERE, "pool.json")
+DEFAULT_PATH = os.path.join(HERE, "postcard.json")
+FEED_PATH = os.path.join(HERE, "today.json")
+
+UA = ("postcard-of-the-day/1.0 "
+      "(+https://github.com/nikokoren/postcard_of_the_day)")
+
+# Changing this reshuffles every schedule. Don't.
+SALT = "postcard-of-the-day/v1"
+
+# The panels. An OG is 800x480, an X is 1872x1404 at a squarer aspect,
+# and there are Minis and Cores in between. Asking for the largest and
+# letting the smaller panels scale down costs nothing and means one URL
+# serves every device.
+X_BOX = (1872, 1404)
+DEFAULT_BOX = X_BOX
+
+MAX_SKIPS = 4
+DEAD_CODES = (403, 404, 410, 451)
+CHECK_TIMEOUT = 12
+CHECK_BUDGET = 400
+MIN_INK_BYTES = 12_000
+
+EPOCH = date(1970, 1, 1)
+
+# Fields that change on every run without the card having changed. If
+# only these differ the file is left alone, so a re-run does not make a
+# commit that says nothing.
+VOLATILE_FIELDS = ("generated", "image_checked")
+
+
+# ============================================================
+# the three axes
+# ============================================================
+
+ERAS = [
+    ("era-pre-1900",  "Before 1900",  1800, 1899),
+    ("era-1900-1914", "1900 - 1914",  1900, 1914),
+    ("era-1915-1929", "1915 - 1929",  1915, 1929),
+    ("era-1930-1945", "1930 - 1945",  1930, 1945),
+    ("era-1946-on",   "1946 onwards", 1946, 2100),
+]
+
+ORIENTATIONS = [
+    ("landscape", "Landscape"),
+    ("portrait",  "Portrait"),
+]
+
+# A country is offered only if it can fill a year of Tuesdays on its
+# own. Below this the selector is promising something it cannot deliver.
+COUNTRY_MIN = 60
+
+# A cell is one point in orientation x country x era, with "all"
+# allowed in any slot -- "a portrait card from France, before 1900".
+# Selections cannot be precomputed one file each (three axes, dozens of
+# values, 2^n combinations), but the cells can: someone picking two
+# countries and two eras is choosing among four of these, and the
+# markup rotates over whichever ones exist.
+CELL_MIN = 20
+CELL_SEP = "__"
+
+# TRMNL rejects a polling payload over 100KB. This is the line the build
+# refuses to cross, with room to spare.
+MAX_FEED_BYTES = 95_000
+MAX_CELLS = 150
+
+TITLE_LIMIT = 120
+SUBTITLE_MARKERS = (" : ", " ; ", " -- ", " — ")
+
+
+def cell_key(orientation, country, era):
+    return CELL_SEP.join((orientation, country, era))
+
+
+def in_era(entry, era):
+    for slug, _, lo, hi in ERAS:
+        if slug == era:
+            return lo <= entry["y"] <= hi
+    return False
+
+
+def cards_for(entries, key):
+    """The subset of the pool one cell selects."""
+    orientation, country, era = key.split(CELL_SEP)
+    out = entries
+    if orientation != "all":
+        out = [e for e in out if e.get("o") == orientation]
+    if country != "all":
+        out = [e for e in out if e.get("c") == country]
+    if era != "all":
+        out = [e for e in out if in_era(e, era)]
+    return out
+
+
+def specificity(key):
+    return sum(1 for part in key.split(CELL_SEP) if part != "all")
+
+
+def countries_in(entries):
+    """(slug, label, count) for every country big enough to offer."""
+    counts = collections.Counter()
+    labels = {}
+    for entry in entries:
+        slug = entry.get("c")
+        if not slug:
+            continue
+        counts[slug] += 1
+        labels[slug] = entry.get("cn") or slug
+    return sorted(((slug, labels[slug], n) for slug, n in counts.items()
+                   if n >= COUNTRY_MIN),
+                  key=lambda row: (-row[2], row[1]))
+
+
+def build_cells(entries, countries):
+    """
+    Every cell with enough cards behind it, coarsest first. Coarse cells
+    are what the markup falls back to when a reader's exact combination
+    is empty, so if the budget bites it bites the specific ones.
+    """
+    country_slugs = ["all"] + [slug for slug, _, _ in countries]
+    era_slugs = ["all"] + [slug for slug, _, _, _ in ERAS]
+    orientations = ["all"] + [slug for slug, _ in ORIENTATIONS]
+
+    keys = []
+    for orientation in orientations:
+        for country in country_slugs:
+            for era in era_slugs:
+                key = cell_key(orientation, country, era)
+                if len(cards_for(entries, key)) >= CELL_MIN:
+                    keys.append(key)
+    keys.sort(key=lambda k: (specificity(k), k))
+    return keys[:MAX_CELLS]
+
+
+def label_aliases(orientations, countries, eras):
+    """
+    Every spelling a setting might arrive as, mapped to the key this
+    feed uses.
+
+    TRMNL does not send back the label a reader picked. It sends a value
+    derived from it -- "United States" comes back as "united_states",
+    "1900 - 1914" as "1900_-_1914" -- and the exact derivation is not
+    documented. So rather than guess one rule, record all of them: the
+    label, its lowercase form, its snake_case form, the key itself, and
+    the key with underscores. A lookup that misses would silently fall
+    back to the whole catalogue, which looks like the recipe ignoring
+    the settings.
+    """
+    aliases = {}
+
+    def add(key, label):
+        lower = label.lower()
+        snake = re.sub(r"[^a-z0-9]+", "_", lower).strip("_")
+        for form in (label, lower, snake, key, key.replace("-", "_"),
+                     re.sub(r"\s+", "_", lower),
+                     re.sub(r"[^a-z0-9]+", "-", lower).strip("-")):
+            if form:
+                aliases[form] = key
+
+    for key, label in orientations:
+        add(key, label)
+    for key, label, _ in countries:
+        add(key, label)
+    for key, label, _, _ in eras:
+        add(key, label)
+    return aliases
+
+
+# ============================================================
+# selection
+# ============================================================
+
+def day_index(day):
+    """Days since the epoch. The one number the whole schedule turns on."""
+    return (day - EPOCH).days
+
+
+def order_for(entries, key, cycle):
+    """
+    The order this cell's cards come out in during one pass through its
+    pool. Sorting by a hash of the id is a shuffle that is stable (same
+    inputs, same order, on any machine and in any Python) without
+    storing a schedule anywhere. The cycle number is in the hash, so the
+    next pass comes out in a different order.
+    """
+    def sort_key(entry):
+        seed = "{}|{}|{}|{}".format(SALT, key, cycle, entry["id"])
+        return hashlib.sha256(seed.encode("utf-8")).hexdigest()
+    return sorted(entries, key=sort_key)
+
+
+def candidates_for(entries, key, day):
+    """The day's card, then the ones that stand in if its image is gone."""
+    total = len(entries)
+    if not total:
+        return []
+    cycle, position = divmod(day_index(day), total)
+    ordered = order_for(entries, key, cycle)
+    return [ordered[(position + offset) % total]
+            for offset in range(min(MAX_SKIPS + 1, total))]
+
+
+# ============================================================
+# images
+# ============================================================
+
+def image_url(entry, box=DEFAULT_BOX, quality="default"):
+    """
+    IIIF sources give us any size we ask for. Fixed sources -- the
+    Library of Congress postcard files -- have one derivative and that
+    is what everyone gets.
+    """
+    if entry.get("k") == "fixed":
+        return entry["b"]
+    return "{}/full/!{},{}/0/{}.jpg".format(entry["b"], box[0], box[1], quality)
+
+
+_checked = {"n": 0}
+
+
+def budget_left():
+    return _checked["n"] < CHECK_BUDGET
+
+
+def image_ok(url):
+    """
+    True if the URL still serves a real image. A card whose scan has
+    been withdrawn should not take a day off the calendar, and a
+    zero-length or error-page response is worse than a substitution.
+    """
+    _checked["n"] += 1
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": UA})
+        with urllib.request.urlopen(req, timeout=CHECK_TIMEOUT) as resp:
+            if resp.status != 200:
+                return False
+            ctype = resp.headers.get("Content-Type") or ""
+            if not ctype.startswith("image/"):
+                return False
+            length = resp.headers.get("Content-Length")
+            if length and int(length) < MIN_INK_BYTES:
+                return False
+            if not length:
+                return len(resp.read(MIN_INK_BYTES)) >= MIN_INK_BYTES
+            return True
+    except urllib.error.HTTPError as e:
+        return e.code not in DEAD_CODES
+    except (urllib.error.URLError, http.client.HTTPException, TimeoutError,
+            ConnectionError, OSError, ValueError):
+        # A timeout is the network's fault, not the card's. Keep it.
+        return True
+
+
+# ============================================================
+# the caption
+# ============================================================
+
+def balance_brackets(text):
+    if text.count("[") > text.count("]"):
+        text += "]"
+    if text.count("(") > text.count(")"):
+        text += ")"
+    return text
+
+
+def title_line(entry):
+    """
+    A title that fits a panel. Cut at a subtitle marker if there is one,
+    then at a clause boundary, and only fall back to a word boundary --
+    with an ellipsis to admit it -- if neither exists.
+    """
+    title = entry["t"]
+    if len(title) <= TITLE_LIMIT:
+        return balance_brackets(title)
+    for marker in SUBTITLE_MARKERS:
+        head = title.split(marker)[0]
+        if 12 <= len(head) <= TITLE_LIMIT:
+            return balance_brackets(head.strip(" ,;:-"))
+    cut = title[:TITLE_LIMIT]
+    for boundary in (", ", " - "):
+        index = cut.rfind(boundary)
+        if index >= 40:
+            return balance_brackets(cut[:index].strip(" ,;:-"))
+    index = cut.rfind(" ")
+    return balance_brackets(cut[:index].strip(" ,;:-")) + "…"
+
+
+def date_line(entry):
+    year, end = entry["y"], entry.get("y2")
+    if end and end != year:
+        return "{}–{}".format(year, end)
+    return str(year)
+
+
+def place_line(entry):
+    bits = [entry.get("pl"), entry.get("cn")]
+    bits = [b for b in bits if b]
+    if not bits:
+        return ""
+    if len(bits) == 2 and bits[1] in bits[0]:
+        return bits[0]
+    return ", ".join(bits)
+
+
+def credit_line(entry):
+    holder = entry.get("h") or ""
+    collection = entry.get("col") or ""
+    if collection and collection.lower() not in holder.lower():
+        return "{}, {}".format(holder, collection) if holder else collection
+    return holder
+
+
+# ============================================================
+# payload
+# ============================================================
+
+def build_payload(entry, key, day, pool_size, checked):
+    return {
+        "id": entry["id"],
+        "title": title_line(entry),
+        "date": date_line(entry),
+        "year": entry["y"],
+        "place": place_line(entry),
+        "country": entry.get("cn") or "",
+        "orientation": entry.get("o") or "",
+        "publisher": entry.get("pub") or "",
+        "credit": credit_line(entry),
+        "rights": entry.get("r") or "",
+        "source_url": entry.get("u") or "",
+        "image": image_url(entry),
+        "cell": key,
+        "pool": pool_size,
+        "day": day.isoformat(),
+        "image_checked": checked,
+    }
+
+
+def pick(entries, key, day, check):
+    """The day's card for one cell, skipping any whose image has gone."""
+    candidates = candidates_for(entries, key, day)
+    if not candidates:
+        return None, False
+    if not check:
+        return candidates[0], False
+    for candidate in candidates:
+        if not budget_left():
+            return candidates[0], False
+        if image_ok(image_url(candidate)):
+            return candidate, True
+    return candidates[0], True
+
+
+# ============================================================
+# writing
+# ============================================================
+
+def substantive(new, old):
+    """True if anything but the volatile fields changed."""
+    def strip(value):
+        if isinstance(value, dict):
+            return {k: strip(v) for k, v in value.items()
+                    if k not in VOLATILE_FIELDS}
+        if isinstance(value, list):
+            return [strip(v) for v in value]
+        return value
+    return strip(new) != strip(old)
+
+
+def write_json(path, payload):
+    try:
+        with open(path) as fh:
+            old = json.load(fh)
+    except (OSError, ValueError):
+        old = None
+    if old is not None and not substantive(payload, old):
+        sys.stderr.write(f"  {os.path.basename(path)}: unchanged\n")
+        return False
+    with open(path, "w") as fh:
+        json.dump(payload, fh, indent=1, sort_keys=True)
+        fh.write("\n")
+    sys.stderr.write(f"  {os.path.basename(path)}: written "
+                     f"({os.path.getsize(path)} bytes)\n")
+    return True
+
+
+def load_pool():
+    with open(POOL_PATH) as fh:
+        data = json.load(fh)
+    entries = [e for e in data.get("entries") or [] if e.get("o") and e.get("b")]
+    if not entries:
+        raise SystemExit("pool.json has no usable entries")
+    return entries
+
+
+# ============================================================
+# selftest
+# ============================================================
+
+def selftest(entries, day):
+    failures = []
+
+    def check(name, ok, detail=""):
+        if not ok:
+            failures.append(f"{name}: {detail}")
+        print(("  ok   " if ok else "  FAIL ") + name +
+              (f"  {detail}" if detail and not ok else ""))
+
+    ids = [e["id"] for e in entries]
+    check("ids are unique", len(ids) == len(set(ids)),
+          f"{len(ids) - len(set(ids))} duplicates")
+
+    key = cell_key("all", "all", "all")
+    total = len(entries)
+
+    first = candidates_for(entries, key, day)[0]["id"]
+    again = candidates_for(entries, key, day)[0]["id"]
+    check("same day, same card", first == again, f"{first} vs {again}")
+
+    tomorrow = candidates_for(entries, key, day + timedelta(days=1))[0]["id"]
+    check("next day is a different card", first != tomorrow, first)
+
+    # One full cycle must visit every card exactly once.
+    cycle_start = day - timedelta(days=day_index(day) % total)
+    sample = min(total, 400)
+    seen = [candidates_for(entries, key, cycle_start + timedelta(days=i))[0]["id"]
+            for i in range(sample)]
+    check("no repeats inside a cycle", len(set(seen)) == sample,
+          f"{sample - len(set(seen))} repeats in {sample} days")
+
+    later = candidates_for(entries, key,
+                           cycle_start + timedelta(days=total))[0]["id"]
+    check("the next cycle reshuffles", later != seen[0], later)
+
+    countries = countries_in(entries)
+    check("enough countries to be worth a selector", len(countries) >= 8,
+          f"{len(countries)}")
+
+    cells = build_cells(entries, countries)
+    check("every cell has cards",
+          all(cards_for(entries, k) for k in cells), "an empty cell got through")
+    check("the catch-all cell exists", key in cells)
+
+    for slug, _ in ORIENTATIONS:
+        k = cell_key(slug, "all", "all")
+        check(f"cell {k}", k in cells)
+
+    payload = build_payload(entries[0], key, day, total, False)
+    check("payload is complete",
+          all(payload.get(f) not in (None,) for f in
+              ("id", "title", "date", "image", "credit")))
+
+    print()
+    if failures:
+        print(f"{len(failures)} failed")
+        return 1
+    print("all good")
+    return 0
+
+
+# ============================================================
+# main
+# ============================================================
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--date", help="YYYY-MM-DD, defaults to today (UTC)")
+    ap.add_argument("--no-check", action="store_true",
+                    help="skip the image liveness probe")
+    ap.add_argument("--selftest", action="store_true")
+    args = ap.parse_args()
+
+    day = (date.fromisoformat(args.date) if args.date
+           else date.fromtimestamp(time.time()))
+    entries = load_pool()
+
+    if args.selftest:
+        return selftest(entries, day)
+
+    check = not args.no_check
+    countries = countries_in(entries)
+    cells = build_cells(entries, countries)
+    sys.stderr.write(f"{len(entries)} cards, {len(countries)} countries, "
+                     f"{len(cells)} cells\n")
+
+    picks, misses = {}, 0
+    for key in cells:
+        subset = cards_for(entries, key)
+        entry, checked = pick(subset, key, day, check)
+        if entry is None:
+            misses += 1
+            continue
+        picks[key] = build_payload(entry, key, day, len(subset), checked)
+
+    default_key = cell_key("all", "all", "all")
+    if default_key not in picks:
+        raise SystemExit("no pick for the full catalogue; refusing to publish")
+
+    generated = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+
+    # The Liquid reads these names directly, so they are part of the
+    # contract: renaming one breaks every installed recipe. The option
+    # lists are called *_options rather than orientations/countries/eras
+    # because a feed key and a settings keyname of the same name collide
+    # in the template scope.
+    feed = {
+        "version": 1,
+        "generated": generated,
+        "day": day.isoformat(),
+        "day_index": day_index(day),
+        "pool": len(entries),
+        "default": default_key,
+        "cell_separator": CELL_SEP,
+        "cell_keys": ",".join(sorted(picks)),
+        "keys_by_label": label_aliases(ORIENTATIONS, countries, ERAS),
+        "orientation_options": [{"key": s, "label": l} for s, l in ORIENTATIONS],
+        "country_options": [{"key": s, "label": l, "count": n}
+                            for s, l, n in countries],
+        "era_options": [{"key": s, "label": l} for s, l, _, _ in ERAS],
+        "picks": picks,
+    }
+
+    size = len(json.dumps(feed, indent=1, sort_keys=True).encode("utf-8"))
+    if size > MAX_FEED_BYTES:
+        raise SystemExit(
+            f"feed is {size} bytes, over the {MAX_FEED_BYTES} limit; "
+            f"raise CELL_MIN or lower MAX_CELLS")
+    sys.stderr.write(f"feed {size} bytes, {len(picks)} picks"
+                     f"{f', {misses} empty cells' if misses else ''}\n")
+
+    single = dict(picks[default_key])
+    single["generated"] = generated
+    write_json(DEFAULT_PATH, single)
+    write_json(FEED_PATH, feed)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
