@@ -103,7 +103,7 @@ CELL_SEP = "__"
 # TRMNL rejects a polling payload over 100KB. This is the line the build
 # refuses to cross, with room to spare.
 MAX_FEED_BYTES = 95_000
-MAX_CELLS = 150
+MAX_CELLS = 140
 
 TITLE_LIMIT = 120
 SUBTITLE_MARKERS = (" : ", " ; ", " -- ", " — ")
@@ -355,7 +355,12 @@ def credit_line(entry):
 # payload
 # ============================================================
 
-def build_payload(entry, key, day, pool_size, checked):
+def build_payload(entry):
+    """
+    One card, as the markup sees it. Deliberately lean: the cell key is
+    already the dict key, and the day and pool size are feed-level, so
+    repeating any of them costs a byte a card for nothing.
+    """
     return {
         "id": entry["id"],
         "title": title_line(entry),
@@ -369,10 +374,6 @@ def build_payload(entry, key, day, pool_size, checked):
         "rights": entry.get("r") or "",
         "source_url": entry.get("u") or "",
         "image": image_url(entry),
-        "cell": key,
-        "pool": pool_size,
-        "day": day.isoformat(),
-        "image_checked": checked,
     }
 
 
@@ -485,7 +486,7 @@ def selftest(entries, day):
         k = cell_key(slug, "all", "all")
         check(f"cell {k}", k in cells)
 
-    payload = build_payload(entries[0], key, day, total, False)
+    payload = build_payload(entries[0])
     check("payload is complete",
           all(payload.get(f) not in (None,) for f in
               ("id", "title", "date", "image", "credit")))
@@ -523,14 +524,15 @@ def main():
     sys.stderr.write(f"{len(entries)} cards, {len(countries)} countries, "
                      f"{len(cells)} cells\n")
 
-    picks, misses = {}, 0
+    picks, misses, probed = {}, 0, 0
     for key in cells:
         subset = cards_for(entries, key)
         entry, checked = pick(subset, key, day, check)
         if entry is None:
             misses += 1
             continue
-        picks[key] = build_payload(entry, key, day, len(subset), checked)
+        probed += 1 if checked else 0
+        picks[key] = build_payload(entry)
 
     default_key = cell_key("all", "all", "all")
     if default_key not in picks:
@@ -560,16 +562,36 @@ def main():
         "picks": picks,
     }
 
-    size = len(json.dumps(feed, indent=1, sort_keys=True).encode("utf-8"))
+    # TRMNL rejects a payload over 100KB outright, and the pool only ever
+    # grows. Rather than fail a morning's run when it crosses the line,
+    # drop the most specific cells until it fits -- the markup already
+    # falls back to a coarser cell, so a reader loses precision, not a
+    # postcard.
+    def measure(payload):
+        return len(json.dumps(payload, indent=1,
+                              sort_keys=True).encode("utf-8"))
+
+    dropped = 0
+    size = measure(feed)
+    while size > MAX_FEED_BYTES and len(feed["picks"]) > 1:
+        worst = max(feed["picks"], key=lambda k: (specificity(k), k))
+        del feed["picks"][worst]
+        feed["cell_keys"] = ",".join(sorted(feed["picks"]))
+        dropped += 1
+        size = measure(feed)
     if size > MAX_FEED_BYTES:
-        raise SystemExit(
-            f"feed is {size} bytes, over the {MAX_FEED_BYTES} limit; "
-            f"raise CELL_MIN or lower MAX_CELLS")
-    sys.stderr.write(f"feed {size} bytes, {len(picks)} picks"
-                     f"{f', {misses} empty cells' if misses else ''}\n")
+        raise SystemExit(f"feed is {size} bytes and cannot be trimmed further")
+
+    sys.stderr.write(
+        f"feed {size} bytes, {len(feed['picks'])} picks"
+        f"{f', {probed} images probed' if probed else ''}"
+        f"{f', {misses} empty cells' if misses else ''}"
+        f"{f', {dropped} cells dropped to fit' if dropped else ''}\n")
 
     single = dict(picks[default_key])
     single["generated"] = generated
+    single["day"] = day.isoformat()
+    single["pool"] = len(entries)
     write_json(DEFAULT_PATH, single)
     write_json(FEED_PATH, feed)
     return 0

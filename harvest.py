@@ -44,8 +44,14 @@ DIMS_PATH = os.path.join(HERE, "dimensions.json")
 UA = ("postcard-of-the-day/1.0 "
       "(+https://github.com/nikokoren/postcard_of_the_day)")
 
-TIMEOUT = 60
-RETRIES = 4
+TIMEOUT = 90
+RETRIES = 5
+
+# A paged crawl of 36,000 records will drop connections; loc.gov in
+# particular truncates a 500KB response often enough to matter. One bad
+# page is not a reason to abandon a source and lose the other 350, so
+# pages are skipped and only a run of them stops the crawl.
+MAX_PAGE_FAILURES = 8   # consecutive
 REQUEST_DELAY = 1.0     # between search pages
 DIMS_WORKERS = 6        # parallel info.json fetches
 DIMS_BUDGET = 20000     # info.json fetches per run
@@ -374,14 +380,21 @@ def dc_crawl(source_key, config, max_pages, stats):
         "f[reuse_allowed_ssi][]": config["reuse"],
         "per_page": 100,
     }
-    entries, page = [], 1
+    entries, page, failures = [], 1, 0
     while page <= max_pages:
         url = DC_SEARCH + "?" + urllib.parse.urlencode(
             {**params, "page": page}, doseq=True)
         data = fetch(url)
         if data is None:
-            sys.stderr.write(f"  page {page} failed, stopping this source\n")
-            break
+            failures += 1
+            sys.stderr.write(f"  page {page} failed ({failures} so far), skipping\n")
+            if failures >= MAX_PAGE_FAILURES:
+                sys.stderr.write("  too many failed pages, stopping this source\n")
+                break
+            page += 1
+            time.sleep(REQUEST_DELAY * 3)
+            continue
+        failures = 0
         rows = data.get("data") or []
         if not rows:
             break
@@ -544,14 +557,21 @@ def loc_crawl(source_key, config, max_pages, stats):
         query = {"fa": config["fa"]}
         collection = config.get("collection", "Library of Congress")
 
-    entries, page = [], 1
+    entries, page, failures = [], 1, 0
     while page <= max_pages:
         url = base + "?" + urllib.parse.urlencode(dict(
             query, fo="json", c=100, sp=page, at="results,pagination"))
         data = fetch(url)
         if data is None:
-            sys.stderr.write(f"  page {page} failed, stopping this source\n")
-            break
+            failures += 1
+            sys.stderr.write(f"  page {page} failed ({failures} so far), skipping\n")
+            if failures >= MAX_PAGE_FAILURES:
+                sys.stderr.write("  too many failed pages, stopping this source\n")
+                break
+            page += 1
+            time.sleep(REQUEST_DELAY * 3)
+            continue
+        failures = 0
         rows = data.get("results") or []
         if not rows:
             break
