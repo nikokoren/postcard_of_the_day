@@ -148,6 +148,21 @@ colour panel can then show the colour, and a monochrome one loses
 nothing: converting the colour file to luminance lands within 1/255 of
 the archive's own greyscale version.
 
+### The size is fixed, and the daily job warms it first
+
+The markup must use `pick.image` as it stands and never compose a size
+from `trmnl.device`. A IIIF server renders each derivative on demand,
+and the *first* request for a given size on a large scan takes 12 to 18
+seconds — measured on an 11016×7176 master: 15.2s to first byte cold,
+0.43s once cached. TRMNL's renderer gives up long before that, and the
+panel comes up blank with the caption still on it.
+
+A device-derived box is a size nothing has warmed, freshly cold every
+time the card changes. So `daily.py` asks for every image it is about to
+publish before it writes the file that points at them — a `HEAD` is
+enough, since the service still has to produce the image to report its
+length — and the markup uses that one warmed URL.
+
 ---
 
 ## Files

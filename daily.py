@@ -36,6 +36,7 @@ import sys
 import time
 import urllib.error
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date, timedelta
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -55,6 +56,19 @@ SALT = "postcard-of-the-day/v1"
 # serves every device.
 X_BOX = (1872, 1404)
 DEFAULT_BOX = X_BOX
+
+# A IIIF server renders a derivative on demand from a master that can be
+# 4,000 pixels across, and the FIRST request for a given size is the one
+# that pays for it -- 12 to 18 seconds on a large scan, against under a
+# second once cached. TRMNL's renderer gives up long before that and the
+# panel comes up blank with the caption still on it.
+#
+# So the daily job asks for every image it is about to publish, before
+# publishing the file that points at it, and the markup uses that exact
+# URL rather than composing a size of its own. A HEAD is enough: the
+# service still has to produce the image to report its length.
+WARM_WORKERS = 6
+WARM_TIMEOUT = 75
 
 MAX_SKIPS = 4
 DEAD_CODES = (403, 404, 410, 451)
@@ -254,6 +268,43 @@ def image_url(entry, box=DEFAULT_BOX, quality="default"):
     if entry.get("k") == "fixed":
         return entry["b"]
     return "{}/full/!{},{}/0/{}.jpg".format(entry["b"], box[0], box[1], quality)
+
+
+def warm(urls):
+    """
+    Pre-render every image the feed points at. Failures are not fatal:
+    an image that would not warm is one the device will wait for, which
+    is the situation this improves on rather than one it guarantees.
+    """
+    urls = sorted(set(urls))
+    if not urls:
+        return 0
+
+    def touch(url):
+        req = urllib.request.Request(url, method="HEAD",
+                                     headers={"User-Agent": UA})
+        try:
+            with urllib.request.urlopen(req, timeout=WARM_TIMEOUT) as resp:
+                return resp.status == 200
+        except Exception:
+            return False
+
+    started = time.monotonic()
+    total, warmed = len(urls), 0
+    # Two passes. A render that ran past the timeout on the first pass
+    # has usually finished by the second, and is then sitting in the
+    # cache waiting to be acknowledged rather than made again.
+    for _ in (1, 2):
+        with ThreadPoolExecutor(max_workers=WARM_WORKERS) as pool:
+            results = list(pool.map(touch, urls))
+        warmed += sum(1 for ok in results if ok)
+        urls = [url for url, ok in zip(urls, results) if not ok]
+        if not urls:
+            break
+    sys.stderr.write("warmed {}/{} images in {:.0f}s{}\n".format(
+        warmed, total, time.monotonic() - started,
+        ", {} still cold".format(len(urls)) if urls else ""))
+    return warmed
 
 
 _checked = {"n": 0}
@@ -537,6 +588,12 @@ def main():
     default_key = cell_key("all", "all", "all")
     if default_key not in picks:
         raise SystemExit("no pick for the full catalogue; refusing to publish")
+
+    # Warm before publishing, so no device is ever the one that triggers
+    # a render. Fixed-derivative sources are static files and skip this.
+    if check:
+        warm(p["image"] for p in picks.values()
+             if "/full/" in p["image"])
 
     generated = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 
