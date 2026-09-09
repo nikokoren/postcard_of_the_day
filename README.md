@@ -44,53 +44,61 @@ nothing to keep alive.
 | axis | values | where it comes from |
 | --- | --- | --- |
 | Orientation | Landscape, Portrait | the scan's own pixel dimensions |
-| Place | seven regions, then whichever countries are deep enough | `subject_hiergeo_geojson_ssm` (Digital Commonwealth), `location_country` (Library of Congress) |
+| Region | seven, listed below | `subject_hiergeo_geojson_ssm` (Digital Commonwealth), `location_country` (Library of Congress) |
 | Era | Before 1900, 1900-1914, 1915-1929, 1930-1945, 1946 onwards | the catalogue date |
 
-### Regions and countries are the same axis
+### Why regions and not countries
 
-A country is offered only if at least **60** cards sit behind it. Below
-that the selector is promising something it cannot keep — a reader who
-picks it would see the same handful come round every couple of months,
-and picking Portrait as well halves that again.
+Countries were tried first and dropped. A random sample of 3,000
+openly-licensed Digital Commonwealth postcards came back **87.7% United
+States**; the Library of Congress half spans 60 countries but is 52%
+American, with France at 9.5% and everything past Italy in low single
+digits. Cross that with two orientations and five eras and most
+countries can no longer fill a year — a selector offering Japan that
+then shows the same eleven cards every other month is worse than one
+offering Asia that always has something.
 
-That rule on its own would leave a thin axis: outside the United States,
-France and Italy the counts fall away fast. So the place list carries
-**seven regions** as well, and they come first:
+So the axis is seven regions:
 
 > North America · Latin America & the Caribbean · Europe · Africa ·
 > Middle East · Asia · Oceania
 
-They are postcard regions, not strict continents. The Middle East is
-split out because "views of the Holy Land" is its own publishing genre
-and nobody looking for it looks under Asia; North Africa stays in
-Africa, because that is where the cards were catalogued.
+Postcard regions, not strict continents. The Middle East is split out
+because views of the Holy Land are their own publishing genre and nobody
+looking for them looks under Asia; North Africa stays in Africa, because
+that is where the cards were catalogued.
 
-Both kinds live in one setting and one cell slot, so as far as the
-markup is concerned "Japan" and "Asia" are the same kind of choice — it
-just resolves one against a card's country and the other against its
-region. Picking a region *and* a country inside it is fine; the
-rotation covers both.
+The country is still on every card and still printed in the caption. It
+is just not something to sort by.
 
 The country-to-region table is applied when `daily.py` loads the pool,
 not when `harvest.py` writes it. Whether Egypt files under Africa or the
 Middle East is a judgement call that will want revisiting, and revisiting
 it should not mean re-crawling 30,000 records.
 
+### Every setting empty means everything
+
+All three settings are multi-selects, and an empty one constrains
+nothing. That is the whole rule, and it is why none of them is a pair of
+on/off switches: two booleans have a state — both off — that has to be
+given a meaning, and any meaning you give it contradicts what the
+switches say. An empty multi-select has no such state to explain, and
+nothing has to be set for the recipe to work.
+
 ### Why the feed ships *cells* rather than selections
 
 Three axes with dozens of values between them is 2ⁿ possible selections,
 and a static file cannot carry one entry per selection. What it can carry
 is one entry per **cell** — a single point like
-`portrait__france__era-1900-1914`, or `portrait__europe__era-1900-1914`. A reader who picks two countries and
+`portrait__europe__era-1900-1914`. A reader who picks two countries and
 two eras is choosing among four cells, and the markup rotates over
 whichever of them the feed actually has, a day at a time.
 
 Cells with fewer than **20** cards behind them are not shipped. Some are
 genuinely empty and always will be, which is why the Liquid loosens one
 axis at a time rather than falling straight through to the whole
-catalogue: asking for portrait cards from Morocco before 1900 should
-still get you a card from Morocco.
+catalogue: asking for portrait cards from Africa before 1900 should
+still get you a card from Africa.
 
 The feed is capped at **95KB**, under TRMNL's 100KB polling limit, and
 `daily.py` refuses to publish a payload over it rather than letting the
@@ -230,7 +238,7 @@ to use at any panel size). The rest is layout.
 | keyname | type | default |
 | --- | --- | --- |
 | `orientation` | multi-select | empty — both |
-| `place` | multi-select | empty — everywhere |
+| `region` | multi-select | empty — everywhere |
 | `era` | multi-select | empty — every era |
 | `show_caption` | true/false | true |
 | `show_place` | true/false | true |

@@ -2,10 +2,8 @@
   Selection logic only -- no layout, no styling. Drop this at the top of
   your markup and everything below it can use `pick` and `card_image`.
 
-  It resolves three settings -- Orientation, Place, Era -- against
-  today.json. Place holds regions and countries in one list; they behave
-  identically here, and the feed's keys_by_label maps either to the key
-  that goes in the middle slot of a cell:
+  It resolves three settings -- Orientation, Region, Era -- against
+  today.json:
 
     several chosen  -> a card matching one value from each axis the
                        reader set, rotating a day at a time over the
@@ -38,9 +36,17 @@
 {% if chosen_orientation == nil %}{% assign chosen_orientation = "" | split: "," %}{% endif %}
 {% if chosen_orientation.first == nil %}{% assign chosen_orientation = chosen_orientation | split: "," %}{% endif %}
 
-{% assign chosen_place = settings.place %}
-{% if chosen_place == nil %}{% assign chosen_place = "" | split: "," %}{% endif %}
-{% if chosen_place.first == nil %}{% assign chosen_place = chosen_place | split: "," %}{% endif %}
+{% comment %}
+  Every one of the three is a multi-select, and every one means "all of
+  them" when it is empty. That is the whole rule, and it is the reason
+  none of them is a pair of on/off switches: two booleans have a state
+  -- both off -- that has to mean something, and whatever it is made to
+  mean contradicts what the switches say. An empty multi-select has no
+  such state to explain.
+{% endcomment %}
+{% assign chosen_region = settings.region %}
+{% if chosen_region == nil %}{% assign chosen_region = "" | split: "," %}{% endif %}
+{% if chosen_region.first == nil %}{% assign chosen_region = chosen_region | split: "," %}{% endif %}
 
 {% assign chosen_era = settings.era %}
 {% if chosen_era == nil %}{% assign chosen_era = "" | split: "," %}{% endif %}
@@ -79,13 +85,13 @@
 {% endfor %}
 {% if o_keys == "" %}{% assign o_keys = "all," %}{% endif %}
 
-{% assign p_keys = "" %}
-{% for label in chosen_place %}
+{% assign r_keys = "" %}
+{% for label in chosen_region %}
   {% assign lbl = label | strip %}
   {% assign k = keys_by_label[lbl] %}
-  {% if k %}{% assign p_keys = p_keys | append: k | append: "," %}{% endif %}
+  {% if k %}{% assign r_keys = r_keys | append: k | append: "," %}{% endif %}
 {% endfor %}
-{% if p_keys == "" %}{% assign p_keys = "all," %}{% endif %}
+{% if r_keys == "" %}{% assign r_keys = "all," %}{% endif %}
 
 {% assign e_keys = "" %}
 {% for label in chosen_era %}
@@ -96,13 +102,13 @@
 {% if e_keys == "" %}{% assign e_keys = "all," %}{% endif %}
 
 {% assign o_list = o_keys | split: "," %}
-{% assign p_list = p_keys | split: "," %}
+{% assign r_list = r_keys | split: "," %}
 {% assign e_list = e_keys | split: "," %}
 
 {% comment %} Every combination the reader asked for that the feed actually carries. {% endcomment %}
 {% assign wanted = "" %}
 {% for o in o_list %}{% if o != "" %}
-  {% for c in p_list %}{% if c != "" %}
+  {% for c in r_list %}{% if c != "" %}
     {% for e in e_list %}{% if e != "" %}
       {% capture cell %}{{ o }}{{ SEP }}{{ c }}{{ SEP }}{{ e }}{% endcapture %}
       {% if cell_keys contains cell %}
@@ -114,10 +120,9 @@
 
 {% comment %}
   Nothing matched, so loosen one axis at a time rather than dropping
-  straight to the whole catalogue. Someone asking for portrait cards
-  from Morocco before 1900 has asked for something thin on the ground,
-  and should still get a card from Morocco -- or, failing that, one
-  from wherever else they asked for.
+  straight to the whole catalogue. Someone asking for
+  portrait cards from Africa before 1900 has asked for something thin on
+  the ground, and should still get a card from Africa.
 {% endcomment %}
 {% assign n = 0 %}
 {% assign wanted_list = wanted | split: "," %}
@@ -125,7 +130,7 @@
 
 {% if n == 0 %}
   {% for o in o_list %}{% if o != "" %}
-    {% for c in p_list %}{% if c != "" %}
+    {% for c in r_list %}{% if c != "" %}
       {% capture cell %}{{ o }}{{ SEP }}{{ c }}{{ SEP }}all{% endcapture %}
       {% if cell_keys contains cell %}{% assign wanted = wanted | append: cell | append: "," %}{% endif %}
     {% endif %}{% endfor %}
@@ -135,7 +140,7 @@
 {% endif %}
 
 {% if n == 0 %}
-  {% for c in p_list %}{% if c != "" %}
+  {% for c in r_list %}{% if c != "" %}
     {% capture cell %}all{{ SEP }}{{ c }}{{ SEP }}all{% endcapture %}
     {% if cell_keys contains cell %}{% assign wanted = wanted | append: cell | append: "," %}{% endif %}
   {% endif %}{% endfor %}

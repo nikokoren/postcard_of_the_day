@@ -106,19 +106,15 @@ ORIENTATIONS = [
 from harvest import REGIONS, region_for  # noqa: E402
 REGION_SLUGS = {slug for slug, _ in REGIONS}
 
-# A country is offered only if it can fill a year of Tuesdays on its
-# own. Below this the selector is promising something it cannot deliver
-# -- a reader who picks it sees the same handful come round every couple
-# of months, and picking portrait as well halves that again.
-COUNTRY_MIN = 60
-
-# Which is why the place axis carries regions as well. Outside the
-# United States, France and Italy the country counts fall away fast, and
-# faster once orientation and era cut across them; a region is always
-# deep enough. Both live in the same setting and the same cell slot, so
-# "Japan" and "Asia" are the same kind of choice as far as the markup is
-# concerned -- it just resolves one against a card's country and the
-# other against its region.
+# The place axis is regions only. Countries were tried and dropped:
+# outside the United States, France and Italy the counts fall away fast,
+# and crossing them with two orientations and five eras leaves most
+# countries unable to fill a year. A selector that offers Japan and then
+# shows the same eleven cards every other month is worse than one that
+# offers Asia and always has something.
+#
+# The country is still on every card, and still printed in the caption
+# -- it is just not something to sort by.
 REGION_MIN = 25
 
 # A cell is one point in orientation x country x era, with "all"
@@ -151,18 +147,13 @@ def in_era(entry, era):
 
 
 def cards_for(entries, key):
-    """
-    The subset of the pool one cell selects. The middle slot holds
-    either a country slug or a region slug; they cannot collide, because
-    a region slug is only ever one of the seven in REGION_SLUGS.
-    """
-    orientation, place, era = key.split(CELL_SEP)
+    """The subset of the pool one cell selects."""
+    orientation, region, era = key.split(CELL_SEP)
     out = entries
     if orientation != "all":
         out = [e for e in out if e.get("o") == orientation]
-    if place != "all":
-        field = "rg" if place in REGION_SLUGS else "c"
-        out = [e for e in out if e.get(field) == place]
+    if region != "all":
+        out = [e for e in out if e.get("rg") == region]
     if era != "all":
         out = [e for e in out if in_era(e, era)]
     return out
@@ -196,37 +187,31 @@ def countries_in(entries):
     return _tally(entries, "c", "cn", COUNTRY_MIN)
 
 
-def places_in(entries):
-    """
-    The place axis, regions first. Order matters: this is the order the
-    options appear in the settings panel, and a reader scanning it
-    should meet the seven broad choices before ninety narrow ones.
-    """
-    return regions_in(entries) + countries_in(entries)
 
 
-def build_cells(entries, places):
+
+def build_cells(entries, regions):
     """
     Every cell with enough cards behind it, coarsest first. Coarse cells
     are what the markup falls back to when a reader's exact combination
     is empty, so if the budget bites it bites the specific ones.
     """
-    country_slugs = ["all"] + [slug for slug, _, _ in places]
+    region_slugs = ["all"] + [slug for slug, _, _ in regions]
     era_slugs = ["all"] + [slug for slug, _, _, _ in ERAS]
     orientations = ["all"] + [slug for slug, _ in ORIENTATIONS]
 
     keys = []
     for orientation in orientations:
-        for country in country_slugs:
+        for region in region_slugs:
             for era in era_slugs:
-                key = cell_key(orientation, country, era)
+                key = cell_key(orientation, region, era)
                 if len(cards_for(entries, key)) >= CELL_MIN:
                     keys.append(key)
     keys.sort(key=lambda k: (specificity(k), k))
     return keys[:MAX_CELLS]
 
 
-def label_aliases(orientations, countries, eras):
+def label_aliases(orientations, regions, eras):
     """
     Every spelling a setting might arrive as, mapped to the key this
     feed uses.
@@ -253,7 +238,7 @@ def label_aliases(orientations, countries, eras):
 
     for key, label in orientations:
         add(key, label)
-    for key, label, _ in countries:
+    for key, label, _ in regions:
         add(key, label)
     for key, label, _, _ in eras:
         add(key, label)
@@ -576,10 +561,9 @@ def selftest(entries, day):
     check("enough regions to be worth a selector", len(regions) >= 3,
           f"{len(regions)}")
 
-    places = places_in(entries)
-    check("every offered place resolves to cards",
+    check("every offered region resolves to cards",
           all(cards_for(entries, cell_key("all", slug, "all"))
-              for slug, _, _ in places), "an empty place got offered")
+              for slug, _, _ in regions), "an empty region got offered")
 
     # The point of regions: a region should survive being crossed with
     # an orientation, which is where most countries stop being viable.
@@ -589,7 +573,7 @@ def selftest(entries, day):
     check("regions survive an orientation filter", len(deep) >= 2,
           f"{len(deep)} of {len(regions)}")
 
-    cells = build_cells(entries, places)
+    cells = build_cells(entries, regions)
     check("every cell has cards",
           all(cards_for(entries, k) for k in cells), "an empty cell got through")
     check("the catch-all cell exists", key in cells)
@@ -634,7 +618,7 @@ def main():
     regions = regions_in(entries)
     countries = countries_in(entries)
     places = places_in(entries)
-    cells = build_cells(entries, places)
+    cells = build_cells(entries, regions)
     sys.stderr.write(f"{len(entries)} cards, {len(regions)} regions, "
                      f"{len(countries)} countries, {len(cells)} cells\n")
 
@@ -674,12 +658,10 @@ def main():
         "default": default_key,
         "cell_separator": CELL_SEP,
         "cell_keys": ",".join(sorted(picks)),
-        "keys_by_label": label_aliases(ORIENTATIONS, places, ERAS),
+        "keys_by_label": label_aliases(ORIENTATIONS, regions, ERAS),
         "orientation_options": [{"key": s, "label": l} for s, l in ORIENTATIONS],
-        # One list, regions first, each marked so markup can group them.
-        "place_options": [{"key": s, "label": l, "count": n,
-                           "kind": "region" if s in REGION_SLUGS else "country"}
-                          for s, l, n in places],
+        "region_options": [{"key": s, "label": l, "count": n}
+                           for s, l, n in regions],
         "era_options": [{"key": s, "label": l} for s, l, _, _ in ERAS],
         "picks": picks,
     }

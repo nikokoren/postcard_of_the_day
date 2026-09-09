@@ -24,16 +24,14 @@ except Exception as e:
 print("parse ok")
 
 picks = {
-  "all__all__all":        {"title":"Everything","image":"IMG-all","place":"","date":"1907"},
-  "landscape__all__all":  {"title":"Landscape","image":"IMG-l","place":"","date":"1907"},
-  "portrait__all__all":   {"title":"Portrait","image":"IMG-p","place":"","date":"1907"},
-  "all__france__all":     {"title":"France","image":"IMG-fr","place":"","date":"1907"},
-  "all__greece__all":     {"title":"Greece","image":"IMG-gr","place":"","date":"1907"},
-  "all__europe__all":     {"title":"Europe","image":"IMG-eu","place":"","date":"1907"},
-  "portrait__europe__all":{"title":"Europe portrait","image":"IMG-eup","place":"","date":"1907"},
-  "all__all__era-1900-1914": {"title":"1900-1914","image":"IMG-e1","place":"","date":"1907"},
-  "landscape__france__era-1900-1914": {"title":"FR landscape 1900s","image":"IMG-x","place":"","date":"1907"},
-  "portrait__greece__all": {"title":"GR portrait","image":"IMG-y","place":"","date":"1907"},
+  "all__all__all":              {"title":"Everything","image":"IMG-all","place":"","date":"1907"},
+  "landscape__all__all":        {"title":"Landscape","image":"IMG-l","place":"","date":"1907"},
+  "portrait__all__all":         {"title":"Portrait","image":"IMG-p","place":"","date":"1907"},
+  "all__europe__all":           {"title":"Europe","image":"IMG-eu","place":"","date":"1907"},
+  "all__africa__all":           {"title":"Africa","image":"IMG-af","place":"","date":"1907"},
+  "portrait__europe__all":      {"title":"Europe portrait","image":"IMG-eup","place":"","date":"1907"},
+  "all__all__era-1900-1914":    {"title":"1900-1914","image":"IMG-e1","place":"","date":"1907"},
+  "landscape__europe__era-1900-1914": {"title":"EU landscape 1900s","image":"IMG-x","place":"","date":"1907"},
 }
 feed = {
   "default":"all__all__all",
@@ -42,8 +40,7 @@ feed = {
   "keys_by_label": {
      "landscape":"landscape","Landscape":"landscape",
      "portrait":"portrait","Portrait":"portrait",
-     "france":"france","France":"france",
-     "greece":"greece","Greece":"greece",
+     "africa":"africa","Africa":"africa",
      "1900_-_1914":"era-1900-1914","1900 - 1914":"era-1900-1914",
      "before_1900":"era-pre-1900",
      "europe":"europe","Europe":"europe",
@@ -54,17 +51,17 @@ feed = {
 CASES = [
   ("nothing selected", {}),
   ("orientation only", {"orientation":["landscape"]}),
-  ("place: two countries", {"place":["france","greece"]}),
+  ("two regions", {"region":["europe","africa"]}),
   ("era only", {"era":["1900_-_1914"]}),
-  ("all three, exists", {"orientation":["landscape"],"place":["france"],"era":["1900_-_1914"]}),
-  ("all three, missing -> loosen", {"orientation":["portrait"],"place":["greece"],"era":["before_1900"]}),
+  ("all three, exists", {"orientation":["landscape"],"region":["europe"],"era":["1900_-_1914"]}),
+  ("all three, missing -> loosen", {"orientation":["portrait"],"region":["africa"],"era":["before_1900"]}),
   ("string not array", {"orientation":"portrait"}),
-  ("unknown value", {"place":["atlantis"]}),
+  ("unknown value", {"region":["atlantis"]}),
   ("caption off", {"show_caption":"false"}),
   ("credit on", {"show_credit":"true"}),
-  ("region", {"place":["europe"]}),
-  ("region + country together", {"place":["europe","france"]}),
-  ("region + orientation", {"place":["europe"],"orientation":["portrait"]}),
+  ("one region", {"region":["europe"]}),
+  ("both orientations", {"orientation":["landscape","portrait"]}),
+  ("region + orientation", {"region":["europe"],"orientation":["portrait"]}),
 ]
 probe = src + "\n<<{{ chosen_key }}|{{ pick.title }}|{{ card_image }}|c{{ want_caption }}|p{{ want_place }}|r{{ want_credit }}>>"
 t2 = env.from_string(probe)
