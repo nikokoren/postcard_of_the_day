@@ -9,8 +9,10 @@
   Selection logic only -- no layout, no styling. Drop this at the top of
   your markup and everything below it can use `pick` and `card_image`.
 
-  It resolves three settings -- Orientation, Country, Era -- against
-  today.json:
+  It resolves three settings -- Orientation, Place, Era -- against
+  today.json. Place holds regions and countries in one list; they behave
+  identically here, and the feed's keys_by_label maps either to the key
+  that goes in the middle slot of a cell:
 
     several chosen  -> a card matching one value from each axis the
                        reader set, rotating a day at a time over the
@@ -43,9 +45,9 @@
 {% if chosen_orientation == nil %}{% assign chosen_orientation = "" | split: "," %}{% endif %}
 {% if chosen_orientation.first == nil %}{% assign chosen_orientation = chosen_orientation | split: "," %}{% endif %}
 
-{% assign chosen_country = settings.country %}
-{% if chosen_country == nil %}{% assign chosen_country = "" | split: "," %}{% endif %}
-{% if chosen_country.first == nil %}{% assign chosen_country = chosen_country | split: "," %}{% endif %}
+{% assign chosen_place = settings.place %}
+{% if chosen_place == nil %}{% assign chosen_place = "" | split: "," %}{% endif %}
+{% if chosen_place.first == nil %}{% assign chosen_place = chosen_place | split: "," %}{% endif %}
 
 {% assign chosen_era = settings.era %}
 {% if chosen_era == nil %}{% assign chosen_era = "" | split: "," %}{% endif %}
@@ -84,13 +86,13 @@
 {% endfor %}
 {% if o_keys == "" %}{% assign o_keys = "all," %}{% endif %}
 
-{% assign c_keys = "" %}
-{% for label in chosen_country %}
+{% assign p_keys = "" %}
+{% for label in chosen_place %}
   {% assign lbl = label | strip %}
   {% assign k = keys_by_label[lbl] %}
-  {% if k %}{% assign c_keys = c_keys | append: k | append: "," %}{% endif %}
+  {% if k %}{% assign p_keys = p_keys | append: k | append: "," %}{% endif %}
 {% endfor %}
-{% if c_keys == "" %}{% assign c_keys = "all," %}{% endif %}
+{% if p_keys == "" %}{% assign p_keys = "all," %}{% endif %}
 
 {% assign e_keys = "" %}
 {% for label in chosen_era %}
@@ -101,13 +103,13 @@
 {% if e_keys == "" %}{% assign e_keys = "all," %}{% endif %}
 
 {% assign o_list = o_keys | split: "," %}
-{% assign c_list = c_keys | split: "," %}
+{% assign p_list = p_keys | split: "," %}
 {% assign e_list = e_keys | split: "," %}
 
 {% comment %} Every combination the reader asked for that the feed actually carries. {% endcomment %}
 {% assign wanted = "" %}
 {% for o in o_list %}{% if o != "" %}
-  {% for c in c_list %}{% if c != "" %}
+  {% for c in p_list %}{% if c != "" %}
     {% for e in e_list %}{% if e != "" %}
       {% capture cell %}{{ o }}{{ SEP }}{{ c }}{{ SEP }}{{ e }}{% endcapture %}
       {% if cell_keys contains cell %}
@@ -121,7 +123,8 @@
   Nothing matched, so loosen one axis at a time rather than dropping
   straight to the whole catalogue. Someone asking for portrait cards
   from Morocco before 1900 has asked for something thin on the ground,
-  and should still get a card from Morocco.
+  and should still get a card from Morocco -- or, failing that, one
+  from wherever else they asked for.
 {% endcomment %}
 {% assign n = 0 %}
 {% assign wanted_list = wanted | split: "," %}
@@ -129,7 +132,7 @@
 
 {% if n == 0 %}
   {% for o in o_list %}{% if o != "" %}
-    {% for c in c_list %}{% if c != "" %}
+    {% for c in p_list %}{% if c != "" %}
       {% capture cell %}{{ o }}{{ SEP }}{{ c }}{{ SEP }}all{% endcapture %}
       {% if cell_keys contains cell %}{% assign wanted = wanted | append: cell | append: "," %}{% endif %}
     {% endif %}{% endfor %}
@@ -139,7 +142,7 @@
 {% endif %}
 
 {% if n == 0 %}
-  {% for c in c_list %}{% if c != "" %}
+  {% for c in p_list %}{% if c != "" %}
     {% capture cell %}all{{ SEP }}{{ c }}{{ SEP }}all{% endcapture %}
     {% if cell_keys contains cell %}{% assign wanted = wanted | append: cell | append: "," %}{% endif %}
   {% endif %}{% endfor %}
@@ -199,7 +202,6 @@
     want_place      whether that block includes the place line
     want_credit     whether to print the credit
 {% endcomment %}
-
 {% comment %} ---------- layout ---------- {% endcomment %}
 
 <div class="layout">

@@ -8,9 +8,13 @@ the monthly job regenerates the settings file, and the only manual step
 is pasting it back into the plugin's Markup editor when the list has
 changed enough to matter.
 
-Only countries with enough cards to fill a year on their own are
-offered -- see COUNTRY_MIN in daily.py. Offering a country with eleven
-postcards behind it is promising something the recipe cannot keep.
+The list is regions first, then countries. Only countries with enough
+cards to fill a year on their own are offered -- see COUNTRY_MIN in
+daily.py -- because offering a country with eleven postcards behind it
+is promising something the recipe cannot keep. Regions are what make
+the axis usable anyway: outside the United States, France and Italy the
+country counts fall away fast, and faster once orientation and era cut
+across them.
 """
 
 import json
@@ -18,7 +22,8 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from daily import ERAS, ORIENTATIONS, countries_in, load_pool  # noqa: E402
+from daily import (ERAS, ORIENTATIONS, REGION_SLUGS,  # noqa: E402
+                   countries_in, load_pool, places_in, regions_in)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "trmnl", "settings.yml")
@@ -87,8 +92,9 @@ author_bio: >-
   posted. Every morning the recipe picks one from about {pool:,} of them,
   drawn from the Library of Congress and Digital Commonwealth, and shows
   it with whatever the catalogue knows: what it shows, where, who
-  printed it and when. Sort by orientation, country or era, or leave the
-  settings alone and take the whole catalogue as it comes. Nothing
+  printed it and when. Sort by orientation, place or era -- a whole
+  region or one country -- or leave the settings alone and take the
+  catalogue as it comes. Nothing
   repeats until every card has had its day. Public domain and openly
   licensed material only.
 """
@@ -96,17 +102,23 @@ author_bio: >-
 
 def main():
     entries = load_pool()
+    regions = regions_in(entries)
     countries = countries_in(entries)
+    places = places_in(entries)
 
     body = [HEADER.format(url=POLLING_URL), FIELD_HEAD]
     body.append(option_block(
         "Orientation", "orientation",
         "Leave empty for both.",
         [label for _, label in ORIENTATIONS]))
+    # A TRMNL select has no group headings, so the two kinds are told
+    # apart by order and by a marker: regions come first, and a country
+    # is indented under nothing in particular but reads as narrower.
     body.append(option_block(
-        "Country", "country",
-        "Where the card is from. Leave empty for everywhere.",
-        ["{}".format(label) for _, label, _ in countries]))
+        "Place", "place",
+        "Regions first, then individual countries. "
+        "Leave empty for everywhere.",
+        [label for _, label, _ in places]))
     body.append(option_block(
         "Era", "era",
         "When it was printed. Leave empty for every era.",
@@ -124,8 +136,8 @@ def main():
 
     with open(OUT, "w") as fh:
         fh.write("".join(body))
-    sys.stderr.write("{}: {} countries, {} eras\n".format(
-        os.path.relpath(OUT, HERE), len(countries), len(ERAS)))
+    sys.stderr.write("{}: {} regions, {} countries, {} eras\n".format(
+        os.path.relpath(OUT, HERE), len(regions), len(countries), len(ERAS)))
     return 0
 
 

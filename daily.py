@@ -101,9 +101,25 @@ ORIENTATIONS = [
     ("portrait",  "Portrait"),
 ]
 
+# Defined in harvest.py, where the country-to-region table lives, and
+# imported rather than restated so the two cannot drift apart.
+from harvest import REGIONS, region_for  # noqa: E402
+REGION_SLUGS = {slug for slug, _ in REGIONS}
+
 # A country is offered only if it can fill a year of Tuesdays on its
-# own. Below this the selector is promising something it cannot deliver.
+# own. Below this the selector is promising something it cannot deliver
+# -- a reader who picks it sees the same handful come round every couple
+# of months, and picking portrait as well halves that again.
 COUNTRY_MIN = 60
+
+# Which is why the place axis carries regions as well. Outside the
+# United States, France and Italy the country counts fall away fast, and
+# faster once orientation and era cut across them; a region is always
+# deep enough. Both live in the same setting and the same cell slot, so
+# "Japan" and "Asia" are the same kind of choice as far as the markup is
+# concerned -- it just resolves one against a card's country and the
+# other against its region.
+REGION_MIN = 25
 
 # A cell is one point in orientation x country x era, with "all"
 # allowed in any slot -- "a portrait card from France, before 1900".
@@ -135,13 +151,18 @@ def in_era(entry, era):
 
 
 def cards_for(entries, key):
-    """The subset of the pool one cell selects."""
-    orientation, country, era = key.split(CELL_SEP)
+    """
+    The subset of the pool one cell selects. The middle slot holds
+    either a country slug or a region slug; they cannot collide, because
+    a region slug is only ever one of the seven in REGION_SLUGS.
+    """
+    orientation, place, era = key.split(CELL_SEP)
     out = entries
     if orientation != "all":
         out = [e for e in out if e.get("o") == orientation]
-    if country != "all":
-        out = [e for e in out if e.get("c") == country]
+    if place != "all":
+        field = "rg" if place in REGION_SLUGS else "c"
+        out = [e for e in out if e.get(field) == place]
     if era != "all":
         out = [e for e in out if in_era(e, era)]
     return out
@@ -151,28 +172,46 @@ def specificity(key):
     return sum(1 for part in key.split(CELL_SEP) if part != "all")
 
 
-def countries_in(entries):
-    """(slug, label, count) for every country big enough to offer."""
+def _tally(entries, slug_field, label_field, minimum):
     counts = collections.Counter()
     labels = {}
     for entry in entries:
-        slug = entry.get("c")
+        slug = entry.get(slug_field)
         if not slug:
             continue
         counts[slug] += 1
-        labels[slug] = entry.get("cn") or slug
+        labels[slug] = entry.get(label_field) or slug
     return sorted(((slug, labels[slug], n) for slug, n in counts.items()
-                   if n >= COUNTRY_MIN),
+                   if n >= minimum),
                   key=lambda row: (-row[2], row[1]))
 
 
-def build_cells(entries, countries):
+def regions_in(entries):
+    """(slug, label, count) for every region big enough to offer."""
+    return _tally(entries, "rg", "rgn", REGION_MIN)
+
+
+def countries_in(entries):
+    """(slug, label, count) for every country big enough to offer."""
+    return _tally(entries, "c", "cn", COUNTRY_MIN)
+
+
+def places_in(entries):
+    """
+    The place axis, regions first. Order matters: this is the order the
+    options appear in the settings panel, and a reader scanning it
+    should meet the seven broad choices before ninety narrow ones.
+    """
+    return regions_in(entries) + countries_in(entries)
+
+
+def build_cells(entries, places):
     """
     Every cell with enough cards behind it, coarsest first. Coarse cells
     are what the markup falls back to when a reader's exact combination
     is empty, so if the budget bites it bites the specific ones.
     """
-    country_slugs = ["all"] + [slug for slug, _, _ in countries]
+    country_slugs = ["all"] + [slug for slug, _, _ in places]
     era_slugs = ["all"] + [slug for slug, _, _, _ in ERAS]
     orientations = ["all"] + [slug for slug, _ in ORIENTATIONS]
 
@@ -482,6 +521,15 @@ def load_pool():
     entries = [e for e in data.get("entries") or [] if e.get("o") and e.get("b")]
     if not entries:
         raise SystemExit("pool.json has no usable entries")
+    # Place each card in a region here rather than at harvest time. The
+    # country-to-region table is a judgement call that will want
+    # correcting -- whether Egypt files under Africa or the Middle East,
+    # what to do with Hawaii -- and correcting it should not mean
+    # re-crawling 30,000 records.
+    for entry in entries:
+        slug, label = region_for(entry.get("cn"), entry.get("ct"))
+        if slug:
+            entry["rg"], entry["rgn"] = slug, label
     return entries
 
 
@@ -524,11 +572,24 @@ def selftest(entries, day):
                            cycle_start + timedelta(days=total))[0]["id"]
     check("the next cycle reshuffles", later != seen[0], later)
 
-    countries = countries_in(entries)
-    check("enough countries to be worth a selector", len(countries) >= 8,
-          f"{len(countries)}")
+    regions = regions_in(entries)
+    check("enough regions to be worth a selector", len(regions) >= 3,
+          f"{len(regions)}")
 
-    cells = build_cells(entries, countries)
+    places = places_in(entries)
+    check("every offered place resolves to cards",
+          all(cards_for(entries, cell_key("all", slug, "all"))
+              for slug, _, _ in places), "an empty place got offered")
+
+    # The point of regions: a region should survive being crossed with
+    # an orientation, which is where most countries stop being viable.
+    deep = [slug for slug, _, _ in regions
+            if all(len(cards_for(entries, cell_key(o, slug, "all"))) >= CELL_MIN
+                   for o, _ in ORIENTATIONS)]
+    check("regions survive an orientation filter", len(deep) >= 2,
+          f"{len(deep)} of {len(regions)}")
+
+    cells = build_cells(entries, places)
     check("every cell has cards",
           all(cards_for(entries, k) for k in cells), "an empty cell got through")
     check("the catch-all cell exists", key in cells)
@@ -570,10 +631,12 @@ def main():
         return selftest(entries, day)
 
     check = not args.no_check
+    regions = regions_in(entries)
     countries = countries_in(entries)
-    cells = build_cells(entries, countries)
-    sys.stderr.write(f"{len(entries)} cards, {len(countries)} countries, "
-                     f"{len(cells)} cells\n")
+    places = places_in(entries)
+    cells = build_cells(entries, places)
+    sys.stderr.write(f"{len(entries)} cards, {len(regions)} regions, "
+                     f"{len(countries)} countries, {len(cells)} cells\n")
 
     picks, misses, probed = {}, 0, 0
     for key in cells:
@@ -611,10 +674,12 @@ def main():
         "default": default_key,
         "cell_separator": CELL_SEP,
         "cell_keys": ",".join(sorted(picks)),
-        "keys_by_label": label_aliases(ORIENTATIONS, countries, ERAS),
+        "keys_by_label": label_aliases(ORIENTATIONS, places, ERAS),
         "orientation_options": [{"key": s, "label": l} for s, l in ORIENTATIONS],
-        "country_options": [{"key": s, "label": l, "count": n}
-                            for s, l, n in countries],
+        # One list, regions first, each marked so markup can group them.
+        "place_options": [{"key": s, "label": l, "count": n,
+                           "kind": "region" if s in REGION_SLUGS else "country"}
+                          for s, l, n in places],
         "era_options": [{"key": s, "label": l} for s, l, _, _ in ERAS],
         "picks": picks,
     }

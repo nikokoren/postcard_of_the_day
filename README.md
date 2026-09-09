@@ -44,20 +44,45 @@ nothing to keep alive.
 | axis | values | where it comes from |
 | --- | --- | --- |
 | Orientation | Landscape, Portrait | the scan's own pixel dimensions |
-| Country | whatever the archives hold, with enough cards to be worth offering | `subject_hiergeo_geojson_ssm` (Digital Commonwealth), `location_country` (Library of Congress) |
+| Place | seven regions, then whichever countries are deep enough | `subject_hiergeo_geojson_ssm` (Digital Commonwealth), `location_country` (Library of Congress) |
 | Era | Before 1900, 1900-1914, 1915-1929, 1930-1945, 1946 onwards | the catalogue date |
+
+### Regions and countries are the same axis
 
 A country is offered only if at least **60** cards sit behind it. Below
 that the selector is promising something it cannot keep — a reader who
-picks it would see the same handful of cards come round every two
-months.
+picks it would see the same handful come round every couple of months,
+and picking Portrait as well halves that again.
+
+That rule on its own would leave a thin axis: outside the United States,
+France and Italy the counts fall away fast. So the place list carries
+**seven regions** as well, and they come first:
+
+> North America · Latin America & the Caribbean · Europe · Africa ·
+> Middle East · Asia · Oceania
+
+They are postcard regions, not strict continents. The Middle East is
+split out because "views of the Holy Land" is its own publishing genre
+and nobody looking for it looks under Asia; North Africa stays in
+Africa, because that is where the cards were catalogued.
+
+Both kinds live in one setting and one cell slot, so as far as the
+markup is concerned "Japan" and "Asia" are the same kind of choice — it
+just resolves one against a card's country and the other against its
+region. Picking a region *and* a country inside it is fine; the
+rotation covers both.
+
+The country-to-region table is applied when `daily.py` loads the pool,
+not when `harvest.py` writes it. Whether Egypt files under Africa or the
+Middle East is a judgement call that will want revisiting, and revisiting
+it should not mean re-crawling 30,000 records.
 
 ### Why the feed ships *cells* rather than selections
 
 Three axes with dozens of values between them is 2ⁿ possible selections,
 and a static file cannot carry one entry per selection. What it can carry
 is one entry per **cell** — a single point like
-`portrait__france__era-1900-1914`. A reader who picks two countries and
+`portrait__france__era-1900-1914`, or `portrait__europe__era-1900-1914`. A reader who picks two countries and
 two eras is choosing among four cells, and the markup rotates over
 whichever of them the feed actually has, a day at a time.
 
@@ -205,7 +230,7 @@ to use at any panel size). The rest is layout.
 | keyname | type | default |
 | --- | --- | --- |
 | `orientation` | multi-select | empty — both |
-| `country` | multi-select | empty — everywhere |
+| `place` | multi-select | empty — everywhere |
 | `era` | multi-select | empty — every era |
 | `show_caption` | true/false | true |
 | `show_place` | true/false | true |
@@ -219,7 +244,7 @@ worth knowing before you edit the Liquid:
   Compare against `"true"`, and give every field a sensible default for
   when it arrives as nothing at all.
 - **A select sends back a value derived from the label, not the label.**
-  "United States" comes back as `united_states`. The exact derivation is
+  "Latin America & the Caribbean" comes back as something like `latin_america_the_caribbean`. The exact derivation is
   not documented, so the feed ships a `keys_by_label` map carrying every
   spelling each option might arrive as. A lookup that missed would
   silently fall back to the whole catalogue — which looks exactly like
@@ -234,7 +259,7 @@ python3 harvest.py --pages 3 --no-measure   # a quick crawl, no Pillow needed
 python3 daily.py --selftest                 # prove the schedule behaves
 python3 daily.py --date 2027-01-01          # any day
 python3 harvest.py --report                 # what is in the pool
-python3 preview.py --cell landscape__france__all --days 24
+python3 preview.py --cell landscape__europe__all --days 24
 ```
 
 `harvest.py` needs Pillow only for the quality pass; `--no-measure`

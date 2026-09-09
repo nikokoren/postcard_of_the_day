@@ -241,6 +241,122 @@ COUNTRY_ALIASES = {
 COUNTRY_SMALL_WORDS = {"of", "the", "and", "de", "du", "da", "di"}
 
 
+# Where a card is from, one level up. Countries are the axis a reader
+# reaches for first, but most of them are thin -- outside the United
+# States, France and Italy the counts fall away fast, and thinner still
+# once orientation and era cut across them. A region is always deep
+# enough to fill a year, so the selector offers both and the markup
+# falls back from one to the other.
+#
+# These are postcard regions, not strict continents. The Middle East is
+# split out because "views of the Holy Land" is its own publishing genre
+# and a reader looking for it will not look under Asia; North Africa
+# stays in Africa because that is where the cards were catalogued.
+REGIONS = [
+    ("north-america",  "North America"),
+    ("latin-america",  "Latin America & the Caribbean"),
+    ("europe",         "Europe"),
+    ("africa",         "Africa"),
+    ("middle-east",    "Middle East"),
+    ("asia",           "Asia"),
+    ("oceania",        "Oceania"),
+]
+
+COUNTRY_REGION = {}
+
+
+def _region(slug, countries):
+    for country in countries:
+        COUNTRY_REGION[country.lower()] = slug
+
+
+_region("north-america", [
+    "United States", "Canada", "Greenland", "Bermuda", "Saint Pierre and Miquelon",
+])
+_region("latin-america", [
+    "Mexico", "Guatemala", "Belize", "Honduras", "El Salvador", "Nicaragua",
+    "Costa Rica", "Panama", "Cuba", "Jamaica", "Haiti", "Dominican Republic",
+    "Puerto Rico", "Bahamas", "Barbados", "Trinidad and Tobago", "Aruba",
+    "Curacao", "Martinique", "Guadeloupe", "Saint Lucia", "Grenada",
+    "Antigua and Barbuda", "Dominica", "Saint Kitts and Nevis", "Virgin Islands",
+    "Colombia", "Venezuela", "Ecuador", "Peru", "Bolivia", "Chile", "Argentina",
+    "Uruguay", "Paraguay", "Brazil", "Guyana", "Suriname", "French Guiana",
+    "British West Indies",
+])
+_region("europe", [
+    "United Kingdom", "Ireland", "France", "Germany", "Italy", "Spain",
+    "Portugal", "Netherlands", "Belgium", "Luxembourg", "Switzerland",
+    "Austria", "Denmark", "Norway", "Sweden", "Finland", "Iceland",
+    "Poland", "Czech Republic", "Slovakia", "Hungary", "Romania", "Bulgaria",
+    "Greece", "Albania", "Serbia", "Croatia", "Slovenia", "Bosnia and Herzegovina",
+    "Montenegro", "North Macedonia", "Kosovo", "Estonia", "Latvia", "Lithuania",
+    "Belarus", "Ukraine", "Moldova", "Russia", "Malta", "Monaco", "Andorra",
+    "San Marino", "Liechtenstein", "Vatican City", "Gibraltar", "Cyprus",
+    "Channel Islands", "Isle of Man", "Faroe Islands", "East Prussia",
+])
+_region("africa", [
+    "Morocco", "Algeria", "Tunisia", "Libya", "Egypt", "Sudan", "South Sudan",
+    "Ethiopia", "Eritrea", "Djibouti", "Somalia", "Kenya", "Uganda", "Tanzania",
+    "Rwanda", "Burundi", "Democratic Republic of the Congo", "Republic of the Congo",
+    "Gabon", "Equatorial Guinea", "Cameroon", "Central African Republic", "Chad",
+    "Niger", "Nigeria", "Benin", "Togo", "Ghana", "Ivory Coast", "Liberia",
+    "Sierra Leone", "Guinea", "Guinea-Bissau", "Senegal", "Gambia", "Mali",
+    "Burkina Faso", "Mauritania", "Cape Verde", "Angola", "Zambia", "Zimbabwe",
+    "Malawi", "Mozambique", "Botswana", "Namibia", "South Africa", "Lesotho",
+    "Eswatini", "Madagascar", "Mauritius", "Seychelles", "Comoros",
+    "Sao Tome and Principe", "Western Sahara",
+])
+_region("middle-east", [
+    "Turkey", "Syria", "Lebanon", "Israel", "Jordan", "Iraq", "Iran",
+    "Saudi Arabia", "Yemen", "Oman", "United Arab Emirates", "Qatar",
+    "Bahrain", "Kuwait", "Afghanistan",
+])
+_region("asia", [
+    "China", "Japan", "North Korea", "South Korea", "Mongolia", "Taiwan",
+    "Hong Kong", "Macau", "Vietnam", "Laos", "Cambodia", "Thailand", "Myanmar",
+    "Malaysia", "Singapore", "Indonesia", "Philippines", "Brunei", "East Timor",
+    "India", "Pakistan", "Bangladesh", "Nepal", "Bhutan", "Sri Lanka",
+    "Maldives", "Kazakhstan", "Uzbekistan", "Turkmenistan", "Kyrgyzstan",
+    "Tajikistan", "Georgia", "Armenia", "Azerbaijan",
+])
+_region("oceania", [
+    "Australia", "New Zealand", "Fiji", "Papua New Guinea", "Samoa", "Tonga",
+    "Vanuatu", "Solomon Islands", "New Caledonia", "French Polynesia",
+    "Hawaii", "Guam", "Micronesia", "Palau", "Marshall Islands", "Kiribati",
+    "Nauru", "Tuvalu", "Cook Islands", "Tahiti",
+])
+
+# What Digital Commonwealth calls a continent, in our terms. A card
+# whose country we do not recognise can still be placed by this.
+CONTINENT_REGION = {
+    "north and central america": "north-america",
+    "north america": "north-america",
+    "central america": "latin-america",
+    "south america": "latin-america",
+    "caribbean": "latin-america",
+    "europe": "europe",
+    "africa": "africa",
+    "asia": "asia",
+    "oceania": "oceania",
+    "australia": "oceania",
+}
+
+REGION_LABELS = dict(REGIONS)
+
+
+def region_for(country, continent=None):
+    """(slug, label) for a card, or (None, None) if we cannot place it."""
+    if country:
+        slug = COUNTRY_REGION.get(country.lower())
+        if slug:
+            return slug, REGION_LABELS[slug]
+    if continent:
+        slug = CONTINENT_REGION.get(squash(continent).lower())
+        if slug:
+            return slug, REGION_LABELS[slug]
+    return None, None
+
+
 def normalise_country(name):
     name = squash(name)
     if not name:
@@ -334,6 +450,7 @@ def dc_evaluate(record, source_key, stats):
     geo = list(dc_hiergeo(attrs))
     country = next((normalise_country(g["country"]) for g in geo
                     if g.get("country")), None)
+    continent = next((g["continent"] for g in geo if g.get("continent")), None)
     place = None
     for g in geo:
         bits = [g.get("city"), g.get("region")]
@@ -357,6 +474,10 @@ def dc_evaluate(record, source_key, stats):
     if country:
         entry["cn"] = country
         entry["c"] = country_slug(country)
+    if continent:
+        # Stored raw. Turning this into a region is daily.py's job, so
+        # the country-to-region table can be corrected without a crawl.
+        entry["ct"] = squash(continent)
     if place:
         entry["pl"] = place[:80]
     publisher = squash(attrs.get("publisher_tsi"))
@@ -816,12 +937,18 @@ def build_pool(max_pages, do_measure):
 
 def describe(entries):
     countries = collections.Counter(e.get("cn") or "unknown" for e in entries)
+    regions = collections.Counter(
+        region_for(e.get("cn"), e.get("ct"))[1] or "unplaced" for e in entries)
     orient = collections.Counter(e.get("o") for e in entries)
     decades = collections.Counter(e["y"] // 10 * 10 for e in entries)
     scored = sum(1 for e in entries if e.get("q"))
     out = [f"{len(entries)} postcards, {scored} scored for render quality",
            "", f"countries ({len(countries)}):"]
     for name, n in countries.most_common(30):
+        out.append(f"  {name:32s} {n:6d}")
+    out.append("")
+    out.append("regions:")
+    for name, n in regions.most_common():
         out.append(f"  {name:32s} {n:6d}")
     out.append("")
     out.append("orientation: " + ", ".join(

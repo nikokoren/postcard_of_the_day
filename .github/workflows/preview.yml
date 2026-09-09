@@ -13,7 +13,7 @@ on:
         required: false
         default: "24"
       cell:
-        description: "Cell key, e.g. landscape__france__era-1900-1914"
+        description: "Cell key, e.g. landscape__europe__era-1900-1914"
         required: false
         default: "all__all__all"
       levels:
