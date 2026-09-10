@@ -109,23 +109,37 @@ because it describes the card rather than somebody's scanning decision. So
 these entries skip the pixel-dimension gate entirely and take the museum at
 its word. It is the cross-check the Library of Congress could not provide.
 
-Where it disappoints is place. The record has no depicted place at all -- no
-`about`, no `represents`, no subject headings -- and its only geography is
-`took_place_at` under production, which is where the card was *printed*.
+**A quarter of them are not single postcards.** The Rijksmuseum files boxes,
+albums and mounted lots under `prentbriefkaart` alongside the cards themselves,
+and on a panel an album spread is four stamps of a picture. The dimensions give
+them away:
 
-That is not a usable substitute. The postcard trade of the 1900s ran on German
-lithographers printing views of Italy, Egypt and everywhere else, so a printer's
-country says nothing about what is on the front. An earlier version of this
-adapter used it and placed 533 cards; every one was the publisher rather than
-the subject. It now reads the title instead, which places 24 -- the ones whose
-caption happens to name a country rather than a town.
+| | stated size |
+| --- | --- |
+| single card | `height 90 mm x width 141 mm` |
+| box of 55 cards | `height 98 mm x width 147 mm x depth 32 mm` |
+| album spread | `height 199 mm x width 255 mm` |
 
-Losing 509 placements to gain correctness is the right trade. The unplaced
-cards are still in the pool and still appear in the all-regions rotation, which
-is what an unconfigured recipe shows anyway; they simply do not claim to be
-from somewhere they are not. A gazetteer of city names would recover a lot of
-them -- most of these titles name a Dutch town -- and is the obvious next
-improvement if the region axis needs the depth.
+A depth means a container. Anything outside a postcard's size envelope is a
+group mounted together. 629 of 2,500 resolved records fail one of those tests.
+
+**Place needs care but not despair.** These records carry no depicted place --
+no `about`, no `represents`, no subject headings -- so it has to come out of
+the production credit, the descriptive note or the title.
+
+Using a production credit for a card's subject is normally indefensible: the
+postcard trade of the 1900s ran on German lithographers printing views of
+everywhere. But that describes an export industry, not this collection. Sampled
+across the set the credits read "photographer: Knud Knudsen, Norway",
+"publisher: Fujisawa Bunjirô, Japan", "photographer, Suriname" -- photographers
+and local publishers. Checked by eye, the Japanese cards are Hiroshige's Tokaido
+stations, the Surinamese ones the Paramaribo market and the colony's arms. The
+credit tracks the subject here.
+
+Germany and Switzerland do appear as producers, and those are the ones where
+the general objection could bite; they are 8 of 106 matches in a sample and are
+left in, on the grounds that a wrong region on a handful beats no region on two
+thousand.
 
 ---
 

@@ -854,6 +854,11 @@ AAT_PRIMARY_TITLE = "300404670"
 AAT_OBJECT_NUMBER = "300312355"
 
 RIJKS_DIMS = re.compile(r"height\s+(\d+)\s*mm\s*x\s*width\s+(\d+)\s*mm", re.I)
+
+# What a postcard measures, in millimetres, generously. The continental
+# standard is 90x140 and A6 is 105x148; early cards run smaller. Outside
+# this and it is an album page or a mounted group, not a card.
+CARD_MM = (60, 180)
 RIJKS_IIIF_TAIL = re.compile(r"/full/[^/]+/\d+/\w+\.jpg$")
 
 
@@ -872,27 +877,45 @@ def la_names(node, aat=None):
 
 def rijks_country(record, title):
     """
-    What the card *shows*, which is the only sense of "where" that means
-    anything on a screen.
+    What the card shows. These records carry no depicted-place field --
+    no `about`, no `represents`, no subject headings -- so it has to be
+    read out of the prose, in three places, in this order.
 
-    The obvious field is the wrong one. A Rijksmuseum record's only place
-    is `took_place_at` under production -- where the card was printed --
-    and for postcards that is actively misleading: the trade in the
-    1900s ran on German lithographers printing views of Italy, Egypt and
-    everywhere else. A German imprint on a card of Sorrento says nothing
-    about Sorrento.
+    The first is the production credit, and using it needs justifying,
+    because in general a printer's country says nothing about a card's
+    subject: the postcard trade of the 1900s ran on German lithographers
+    printing views of Italy and Egypt and everywhere else.
 
-    There is no depicted-place field to fall back on; these records carry
-    no `about`, no `represents` and no subject headings. So the title is
-    all there is, and it only helps when it happens to name a country
-    rather than a town. Most cards therefore stay unplaced, which is the
-    honest outcome -- they still appear in the all-regions rotation,
-    which is what an unconfigured recipe shows anyway.
+    That argument does not describe this collection, which is the point.
+    Sampled across the set, the credits read "photographer: Knud
+    Knudsen, Norway", "publisher: Fujisawa Bunjirô, Japan",
+    "photographer, Suriname" -- photographers and local publishers, not
+    export lithographers. A photographer's country is where the
+    photograph was taken. Checked by eye, the Japanese cards are
+    Hiroshige's Tokaido stations, the Surinamese ones are the Paramaribo
+    market and the colony's arms, the Norwegian ones are waterfalls and
+    hotels. The credit tracks the subject here.
+
+    Germany and Switzerland do appear as producers, and those are the
+    ones where the general objection could bite. They are 8 of 106
+    matches in the sample, and left in: a wrong region on a handful
+    beats no region on two thousand.
+
+    Then the descriptive note, which is straightforwardly about the
+    subject, and last the title.
     """
-    lowered = (title or "").lower()
-    for name in sorted(COUNTRY_REGION, key=len, reverse=True):
-        if re.search(r"\b" + re.escape(name) + r"\b", lowered):
-            return normalise_country(name)
+    prose = []
+    for part in ((record.get("produced_by") or {}).get("part") or []):
+        for note in part.get("referred_to_by") or []:
+            prose.append(squash(note.get("content")))
+    for note in record.get("referred_to_by") or []:
+        prose.append(squash(note.get("content")))
+
+    for text in prose + [title]:
+        lowered = (text or "").lower()
+        for name in sorted(COUNTRY_REGION, key=len, reverse=True):
+            if re.search(r"\b" + re.escape(name) + r"\b", lowered):
+                return normalise_country(name)
     return None
 
 
@@ -920,16 +943,37 @@ def rijks_resolve(object_id, stats):
         stats["out of range"] += 1
         return None
 
-    # The card's own measurements, which say which way up it is far more
-    # reliably than the shape of somebody's scan does.
+    # The card's own measurements, which do two jobs.
+    #
+    # They say which way up it is, far more reliably than the shape of
+    # somebody's scan does. And they say whether it is a card at all:
+    # the Rijksmuseum files boxes, albums and multi-card lots under
+    # "prentbriefkaart" too, and those are useless on a panel -- an
+    # album page photographs as four stamps of a picture. Measured:
+    #
+    #   single card   height 90 mm x width 141 mm
+    #   box of 55     height 98 mm x width 147 mm x depth 32 mm
+    #   album spread  height 199 mm x width 255 mm
+    #
+    # A depth means a container. Anything outside a postcard's size
+    # envelope is a group of them mounted together.
     orientation = None
     for note in record.get("referred_to_by") or []:
-        m = RIJKS_DIMS.search(str(note.get("content") or ""))
-        if m:
-            height, width = int(m.group(1)), int(m.group(2))
-            if abs(height - width) > 4:
-                orientation = "landscape" if width > height else "portrait"
-            break
+        content = str(note.get("content") or "")
+        m = RIJKS_DIMS.search(content)
+        if not m:
+            continue
+        if re.search(r"\bdepth\b|\bdiepte\b", content, re.I):
+            stats["a box, not a card"] += 1
+            return None
+        height, width = int(m.group(1)), int(m.group(2))
+        if not (CARD_MM[0] <= height <= CARD_MM[1]
+                and CARD_MM[0] <= width <= CARD_MM[1]):
+            stats["a group, not a card"] += 1
+            return None
+        if abs(height - width) > 4:
+            orientation = "landscape" if width > height else "portrait"
+        break
     if not orientation:
         stats["no shape"] += 1
         return None

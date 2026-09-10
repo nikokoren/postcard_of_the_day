@@ -61,14 +61,20 @@ respectively. Spot-checked against titles, those fields follow the
 subject — Rothenburg ob der Tauber, Mexico City, Villeneuve-sur-Yonne —
 and not the publisher.
 
-The Rijksmuseum records no depicted place at all: no `about`, no
-`represents`, no subject headings. Its only place is `took_place_at`
-under production. An earlier version of this used it and placed 533
-cards; every one of those was the printer's country rather than the
-card's subject, so it now falls back to whatever the title names, which
-places 24. That is a real loss and the right trade — the remaining cards
-are unplaced rather than wrong, and unplaced cards still appear in the
-all-regions rotation, which is what an unconfigured recipe shows.
+The Rijksmuseum records no depicted place at all — no `about`, no
+`represents`, no subject headings — so its place has to come out of the
+production credit, the descriptive note or the title.
+
+Using a production credit for a card's subject is normally
+indefensible, for the reason above. But that describes an export
+industry, not this collection: sampled across the set, the credits read
+"photographer: Knud Knudsen, Norway", "publisher: Fujisawa Bunjirô,
+Japan", "photographer, Suriname" — photographers and local publishers,
+whose country is where the photograph was taken. Checked by eye, the
+Japanese cards are Hiroshige's Tōkaidō stations and the Surinamese ones
+the Paramaribo market. Germany and Switzerland appear as producers and
+are where the general objection could still bite; they are 8 of 106
+matches in a sample, and left in.
 
 ### When is a card from
 
@@ -235,6 +241,13 @@ so the threshold came off.
 Measurement is budgeted (900 cards a run) and cached in `quality.json`,
 so each monthly refresh covers more of the pool than the last. An
 unmeasured card is not held against itself.
+
+One filter that only exists because somebody looked: the Rijksmuseum
+files **boxes, albums and mounted lots** under the same type as single
+cards, and an album spread renders as four stamps of a picture. The
+stated dimensions give them away — a `depth` means a container, and
+`199 x 255 mm` is a page rather than a card — and 629 of 2,500 resolved
+records fail one of those tests.
 
 `audit_orientation.py` answers a different question: is a card we call
 "landscape" actually landscape? Orientation comes from pixel dimensions,

@@ -1,17 +1,17 @@
 {
- "country": "Germany",
+ "country": "Italy",
  "credit": "Library of Congress, Prints and Photographs Division",
- "date": "1920",
+ "date": "1907",
  "day": "2026-09-10",
- "generated": "2026-09-10T15:37:59Z",
- "id": "loc:2025709314",
- "image": "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b06000/1b06300/1b06369v.jpg",
- "orientation": "portrait",
- "place": "Germany",
- "pool": 15307,
+ "generated": "2026-09-10T16:39:26Z",
+ "id": "loc:2025712033",
+ "image": "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b09000/1b09200/1b09243v.jpg",
+ "orientation": "landscape",
+ "place": "Italy",
+ "pool": 15046,
  "publisher": "",
  "rights": "No known restrictions on publication",
- "source_url": "https://www.loc.gov/item/2025709314/",
- "title": "Bildnis der Grafin Therese Brunswick Beethovens \"Unsterblicher Geliebten\"",
- "year": 1920
+ "source_url": "https://www.loc.gov/item/2025712033/",
+ "title": "Pestum. La Basilique",
+ "year": 1907
 }
