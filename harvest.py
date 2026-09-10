@@ -54,7 +54,12 @@ RETRIES = 5
 # pages are skipped and only a run of them stops the crawl.
 MAX_PAGE_FAILURES = 8   # consecutive
 REQUEST_DELAY = 1.0     # between search pages
-DIMS_WORKERS = 6        # parallel info.json fetches
+# Two, not six. A IIIF host behind a shared egress will drop
+# connections under concurrency long before it runs out of capacity:
+# measured against Digital Commonwealth, six workers failed 13 of 20
+# requests after 11s each while the seven that got through took 0.6s.
+# Fewer workers finish more work.
+DIMS_WORKERS = 2        # parallel info.json fetches
 DIMS_BUDGET = 2500      # info.json fetches per run
 MEASURE_BUDGET = 900    # image fetches per run, for render quality
 POOL_VERSION = 1
@@ -153,6 +158,20 @@ LICENCE_BAD = re.compile(r"(-nc|-nd|noncommercial|noderiv)", re.I)
 # the resumable crawl cache
 # ============================================================
 
+def write_json_atomic(path, payload):
+    """
+    Write via a temp file and rename. A checkpoint exists precisely
+    because the process may be interrupted, so writing in place means
+    the one event it is defending against is also the one that can
+    destroy it -- a crawl killed mid-write left a truncated crawl.json
+    and cost 12,147 harvested records. os.replace is atomic on POSIX.
+    """
+    tmp = path + ".tmp"
+    with open(tmp, "w") as fh:
+        json.dump(payload, fh, separators=(",", ":"), sort_keys=True)
+        fh.write("\n")
+    os.replace(tmp, path)
+
 def load_crawl():
     try:
         with open(CRAWL_PATH) as fh:
@@ -165,10 +184,7 @@ def load_crawl():
 
 
 def save_crawl(cache):
-    with open(CRAWL_PATH, "w") as fh:
-        json.dump({"version": 1, "sources": cache}, fh,
-                  separators=(",", ":"), sort_keys=True)
-        fh.write("\n")
+    write_json_atomic(CRAWL_PATH, {"version": 1, "sources": cache})
 
 
 def crawl_state(cache, source_key):
@@ -801,10 +817,8 @@ def load_cache(path):
 
 
 def save_cache(path, entries, name):
-    with open(path, "w") as fh:
-        json.dump({"version": 1, name: len(entries), "entries": entries},
-                  fh, separators=(",", ":"), sort_keys=True)
-        fh.write("\n")
+    write_json_atomic(path, {"version": 1, name: len(entries),
+                             "entries": entries})
 
 
 def fetch_dimensions(base):
@@ -971,7 +985,7 @@ def fill_quality(entries, cache, budget):
 # pool
 # ============================================================
 
-def build_pool(max_pages, do_measure):
+def build_pool(max_pages, do_measure, dims_budget=DIMS_BUDGET):
     stats = collections.Counter()
     entries, seen_ids = [], set()
 
@@ -993,7 +1007,7 @@ def build_pool(max_pages, do_measure):
 
     sys.stderr.write("\ndimensions\n")
     dims_cache = load_cache(DIMS_PATH)
-    fill_dimensions(entries, dims_cache, DIMS_BUDGET)
+    fill_dimensions(entries, dims_cache, dims_budget)
     save_cache(DIMS_PATH, dims_cache, "measured")
     entries = apply_dimensions(entries, dims_cache, stats)
     sys.stderr.write(f"  {len(entries)} cards with usable images\n")
@@ -1061,6 +1075,8 @@ def main():
                     help="max search pages per source (100 records a page)")
     ap.add_argument("--no-measure", action="store_true",
                     help="skip render-quality measurement")
+    ap.add_argument("--dims-budget", type=int, default=DIMS_BUDGET,
+                    help="info.json lookups this run (the orientation axis)")
     ap.add_argument("--report", action="store_true",
                     help="describe the existing pool and exit")
     args = ap.parse_args()
@@ -1070,7 +1086,8 @@ def main():
             print(describe(json.load(fh)["entries"]))
         return 0
 
-    entries, stats, scored, sized = build_pool(args.pages, not args.no_measure)
+    entries, stats, scored, sized = build_pool(
+        args.pages, not args.no_measure, args.dims_budget)
     if not entries:
         sys.stderr.write("\nnothing harvested; leaving the old pool alone\n")
         return 1
@@ -1083,9 +1100,7 @@ def main():
         "sized": sized,
         "entries": entries,
     }
-    with open(POOL_PATH, "w") as fh:
-        json.dump(payload, fh, separators=(",", ":"), sort_keys=True)
-        fh.write("\n")
+    write_json_atomic(POOL_PATH, payload)
 
     sys.stderr.write("\ndropped:\n")
     for reason, n in stats.most_common():

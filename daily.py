@@ -182,11 +182,6 @@ def regions_in(entries):
     return _tally(entries, "rg", "rgn", REGION_MIN)
 
 
-def countries_in(entries):
-    """(slug, label, count) for every country big enough to offer."""
-    return _tally(entries, "c", "cn", COUNTRY_MIN)
-
-
 
 
 
@@ -633,11 +628,9 @@ def main():
 
     check = not args.no_check
     regions = regions_in(entries)
-    countries = countries_in(entries)
-    places = places_in(entries)
     cells = build_cells(entries, regions)
     sys.stderr.write(f"{len(entries)} cards, {len(regions)} regions, "
-                     f"{len(countries)} countries, {len(cells)} cells\n")
+                     f"{len(cells)} cells\n")
 
     picks, misses, probed = {}, 0, 0
     for key in cells:
