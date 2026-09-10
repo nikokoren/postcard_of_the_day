@@ -44,8 +44,41 @@ nothing to keep alive.
 | axis | values | where it comes from |
 | --- | --- | --- |
 | Orientation | Landscape, Portrait | the scan's own pixel dimensions |
-| Region | seven, listed below | `subject_hiergeo_geojson_ssm` (Digital Commonwealth), `location_country` (Library of Congress) |
-| Era | Before 1900, 1900-1914, 1915-1929, 1930-1945, 1946 onwards | the catalogue date |
+| Region | seven, listed below | the place the card **shows**, not where it was printed |
+| Era | Before 1900, 1900-1914, 1915-1929, 1930-1945, 1946 onwards | when it was printed, or posted where a postmark was transcribed |
+
+### Depicted, not printed
+
+"Where is this card from" has two answers and only one of them is
+interesting. A card of Sorrento printed in Leipzig is a card of
+Sorrento — and that is not a hypothetical: the postcard trade of the
+1900s ran on German lithographers printing views of everywhere, so the
+place of production is actively misleading.
+
+The Library of Congress and Digital Commonwealth both record the
+depicted place, in `location_country` and `subject_hiergeo_geojson_ssm`
+respectively. Spot-checked against titles, those fields follow the
+subject — Rothenburg ob der Tauber, Mexico City, Villeneuve-sur-Yonne —
+and not the publisher.
+
+The Rijksmuseum records no depicted place at all: no `about`, no
+`represents`, no subject headings. Its only place is `took_place_at`
+under production. An earlier version of this used it and placed 533
+cards; every one of those was the printer's country rather than the
+card's subject, so it now falls back to whatever the title names, which
+places 24. That is a real loss and the right trade — the remaining cards
+are unplaced rather than wrong, and unplaced cards still appear in the
+all-regions rotation, which is what an unconfigured recipe shows.
+
+### When is a card from
+
+Almost always the date is when the card was **printed**. The postmark is
+on the back, and the back is usually not scanned, let alone transcribed.
+About 1% of Library of Congress records do transcribe one — "Postmarked
+1905", "Cancelled Sierra Leone stamp postmarked 1912" — and where they
+do it is the better answer to how old a card is, so it wins and the
+caption says "Posted 1912" rather than passing a printing date off as a
+posting date.
 
 ### Why regions and not countries
 

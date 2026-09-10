@@ -1,17 +1,17 @@
 {
- "country": "United States",
+ "country": "Germany",
  "credit": "Library of Congress, Prints and Photographs Division",
- "date": "1905",
+ "date": "1920",
  "day": "2026-09-10",
- "generated": "2026-09-10T14:19:23Z",
- "id": "loc:2025663795",
- "image": "https://tile.loc.gov/storage-services/service/pnp/pcrd/1a00000/1a02000/1a02100/1a02127v.jpg",
- "orientation": "landscape",
- "place": "United States",
- "pool": 15290,
+ "generated": "2026-09-10T15:37:59Z",
+ "id": "loc:2025709314",
+ "image": "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b06000/1b06300/1b06369v.jpg",
+ "orientation": "portrait",
+ "place": "Germany",
+ "pool": 15307,
  "publisher": "",
  "rights": "No known restrictions on publication",
- "source_url": "https://www.loc.gov/item/2025663795/",
- "title": "Stafford Springs Hotel, Stafford, Conn",
- "year": 1905
+ "source_url": "https://www.loc.gov/item/2025709314/",
+ "title": "Bildnis der Grafin Therese Brunswick Beethovens \"Unsterblicher Geliebten\"",
+ "year": 1920
 }

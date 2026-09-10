@@ -420,6 +420,18 @@ def title_line(entry):
 
 
 def date_line(entry):
+    """
+    What the date on the screen means.
+
+    Almost always it is when the card was *printed*, because that is
+    what a catalogue records -- the postmark is on the back, and the
+    back is usually not even scanned. About 1% of records transcribe one
+    anyway, and where they do it is the better answer to "how old is
+    this card", so it is used and labelled as what it is rather than
+    quietly passed off as a publication date.
+    """
+    if entry.get("pm"):
+        return "Posted {}".format(entry["pm"])
     year, end = entry["y"], entry.get("y2")
     if end and end != year:
         return "{}–{}".format(year, end)

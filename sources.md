@@ -109,12 +109,23 @@ because it describes the card rather than somebody's scanning decision. So
 these entries skip the pixel-dimension gate entirely and take the museum at
 its word. It is the cross-check the Library of Congress could not provide.
 
-Where it disappoints is provenance. Only about a quarter of the cards record
-a place of production; the rest say "unknown" in both Dutch and English, and
-no amount of parsing conjures a country out of that. The quarter that do are
-worth having, though, and not only for the obvious reason -- alongside the
-Netherlands they bring Suriname, Japan and Norway, three places nothing else
-in the pool reaches.
+Where it disappoints is place. The record has no depicted place at all -- no
+`about`, no `represents`, no subject headings -- and its only geography is
+`took_place_at` under production, which is where the card was *printed*.
+
+That is not a usable substitute. The postcard trade of the 1900s ran on German
+lithographers printing views of Italy, Egypt and everywhere else, so a printer's
+country says nothing about what is on the front. An earlier version of this
+adapter used it and placed 533 cards; every one was the publisher rather than
+the subject. It now reads the title instead, which places 24 -- the ones whose
+caption happens to name a country rather than a town.
+
+Losing 509 placements to gain correctness is the right trade. The unplaced
+cards are still in the pool and still appear in the all-regions rotation, which
+is what an unconfigured recipe shows anyway; they simply do not claim to be
+from somewhere they are not. A gazetteer of city names would recover a lot of
+them -- most of these titles name a Dutch town -- and is the obvious next
+improvement if the region axis needs the depth.
 
 ---
 

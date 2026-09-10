@@ -626,6 +626,28 @@ LOC_DIMS_RE = re.compile(r"#h=(\d+)&w=(\d+)")
 LOC_PCT_RE = re.compile(r"/full/pct:([\d.]+)/")
 YEAR_RE = re.compile(r"\b(1[89]\d\d|20\d\d)\b")
 
+# When a card was posted beats when it was printed, and occasionally a
+# cataloguer transcribed the postmark: "Postmarked 1905", "Cancelled
+# Sierra Leone stamp postmarked 1912". It is about 1% of records, so it
+# is not something to build an axis on -- but where it exists it is the
+# better answer to "how old is this card", and it is worth saying so on
+# the screen.
+POSTMARK_RE = re.compile(
+    r"(?:post\s?marked|postmark|cancell?ed[^.]{0,40}?)\D{0,12}(1[89]\d\d|20\d\d)",
+    re.I)
+
+
+def loc_postmark(record):
+    notes = list(record.get("description") or [])
+    notes += list((record.get("item") or {}).get("notes") or [])
+    for note in notes:
+        m = POSTMARK_RE.search(str(note))
+        if m:
+            year = int(m.group(1))
+            if MIN_YEAR <= year <= MAX_YEAR:
+                return year
+    return None
+
 # A record only counts if the catalogue calls it a postcard. The genre
 # terms carry their own date range -- "Postcards--1900-1910" -- and some
 # older records carry none at all, in which case the collection they sit
@@ -715,7 +737,8 @@ def loc_evaluate(record, label, collection, stats):
         stats["title"] += 1
         return None
 
-    year = loc_year(record)
+    postmark = loc_postmark(record)
+    year = postmark or loc_year(record)
     if year is None:
         stats["no date"] += 1
         return None
@@ -742,6 +765,10 @@ def loc_evaluate(record, label, collection, stats):
         "h": "Library of Congress",
         "col": collection,
     }
+    if postmark:
+        # Marked, so the caption can say "Posted 1912" rather than
+        # implying a printing date is a posting date.
+        entry["pm"] = postmark
     if country:
         entry["cn"] = country
         entry["c"] = country_slug(country)
@@ -845,24 +872,27 @@ def la_names(node, aat=None):
 
 def rijks_country(record, title):
     """
-    Where the card is from. The production note carries it in prose --
-    "maker: anonymous, Netherlands" -- so the country is read out of
-    that first. Failing that the title is searched, which for a postcard
-    is fair: the place on the front is the place it is from, and a card
-    captioned Batavia belongs under Asia however Dutch its publisher.
-    """
-    prose = []
-    for part in ((record.get("produced_by") or {}).get("part") or []):
-        for note in part.get("referred_to_by") or []:
-            prose.append(squash(note.get("content")))
-    for note in record.get("referred_to_by") or []:
-        prose.append(squash(note.get("content")))
+    What the card *shows*, which is the only sense of "where" that means
+    anything on a screen.
 
-    for text in prose + [title]:
-        lowered = (text or "").lower()
-        for name, _ in sorted(COUNTRY_REGION.items(), key=lambda kv: -len(kv[0])):
-            if re.search(r"\b" + re.escape(name) + r"\b", lowered):
-                return normalise_country(name)
+    The obvious field is the wrong one. A Rijksmuseum record's only place
+    is `took_place_at` under production -- where the card was printed --
+    and for postcards that is actively misleading: the trade in the
+    1900s ran on German lithographers printing views of Italy, Egypt and
+    everywhere else. A German imprint on a card of Sorrento says nothing
+    about Sorrento.
+
+    There is no depicted-place field to fall back on; these records carry
+    no `about`, no `represents` and no subject headings. So the title is
+    all there is, and it only helps when it happens to name a country
+    rather than a town. Most cards therefore stay unplaced, which is the
+    honest outcome -- they still appear in the all-regions rotation,
+    which is what an unconfigured recipe shows anyway.
+    """
+    lowered = (title or "").lower()
+    for name in sorted(COUNTRY_REGION, key=len, reverse=True):
+        if re.search(r"\b" + re.escape(name) + r"\b", lowered):
+            return normalise_country(name)
     return None
 
 
