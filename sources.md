@@ -145,25 +145,41 @@ thousand.
 
 ## Looked at and left out
 
-**Europeana** (154,196 openly-licensed postcards, 29 countries) is the obvious
-candidate for breadth and it is the one that hurts to lose. Two things
-disqualify it *as a primary source*:
+**Europeana** is an aggregator, and that is the whole story: it holds the
+metadata centrally but the image stays on the contributing institution's own
+server. A pooled sample of 54 openly-licensed postcards came back with a median
+short side of **525 pixels**, only 7 of them clearing 900, which is why it was
+rejected as a primary source.
 
-- *Image size.* `edmIsShownBy` is a raw provider URL with no IIIF and no
-  resizing. In a sample of 54 fetched images the median short side was **525
-  pixels** and only 7 cleared 900. Most providers publish an 800px web copy and
-  nothing larger. That is below the OG panel, never mind the X.
-- *Titles.* The largest provider, Deutsche Fotothek (49,695 items, 32% of the
-  pool), titles every record "Postkarte". The second largest, Estonia's muis.ee,
-  titles them "Postkaart".
+That average turned out to be misleading, and the discovery pass says so. It
+was dominated by two providers -- Estonia's muis.ee, which publishes an 800px
+web copy, and Deutsche Fotothek, whose 49,695 records are every one of them
+titled "Postkarte". Asked provider by provider instead, the picture is quite
+different:
 
-The way back in is to use it as a **discovery engine** rather than a source.
-Europeana is an aggregator: it holds the metadata centrally but the image stays
-on the contributing institution's own server, which is exactly why the average
-is so poor. So query Europeana to find which individual providers serve
-full-resolution IIIF with real captions, allow-list those providers, and then
-fetch from them directly. That turns a fatal average into a usable subset, and
-it is how any further European postcard source is likely to be found.
+| provider | cards | median short side | notes |
+| --- | --- | --- | --- |
+| University of Graz | 5,999 | **1,982 px** | serves IIIF, 6 of 6 sampled |
+| National Heritage Institute, Bucharest | 6,074 | 1,696 px | |
+| FHXB Friedrichshain-Kreuzberg Museum | 5,318 | 1,516 px | |
+| Csorba Győző Library, Pécs | 3,550 | 1,407 px | |
+| Digital Library Trentino | 5,576 | 1,073 px | |
+| Ajuntament de Girona | 2,668 | 1,039 px | |
+| National Library of Latvia | 4,288 | 1,008 px | |
+
+**33,473 cards across seven providers**, none with a generic title in the
+sample, all comfortably above the 1,000px bar -- Austria, Romania, Germany,
+Hungary, Italy, Catalonia and Latvia. That is more than twice what the
+Rijksmuseum contributes and it lands in six countries the pool barely has.
+
+So Europeana earns its place as a **discovery engine**: query it to find who
+publishes properly, then allow-list those providers. Deutsche Fotothek fails on
+captions rather than resolution -- 1,057px is perfectly usable, "Postkarte" is
+not -- and would be worth revisiting if its titles can be recovered from
+another field.
+
+Building it needs a free Europeana API key in an Actions secret; the survey
+above ran on the public demo key, which is not for production use.
 
 **Wikimedia Commons** is the other big one -- `Postcards of France` alone has
 86,235 files, `Postcards of Germany` 81,166, across ~180 country categories,
