@@ -106,6 +106,55 @@ plugin degrade.
 
 ---
 
+## Whose day is it?
+
+The card changes at **the viewer's local midnight**, not at a fixed UTC
+moment — and that distinction is the whole reason the feed is shaped the
+way it is.
+
+An earlier version chose the pick here, against the UTC date, and baked
+it into the file. That means the card changes at the same instant
+worldwide: 02:05 in Berlin, which reads as a new day, but **17:05 the
+previous afternoon** in Los Angeles and **midday** in Auckland, where it
+swaps while somebody is looking at it.
+
+TRMNL hands the markup everything it needs to do better:
+
+```liquid
+{% assign local_seconds = trmnl.system.timestamp_utc | plus: trmnl.user.utc_offset %}
+{% assign local_day = local_seconds | divided_by: 86400 %}
+```
+
+`timestamp_utc` is unix seconds and `utc_offset` is that viewer's offset
+in seconds, so those two lines produce the same integer `daily.py`
+counts in — for that device, in its own timezone.
+
+So the feed carries **three days**: yesterday, today and tomorrow. Three
+is not a guess. Offsets run from −12 to +14, so the 24 hours one
+published file is live span about 50 hours of local time, which always
+crosses two or three midnights — and it comes to three for *any* publish
+hour, so there is nothing to tune. A device with no usable clock falls
+back to the day the file was built for.
+
+That is also why a pick is a **list rather than an object**: at 94 cells
+across 3 days, field names alone would cost roughly 17KB of the 95KB
+budget. `selection.liquid` unpacks one into `card_image`, `card_title`,
+`card_date`, `card_place`, `card_publisher` and `card_credit` so the
+layout stays readable.
+
+### What that costs at each hop
+
+| step | when |
+| --- | --- |
+| Actions cron fires | 00:05 UTC |
+| `daily.py` picks, warms every image, commits | ~1–4 min |
+| `raw.githubusercontent.com` serves it | `max-age=300`, so up to 5 min |
+| TRMNL polls | `refresh_interval: 60`, so up to 60 min |
+
+The daily job publishes all three days at once, so a device does not
+wait on the cron to see *its* midnight — the card for its tomorrow is
+already in the file it fetched today.
+
 ## Determinism
 
 ```python

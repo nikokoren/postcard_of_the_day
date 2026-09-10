@@ -131,6 +131,29 @@ CELL_SEP = "__"
 MAX_FEED_BYTES = 95_000
 MAX_CELLS = 140
 
+# The feed carries three days, not one, and this is why.
+#
+# The pick used to be chosen here, against the UTC date, and baked into
+# the file -- so the card changed at the same instant worldwide. In
+# Berlin that is 02:05, which reads as a new day. In Los Angeles it is
+# 17:05 the *previous* afternoon, and in Auckland it lands at midday,
+# changing the card while somebody is looking at it.
+#
+# The device knows better than we do: trmnl.system.timestamp_utc plus
+# trmnl.user.utc_offset gives the viewer's own local time, so the markup
+# can work out its own local day and ask for that day's card.
+#
+# Which days can it ask for? Offsets run from -12 to +14, so across the
+# 24 hours one published file is live, the local day-index seen on a
+# device spans exactly three values -- and it is three for any publish
+# hour, so there is nothing to tune. Hence yesterday, today, tomorrow.
+DAY_SPAN = (-1, 0, 1)
+
+# One pick as a list, not an object: at 282 of them, field names alone
+# would cost around 17KB of the 95KB budget. Order is part of the
+# contract with the markup -- see PICK_FIELDS in the README.
+#   0 image  1 title  2 date  3 place  4 publisher  5 credit  6 source
+
 TITLE_LIMIT = 120
 SUBTITLE_MARKERS = (" : ", " ; ", " -- ", " — ")
 
@@ -425,12 +448,27 @@ def credit_line(entry):
 # payload
 # ============================================================
 
+PICK_FIELDS = ("image", "title", "date", "place", "publisher", "credit")
+
+
 def build_payload(entry):
     """
-    One card, as the markup sees it. Deliberately lean: the cell key is
-    already the dict key, and the day and pool size are feed-level, so
-    repeating any of them costs a byte a card for nothing.
+    One card as a list, in PICK_FIELDS order. The cell key and the day
+    are already the keys this sits under, and the pool size is
+    feed-level, so repeating any of them costs bytes for nothing.
     """
+    return [
+        image_url(entry),
+        title_line(entry),
+        date_line(entry),
+        place_line(entry),
+        entry.get("pub") or "",
+        credit_line(entry),
+    ]
+
+
+def full_payload(entry, day):
+    """The single-card file, which can afford to be readable."""
     return {
         "id": entry["id"],
         "title": title_line(entry),
@@ -444,6 +482,7 @@ def build_payload(entry):
         "rights": entry.get("r") or "",
         "source_url": entry.get("u") or "",
         "image": image_url(entry),
+        "day": day.isoformat(),
     }
 
 
@@ -585,8 +624,10 @@ def selftest(entries, day):
 
     payload = build_payload(entries[0])
     check("payload is complete",
-          all(payload.get(f) not in (None,) for f in
-              ("id", "title", "date", "image", "credit")))
+          len(payload) == len(PICK_FIELDS) and all(
+              isinstance(v, str) for v in payload))
+    check("a device can name any day the feed carries",
+          set(DAY_SPAN) == {-1, 0, 1})
 
     print()
     if failures:
@@ -632,25 +673,38 @@ def main():
     sys.stderr.write(f"{len(entries)} cards, {len(regions)} regions, "
                      f"{len(cells)} cells\n")
 
-    picks, misses, probed = {}, 0, 0
-    for key in cells:
-        subset = cards_for(entries, key)
-        entry, checked = pick(subset, key, day, check)
-        if entry is None:
-            misses += 1
-            continue
-        probed += 1 if checked else 0
-        picks[key] = build_payload(entry)
+    # Every cell, for every day a device might be on. A card that is
+    # tomorrow's here is today's for somebody fourteen hours ahead.
+    days, misses, probed, chosen = {}, 0, 0, {}
+    for shift in DAY_SPAN:
+        that_day = day + timedelta(days=shift)
+        picks = {}
+        for key in cells:
+            subset = cards_for(entries, key)
+            # Only probe the images for the middle day. The other two
+            # are the same cards a day either side of their own turn,
+            # and get probed when it comes.
+            entry, checked = pick(subset, key, that_day,
+                                  check and shift == 0)
+            if entry is None:
+                misses += 1
+                continue
+            probed += 1 if checked else 0
+            picks[key] = build_payload(entry)
+            chosen[entry["id"]] = entry
+        days[str(day_index(that_day))] = picks
 
     default_key = cell_key("all", "all", "all")
-    if default_key not in picks:
+    today = days[str(day_index(day))]
+    if default_key not in today:
         raise SystemExit("no pick for the full catalogue; refusing to publish")
 
     # Warm before publishing, so no device is ever the one that triggers
-    # a render. Fixed-derivative sources are static files and skip this.
+    # a render -- across all three days, because a device fourteen hours
+    # ahead is already on tomorrow's. Fixed-derivative sources are
+    # static files and skip this.
     if check:
-        warm(p["image"] for p in picks.values()
-             if "/full/" in p["image"])
+        warm(image_url(e) for e in chosen.values() if e.get("k") == "iiif")
 
     generated = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 
@@ -666,14 +720,16 @@ def main():
         "day_index": day_index(day),
         "pool": len(entries),
         "default": default_key,
+        "default_day": str(day_index(day)),
         "cell_separator": CELL_SEP,
-        "cell_keys": ",".join(sorted(picks)),
+        "cell_keys": ",".join(sorted(today)),
+        "pick_fields": list(PICK_FIELDS),
         "keys_by_label": label_aliases(ORIENTATIONS, regions, ERAS),
         "orientation_options": [{"key": s, "label": l} for s, l in ORIENTATIONS],
         "region_options": [{"key": s, "label": l, "count": n}
                            for s, l, n in regions],
         "era_options": [{"key": s, "label": l} for s, l, _, _ in ERAS],
-        "picks": picks,
+        "days": days,
     }
 
     # TRMNL rejects a payload over 100KB outright, and the pool only ever
@@ -687,24 +743,27 @@ def main():
 
     dropped = 0
     size = measure(feed)
-    while size > MAX_FEED_BYTES and len(feed["picks"]) > 1:
-        worst = max(feed["picks"], key=lambda k: (specificity(k), k))
-        del feed["picks"][worst]
-        feed["cell_keys"] = ",".join(sorted(feed["picks"]))
+    while size > MAX_FEED_BYTES and len(feed["cell_keys"]) > 1:
+        worst = max(feed["days"][feed["default_day"]],
+                    key=lambda k: (specificity(k), k))
+        for picks in feed["days"].values():
+            picks.pop(worst, None)
+        feed["cell_keys"] = ",".join(sorted(feed["days"][feed["default_day"]]))
         dropped += 1
         size = measure(feed)
     if size > MAX_FEED_BYTES:
         raise SystemExit(f"feed is {size} bytes and cannot be trimmed further")
 
     sys.stderr.write(
-        f"feed {size} bytes, {len(feed['picks'])} picks"
+        f"feed {size} bytes, {len(feed['days'])} days x "
+        f"{len(feed['days'][feed['default_day']])} cells"
         f"{f', {probed} images probed' if probed else ''}"
         f"{f', {misses} empty cells' if misses else ''}"
         f"{f', {dropped} cells dropped to fit' if dropped else ''}\n")
 
-    single = dict(picks[default_key])
+    single = full_payload(
+        pick(cards_for(entries, default_key), default_key, day, False)[0], day)
     single["generated"] = generated
-    single["day"] = day.isoformat()
     single["pool"] = len(entries)
     write_json(DEFAULT_PATH, single)
     write_json(FEED_PATH, feed)

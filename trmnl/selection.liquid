@@ -172,30 +172,62 @@
     {% assign j = j | plus: 1 %}
   {% endif %}
 {% endfor %}
-{% assign pick = picks[chosen_key] %}
-{% if pick == nil %}{% assign pick = picks[default] %}{% endif %}
+{% comment %}
+  Which day is it *here*? Not in UTC -- here, on this device.
+
+  The feed used to carry one day, chosen against the UTC date, so the
+  card changed at the same instant everywhere. In Berlin that is 02:05,
+  which reads as a new day. In Los Angeles it is 17:05 the previous
+  afternoon; in Auckland it lands at midday and changes the card while
+  somebody is looking at it.
+
+  TRMNL hands us everything needed to do better: system.timestamp_utc is
+  unix seconds, user.utc_offset is that viewer's offset in seconds, and
+  the two added together and divided by 86400 is their own local day
+  number -- the same integer daily.py counts in.
+
+  The feed carries yesterday, today and tomorrow, which is all three
+  values a device anywhere can land on while one file is live (offsets
+  run -12 to +14, so 24 hours of file life spans 50 hours of local
+  time). Missing or odd values fall back to the day the feed was built
+  for, which is what the old behaviour was.
+{% endcomment %}
+{% assign local_seconds = trmnl.system.timestamp_utc | plus: trmnl.user.utc_offset %}
+{% assign local_day = local_seconds | divided_by: 86400 %}
+{% assign day_key = local_day | append: "" %}
+{% assign day_picks = days[day_key] %}
+{% if day_picks == nil %}{% assign day_picks = days[default_day] %}{% endif %}
+
+{% assign pick = day_picks[chosen_key] %}
+{% if pick == nil %}{% assign pick = day_picks[default] %}{% endif %}
 
 {% comment %}
-  pick.image is already sized for the largest panel there is (1872x1404,
-  the X) and every smaller screen scales it down for free, so it is safe
-  to use as-is. It asks for the colour scan rather than a greyscale one:
-  a colour panel can then show the colour, and a monochrome one loses
-  nothing -- converting the colour file to luminance lands within 1/255
-  of the archive's own greyscale version.
+  A pick is a list, not an object -- at 282 of them in one file, field
+  names alone would cost about 17KB of the 95KB TRMNL allows. Unpack it
+  once here so the layout below stays readable. The order is the feed's
+  pick_fields.
 {% endcomment %}
-{% assign card_image = pick.image %}
+{% assign card_image = pick[0] %}
+{% assign card_title = pick[1] %}
+{% assign card_date = pick[2] %}
+{% assign card_place = pick[3] %}
+{% assign card_publisher = pick[4] %}
+{% assign card_credit = pick[5] %}
 
 {% comment %}
   From here on:
-    card_image      the postcard, ready to use at any panel size
-    pick.title      the card's own caption, trimmed to fit
-    pick.date       "1907" or "1900-1906"
-    pick.place      "Athens, Region of Attica, Greece"
-    pick.country    "Greece"
-    pick.publisher  who printed it, when the archive knows
-    pick.credit     the holding institution and collection
-    pick.rights     the rights statement
-    pick.source_url the catalogue record
+    card_image      the postcard, ready to use at any panel size. It is
+                    already sized for the largest panel there is
+                    (1872x1404, the X) and smaller screens scale it down
+                    for free, and daily.py has already asked the archive
+                    for it so it is warm -- do NOT rebuild this URL from
+                    trmnl.device, or the first device to look pays for a
+                    cold render and shows a blank panel.
+    card_title      the card's own caption, trimmed to fit
+    card_date       "1907" or "1900-1906"
+    card_place      "Athens, Region of Attica, Greece"
+    card_publisher  who printed it, when the archive knows
+    card_credit     the holding institution and collection
     want_caption    whether to draw the caption block at all
     want_place      whether that block includes the place line
     want_credit     whether to print the credit
