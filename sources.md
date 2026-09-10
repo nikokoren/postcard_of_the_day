@@ -51,6 +51,33 @@ outside Europe and North America, and the titles are the cards' own printed
 captions ("UN CAMP DANS LE RUANDA", "RUTSHURU -- LE POSTE"). It carries the
 country axis somewhere Digital Commonwealth cannot.
 
+### University of Graz (GAMS) — the GrazMuseum's Ansichtskarten
+
+- API: none needed. Object ids are sequential, so the collection is walked:
+  `https://gams.uni-graz.at/o:gm.<n>/DC` returns a Dublin Core record.
+- Images: IIIF Image API 2 (Level 2) at `gams.uni-graz.at/iiif/o:gm.<n>%2FRECTO`
+- Size: 9,000 ids walked, **5,805 postcards**, masters around 3000x1947
+- Rights: CC BY-SA 3.0 AT on about three quarters; the rest is CC BY-NC-ND
+  and is dropped by the same rule that excluded the British Museum
+
+Found through the Europeana discovery pass and then reached directly, which
+is the pattern working exactly as intended: Europeana pointed at a provider
+publishing properly, and the provider turned out to need no aggregator, no
+API key and no search API at all.
+
+`RECTO` in the image path is the picture side. These cards are scanned front
+and back, and the back is an address panel.
+
+The metadata is the best of any source here. Real captions ("Graz. Karl
+Morre-Denkmal im Volksgarten", "Alt Graz: Rathaus Ecke Schmiedgasse"), dates
+as years or ranges, a description, and subject terms -- Kirche, Brücke, Markt,
+Denkmal -- which are the makings of a theme axis if one is ever wanted.
+
+Place is the GrazMuseum's own city, so Austria is the default rather than an
+inference: in a sample of 40 every card was published by the museum and every
+title named Graz or somewhere in Styria. A title naming anywhere else wins,
+because a card of Venice bought in Graz is a card of Venice.
+
 ---
 
 ## Rights

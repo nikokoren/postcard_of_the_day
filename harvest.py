@@ -24,6 +24,8 @@ Usage:
 
 import argparse
 import collections
+import collections
+import html
 import http.client
 import io
 import json
@@ -110,7 +112,8 @@ GENERIC_TITLE = re.compile(
     r"post\s?card|postkarte|postkaart|postkort|postikaart|briefkaart|"
     r"carte\s?postale|cartolina|tarjeta\s?postal|ansichtskarte|"
     r"vykort|k[ao]rtti|pohlednice|pocztowka|otkritka|"
-    r"unidentified|untitled|no\s?title|\[?n\.?\s?t\.?\]?"
+    r"unidentified|untitled|no\s?title|ohne\s?titel|senza\s?titolo|"
+    r"\[?n\.?\s?t\.?\]?"
     r")\W*(?:\d+)?\W*$",
     re.I)
 
@@ -145,6 +148,9 @@ SOURCES = [
      "Digital Commonwealth", {"reuse": "creative commons"}),
     ("rijksmuseum", "rijksmuseum", "Rijksmuseum",
      {"type": "prentbriefkaart"}),
+    ("graz", "gams", "University of Graz",
+     {"prefix": "o:gm.", "max_id": 9000,
+      "collection": "GrazMuseum Ansichtskarten"}),
 ]
 
 # Resolving one Rijksmuseum card costs three requests -- the object, the
@@ -155,6 +161,12 @@ SOURCES = [
 # thousand more and the pool fills in over a handful of months.
 RIJKS_BUDGET = 1500
 RIJKS_WORKERS = 2
+
+# GAMS ids are sequential, so the collection is walked rather than
+# searched: one Dublin Core record per card, no key and no aggregator in
+# between. Gaps are ordinary and 404s are skipped.
+GAMS_BUDGET = 3000
+GAMS_WORKERS = 4
 
 # Licences that let a screen show the card. NC and ND are dropped: a
 # panel in a living room is arguably neither commercial nor a derivative,
@@ -843,6 +855,130 @@ CRAWLERS = {
 
 
 # ============================================================
+# source: GAMS, University of Graz
+# ============================================================
+
+GAMS_BASE = "https://gams.uni-graz.at"
+GAMS_DC = re.compile(r"<dc:(\w+)>(.*?)</dc:\1>", re.S)
+GAMS_YEARS = re.compile(r"(1[89]\d\d|20\d\d)")
+
+
+def gams_dc(object_id):
+    """The Dublin Core record, as {element: [values]}."""
+    body = fetch(f"{GAMS_BASE}/{object_id}/DC", accept="application/xml",
+                 raw=True, tries=2)
+    if not body:
+        return None
+    text = body.decode("utf-8", "replace")
+    fields = collections.defaultdict(list)
+    for match in GAMS_DC.finditer(text):
+        value = squash(html.unescape(match.group(2)))
+        if value:
+            fields[match.group(1)].append(value)
+    return fields
+
+
+def gams_evaluate(object_id, config, stats):
+    fields = gams_dc(object_id)
+    if not fields:
+        stats["missing"] += 1
+        return None
+    if not any(t.lower().startswith("postkarte")
+               for t in fields.get("type", [])):
+        stats["not a postcard"] += 1
+        return None
+
+    rights = " ".join(fields.get("rights", []))
+    if not LICENCE_OK.search(rights) or LICENCE_BAD.search(rights):
+        # A quarter of this collection is CC BY-NC-ND, which the same
+        # rule that excluded the British Museum excludes here.
+        stats["rights"] += 1
+        return None
+
+    title = tidy_title((fields.get("title") or [""])[0])
+    if not usable_title(title):
+        stats["title"] += 1
+        return None
+
+    # Dates come as a year or a range: "1881", "1910-1920", "1905-1910".
+    years = [int(y) for y in GAMS_YEARS.findall(" ".join(fields.get("date", [])))]
+    if not years:
+        stats["no date"] += 1
+        return None
+    y1, y2 = min(years), max(years)
+    if y1 < MIN_YEAR or y1 > MAX_YEAR:
+        stats["out of range"] += 1
+        return None
+
+    # The GrazMuseum's own holdings, and they are of Graz: in a sample of
+    # 40 every card was published by the museum and every title named
+    # Graz or somewhere in Styria. So Austria is the default rather than
+    # an assumption -- but a title that names somewhere else wins, since
+    # a card of Venice bought in Graz is a card of Venice.
+    country = "Austria"
+    lowered = (title + " " + " ".join(fields.get("subject", []))).lower()
+    for name in sorted(COUNTRY_REGION, key=len, reverse=True):
+        if name != "austria" and re.search(r"\b" + re.escape(name) + r"\b", lowered):
+            country = normalise_country(name)
+            break
+
+    entry = {
+        "id": "graz:" + object_id,
+        # RECTO is the picture side; these cards are scanned front and
+        # back, and the back is an address panel.
+        "b": "{}/iiif/{}%2FRECTO".format(GAMS_BASE, object_id),
+        "k": "iiif",
+        "t": title,
+        "y": y1,
+        "src": "graz",
+        "r": (fields.get("rights") or ["CC BY-SA 3.0 AT"])[0],
+        "u": "{}/{}".format(GAMS_BASE, object_id),
+        "h": "University of Graz",
+        "col": config.get("collection", "GAMS"),
+        "cn": country,
+        "c": country_slug(country),
+    }
+    if y2 != y1:
+        entry["y2"] = y2
+    description = (fields.get("description") or [""])[0]
+    if description:
+        entry["pl"] = description[:80]
+    return entry
+
+
+def gams_crawl(source_key, config, max_pages, stats, cache):
+    """Walk the id range, resolving a budget of new cards each run."""
+    state = crawl_state(cache, source_key)
+    state.setdefault("resolved", {})
+    prefix, top = config["prefix"], config["max_id"]
+
+    todo = [prefix + str(i) for i in range(1, top + 1)
+            if prefix + str(i) not in state["resolved"]]
+    todo = todo[:config.get("budget", GAMS_BUDGET)]
+    if todo:
+        sys.stderr.write(f"  walking {len(todo)} ids "
+                         f"({len(state['resolved'])} seen so far)\n")
+        done = 0
+        with ThreadPoolExecutor(max_workers=GAMS_WORKERS) as pool:
+            for object_id, entry in zip(todo, pool.map(
+                    lambda i: gams_evaluate(i, config, stats), todo)):
+                state["resolved"][object_id] = entry
+                done += 1
+                if done % 250 == 0:
+                    save_crawl(cache)
+                    sys.stderr.write(f"    {done}/{len(todo)}\n")
+                    sys.stderr.flush()
+        save_crawl(cache)
+    if len(state["resolved"]) >= top:
+        state["done"] = True
+        save_crawl(cache)
+    return [e for e in state["resolved"].values() if e]
+
+
+CRAWLERS["gams"] = gams_crawl
+
+
+# ============================================================
 # source: the Rijksmuseum
 # ============================================================
 
@@ -1115,7 +1251,7 @@ def fetch_dimensions(base):
         return None
 
 
-def fill_dimensions(entries, cache, budget):
+def fill_dimensions(entries, cache, budget, only_source=None):
     """
     Ask each card's IIIF endpoint how big it is. 883 bytes a card, and it
     is the only way to know which way up a postcard is, so it is worth
@@ -1125,6 +1261,13 @@ def fill_dimensions(entries, cache, budget):
     todo = [e for e in entries
             if e.get("k") == "iiif" and e["id"] not in cache
             and not (e.get("w") and e.get("h_px"))]
+    if only_source:
+        # Spend the whole budget on one source. Worth having when a
+        # source has just been added, and worth having because hosts
+        # differ enormously: Graz answered 50 of 50 info.json requests
+        # while Digital Commonwealth was dropping almost all of them, so
+        # sharing a budget between them wastes it on the one that fails.
+        todo = [e for e in todo if e.get("src") == only_source]
 
     # Measure the cards most likely to survive first. Most of an
     # unmeasured backlog is American, and the per-country cap throws
@@ -1275,7 +1418,7 @@ def fill_quality(entries, cache, budget):
 # ============================================================
 
 def build_pool(max_pages, do_measure, dims_budget=DIMS_BUDGET,
-               rijks_budget=RIJKS_BUDGET):
+               rijks_budget=RIJKS_BUDGET, dims_source=None):
     stats = collections.Counter()
     entries, seen_ids = [], set()
 
@@ -1283,7 +1426,9 @@ def build_pool(max_pages, do_measure, dims_budget=DIMS_BUDGET,
     for source_key, kind, label, config in SOURCES:
         sys.stderr.write(f"\n{source_key} ({label})\n")
         crawler = CRAWLERS[kind]
-        found = crawler(source_key, dict(config, budget=rijks_budget),
+        found = crawler(source_key, dict(config, budget=(
+                            rijks_budget if kind == "rijksmuseum"
+                            else GAMS_BUDGET)),
                         max_pages, stats, cache)
         added = 0
         for entry in found:
@@ -1298,7 +1443,7 @@ def build_pool(max_pages, do_measure, dims_budget=DIMS_BUDGET,
 
     sys.stderr.write("\ndimensions\n")
     dims_cache = load_cache(DIMS_PATH)
-    fill_dimensions(entries, dims_cache, dims_budget)
+    fill_dimensions(entries, dims_cache, dims_budget, dims_source)
     save_cache(DIMS_PATH, dims_cache, "measured")
     entries = apply_dimensions(entries, dims_cache, stats)
     sys.stderr.write(f"  {len(entries)} cards with usable images\n")
@@ -1370,6 +1515,8 @@ def main():
                     help="info.json lookups this run (the orientation axis)")
     ap.add_argument("--rijks-budget", type=int, default=RIJKS_BUDGET,
                     help="Rijksmuseum cards to resolve this run")
+    ap.add_argument("--dims-source",
+                    help="spend the whole dimension budget on one source")
     ap.add_argument("--report", action="store_true",
                     help="describe the existing pool and exit")
     args = ap.parse_args()
@@ -1380,7 +1527,8 @@ def main():
         return 0
 
     entries, stats, scored, sized = build_pool(
-        args.pages, not args.no_measure, args.dims_budget, args.rijks_budget)
+        args.pages, not args.no_measure, args.dims_budget, args.rijks_budget,
+        args.dims_source)
     if not entries:
         sys.stderr.write("\nnothing harvested; leaving the old pool alone\n")
         return 1
