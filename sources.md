@@ -72,7 +72,7 @@ dropped at harvest time. A TRMNL screen is arguably neither commercial nor a
 derivative, but "arguably" is not a licence, and there is enough material
 without them.
 
-### Rijksmuseum — next in
+### Rijksmuseum
 
 - API: `https://data.rijksmuseum.nl/search/collection` (Linked Art Search, **no key**)
 - Filter: `type=prentbriefkaart&imageAvailable=true` — the search takes Dutch or
@@ -91,9 +91,30 @@ carries `shows` -> a VisualItem, which carries `subject_of` -> a DigitalObject,
 which finally carries the IIIF URL. Two extra requests per card on a monthly
 crawl, and cacheable like everything else.
 
-Worth adding for the region axis alone: it brings the Netherlands in properly,
-and Dutch colonial subjects should populate Asia, which is otherwise the
-thinnest region in the pool.
+Two things turned out differently from the documentation.
+
+**The image is three records deep, not one.** Linked Art separates the object
+from the image *of* the object from the file that image is served as:
+`HumanMadeObject -> shows -> VisualItem`, then
+`VisualItem -> digitally_shown_by -> DigitalObject`, and only then an
+`access_point` carrying the IIIF endpoint. It is tempting to stop at the
+visual item's `subject_of`, which also holds a digital object -- that one is
+the catalogue web page, and taking it fails silently on every record. So one
+card costs three requests, the full 16,020 costs about 48,000, and resolution
+is budgeted and cached like everything else here.
+
+**Every record states the card's own physical size** -- "height 91 mm x width
+142 mm" -- which is a better orientation signal than the scan's proportions,
+because it describes the card rather than somebody's scanning decision. So
+these entries skip the pixel-dimension gate entirely and take the museum at
+its word. It is the cross-check the Library of Congress could not provide.
+
+Where it disappoints is provenance. Only about a quarter of the cards record
+a place of production; the rest say "unknown" in both Dutch and English, and
+no amount of parsing conjures a country out of that. The quarter that do are
+worth having, though, and not only for the obvious reason -- alongside the
+Netherlands they bring Suriname, Japan and Norway, three places nothing else
+in the pool reaches.
 
 ---
 

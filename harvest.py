@@ -143,7 +143,18 @@ SOURCES = [
      "Digital Commonwealth", {"reuse": "no restrictions"}),
     ("dc-cc", "digital_commonwealth",
      "Digital Commonwealth", {"reuse": "creative commons"}),
+    ("rijksmuseum", "rijksmuseum", "Rijksmuseum",
+     {"type": "prentbriefkaart"}),
 ]
+
+# Resolving one Rijksmuseum card costs three requests -- the object, the
+# visual item it shows, and the digital object that visual item is
+# served as -- so the full 16,020 is around 48,000 requests and not
+# something to do in one sitting.
+# Budgeted and cached like everything else here: each run resolves a few
+# thousand more and the pool fills in over a handful of months.
+RIJKS_BUDGET = 1500
+RIJKS_WORKERS = 2
 
 # Licences that let a screen show the card. NC and ND are dropped: a
 # panel in a living room is arguably neither commercial nor a derivative,
@@ -805,6 +816,204 @@ CRAWLERS = {
 
 
 # ============================================================
+# source: the Rijksmuseum
+# ============================================================
+
+RIJKS_SEARCH = "https://data.rijksmuseum.nl/search/collection"
+
+# Linked Art says what a thing is by pointing at a Getty AAT number
+# rather than by naming a field, so these are the three that matter.
+AAT_PRIMARY_TITLE = "300404670"
+AAT_OBJECT_NUMBER = "300312355"
+
+RIJKS_DIMS = re.compile(r"height\s+(\d+)\s*mm\s*x\s*width\s+(\d+)\s*mm", re.I)
+RIJKS_IIIF_TAIL = re.compile(r"/full/[^/]+/\d+/\w+\.jpg$")
+
+
+def la_names(node, aat=None):
+    """The `identified_by` strings on a Linked Art node, optionally by type."""
+    out = []
+    for name in node.get("identified_by") or []:
+        kinds = [c.get("id", "").rsplit("/", 1)[-1]
+                 for c in (name.get("classified_as") or [])]
+        if aat is None or aat in kinds:
+            content = squash(name.get("content"))
+            if content:
+                out.append(content)
+    return out
+
+
+def rijks_country(record, title):
+    """
+    Where the card is from. The production note carries it in prose --
+    "maker: anonymous, Netherlands" -- so the country is read out of
+    that first. Failing that the title is searched, which for a postcard
+    is fair: the place on the front is the place it is from, and a card
+    captioned Batavia belongs under Asia however Dutch its publisher.
+    """
+    prose = []
+    for part in ((record.get("produced_by") or {}).get("part") or []):
+        for note in part.get("referred_to_by") or []:
+            prose.append(squash(note.get("content")))
+    for note in record.get("referred_to_by") or []:
+        prose.append(squash(note.get("content")))
+
+    for text in prose + [title]:
+        lowered = (text or "").lower()
+        for name, _ in sorted(COUNTRY_REGION.items(), key=lambda kv: -len(kv[0])):
+            if re.search(r"\b" + re.escape(name) + r"\b", lowered):
+                return normalise_country(name)
+    return None
+
+
+def rijks_resolve(object_id, stats):
+    """One card, from its Linked Art record and the visual item it shows."""
+    record = fetch(object_id, accept="application/ld+json", tries=2)
+    if not isinstance(record, dict):
+        return None
+
+    title = tidy_title((la_names(record, AAT_PRIMARY_TITLE)
+                        or la_names(record) or [""])[0])
+    if not usable_title(title):
+        stats["title"] += 1
+        return None
+
+    span = (record.get("produced_by") or {}).get("timespan") or {}
+    def year(key):
+        m = YEAR_RE.search(str(span.get(key) or ""))
+        return int(m.group(1)) if m else None
+    y1, y2 = year("begin_of_the_begin"), year("end_of_the_end")
+    if y1 is None:
+        stats["no date"] += 1
+        return None
+    if y1 < MIN_YEAR or y1 > MAX_YEAR:
+        stats["out of range"] += 1
+        return None
+
+    # The card's own measurements, which say which way up it is far more
+    # reliably than the shape of somebody's scan does.
+    orientation = None
+    for note in record.get("referred_to_by") or []:
+        m = RIJKS_DIMS.search(str(note.get("content") or ""))
+        if m:
+            height, width = int(m.group(1)), int(m.group(2))
+            if abs(height - width) > 4:
+                orientation = "landscape" if width > height else "portrait"
+            break
+    if not orientation:
+        stats["no shape"] += 1
+        return None
+
+    shows = (record.get("shows") or [{}])[0].get("id")
+    if not shows:
+        stats["no image"] += 1
+        return None
+    # Three records deep, because Linked Art separates the object from
+    # the image *of* the object from the file that image is served as:
+    #   HumanMadeObject -> shows -> VisualItem
+    #   VisualItem      -> digitally_shown_by -> DigitalObject
+    #   DigitalObject   -> access_point -> the IIIF endpoint
+    # It is tempting to stop at the VisualItem's subject_of, which also
+    # carries a digital object -- that one is the catalogue web page.
+    visual = fetch(shows, accept="application/ld+json", tries=2)
+    iiif = None
+    for shown in ((visual or {}).get("digitally_shown_by") or []):
+        for point in shown.get("access_point") or []:
+            if "iiif" in str(point.get("id") or ""):
+                iiif = point["id"]
+        if iiif or not shown.get("id"):
+            continue
+        digital = fetch(shown["id"], accept="application/ld+json", tries=2)
+        for point in ((digital or {}).get("access_point") or []):
+            if "iiif" in str(point.get("id") or ""):
+                iiif = point["id"]
+        if iiif:
+            break
+    if not iiif:
+        stats["no image"] += 1
+        return None
+
+    number = (la_names(record, AAT_OBJECT_NUMBER) or [""])[0]
+    entry = {
+        "id": "rijks:" + (number or object_id.rsplit("/", 1)[-1]),
+        "b": RIJKS_IIIF_TAIL.sub("", iiif),
+        "k": "iiif",
+        "t": title,
+        "y": y1,
+        "o": orientation,
+        "src": "rijks",
+        "r": "Public Domain (CC0 metadata)",
+        "u": object_id,
+        "h": "Rijksmuseum",
+        "col": "Rijksmuseum",
+    }
+    if y2 and y2 != y1:
+        entry["y2"] = y2
+    country = rijks_country(record, title)
+    if country:
+        entry["cn"] = country
+        entry["c"] = country_slug(country)
+    return entry
+
+
+def rijks_crawl(source_key, config, max_pages, stats, cache):
+    """
+    Two passes. The search API is cheap and only hands back identifiers,
+    so that runs to completion; resolving those identifiers into cards
+    costs two requests each and runs to a budget.
+    """
+    state = crawl_state(cache, source_key)
+    state.setdefault("ids", [])
+    state.setdefault("resolved", {})
+
+    if not state["done"]:
+        url = state.get("token") or (RIJKS_SEARCH + "?" + urllib.parse.urlencode(
+            {"imageAvailable": "true", "type": config["type"]}))
+        page = 0
+        while url and page < max_pages:
+            data = fetch(url)
+            if data is None:
+                sys.stderr.write("  search page failed, pausing this source\n")
+                break
+            if page == 0 and not state["ids"]:
+                total = (data.get("partOf") or {}).get("totalItems")
+                sys.stderr.write(f"  {source_key}: {total} records\n")
+            state["ids"].extend(x["id"] for x in data.get("orderedItems") or [])
+            url = data.get("next", {}).get("id") if isinstance(
+                data.get("next"), dict) else data.get("next")
+            state["token"] = url
+            page += 1
+            if page % CRAWL_SAVE_EVERY == 0:
+                sys.stderr.write(f"  page {page}, {len(state['ids'])} ids\n")
+                save_crawl(cache)
+            time.sleep(REQUEST_DELAY)
+        if not url:
+            state["done"] = True
+        save_crawl(cache)
+
+    budget = config.get("budget", RIJKS_BUDGET)
+    todo = [i for i in state["ids"] if i not in state["resolved"]][:budget]
+    if todo:
+        sys.stderr.write(f"  resolving {len(todo)} of "
+                         f"{len(state['ids']) - len(state['resolved'])} left\n")
+        done = 0
+        with ThreadPoolExecutor(max_workers=RIJKS_WORKERS) as pool:
+            for object_id, entry in zip(todo, pool.map(
+                    lambda i: rijks_resolve(i, stats), todo)):
+                state["resolved"][object_id] = entry
+                done += 1
+                if done % 250 == 0:
+                    save_crawl(cache)
+                    sys.stderr.write(f"    {done}/{len(todo)}\n")
+        save_crawl(cache)
+
+    return [e for e in state["resolved"].values() if e]
+
+
+CRAWLERS["rijksmuseum"] = rijks_crawl
+
+
+# ============================================================
 # dimensions -- what the orientation axis is built on
 # ============================================================
 
@@ -885,6 +1094,12 @@ def apply_dimensions(entries, cache, stats):
     """Attach size and orientation; drop cards that are too small or oddly shaped."""
     kept = []
     for entry in entries:
+        # A source that tells us the card's real measurements has given
+        # better evidence than the scan's proportions ever could, so it
+        # is taken at its word and skips the pixel gate entirely.
+        if entry.get("o") and not entry.get("w"):
+            kept.append(entry)
+            continue
         dims = cache.get(entry["id"])
         if dims is None and entry.get("w") and entry.get("h_px"):
             dims = [entry["w"], entry["h_px"]]
@@ -985,7 +1200,8 @@ def fill_quality(entries, cache, budget):
 # pool
 # ============================================================
 
-def build_pool(max_pages, do_measure, dims_budget=DIMS_BUDGET):
+def build_pool(max_pages, do_measure, dims_budget=DIMS_BUDGET,
+               rijks_budget=RIJKS_BUDGET):
     stats = collections.Counter()
     entries, seen_ids = [], set()
 
@@ -993,7 +1209,8 @@ def build_pool(max_pages, do_measure, dims_budget=DIMS_BUDGET):
     for source_key, kind, label, config in SOURCES:
         sys.stderr.write(f"\n{source_key} ({label})\n")
         crawler = CRAWLERS[kind]
-        found = crawler(source_key, config, max_pages, stats, cache)
+        found = crawler(source_key, dict(config, budget=rijks_budget),
+                        max_pages, stats, cache)
         added = 0
         for entry in found:
             if entry["id"] in seen_ids:
@@ -1077,6 +1294,8 @@ def main():
                     help="skip render-quality measurement")
     ap.add_argument("--dims-budget", type=int, default=DIMS_BUDGET,
                     help="info.json lookups this run (the orientation axis)")
+    ap.add_argument("--rijks-budget", type=int, default=RIJKS_BUDGET,
+                    help="Rijksmuseum cards to resolve this run")
     ap.add_argument("--report", action="store_true",
                     help="describe the existing pool and exit")
     args = ap.parse_args()
@@ -1087,7 +1306,7 @@ def main():
         return 0
 
     entries, stats, scored, sized = build_pool(
-        args.pages, not args.no_measure, args.dims_budget)
+        args.pages, not args.no_measure, args.dims_budget, args.rijks_budget)
     if not entries:
         sys.stderr.write("\nnothing harvested; leaving the old pool alone\n")
         return 1
