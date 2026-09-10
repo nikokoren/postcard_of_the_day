@@ -203,6 +203,18 @@ Measurement is budgeted (900 cards a run) and cached in `quality.json`,
 so each monthly refresh covers more of the pool than the last. An
 unmeasured card is not held against itself.
 
+`audit_orientation.py` answers a different question: is a card we call
+"landscape" actually landscape? Orientation comes from pixel dimensions,
+which assumes the scan is stored the way the card is meant to be read.
+Comparing against the catalogue's own physical dimensions does not
+settle it — over 1,292 Library of Congress records that disagreed 21.7%
+of the time, and every disagreement read exactly "9.0 x 14.0 cm", the
+standard postcard size applied as boilerplate rather than measured. Six
+of those rendered as genuinely portrait cards, upright, captions along
+the bottom, so the catalogue is the unreliable side. Looking is what
+works: thirty cards inspected that way, none sideways, which bounds the
+error rate near 10% rather than proving it zero.
+
 `preview.py` renders upcoming picks as a contact sheet at the panel's own
 grey depth. Whether a card is *legible* can be measured; whether it is
 *interesting* cannot, and a contact sheet is the cheapest way to put that
