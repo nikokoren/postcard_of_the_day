@@ -72,13 +72,36 @@ dropped at harvest time. A TRMNL screen is arguably neither commercial nor a
 derivative, but "arguably" is not a licence, and there is enough material
 without them.
 
+### Rijksmuseum — next in
+
+- API: `https://data.rijksmuseum.nl/search/collection` (Linked Art Search, **no key**)
+- Filter: `type=prentbriefkaart&imageAvailable=true` — the search takes Dutch or
+  English terms interchangeably
+- Images: IIIF Image API 2 (Level 2) at `iiif.micr.io`
+- Size: **16,020** cards with images
+- Rights: **Public Domain Mark** on the image, **CC0** on the metadata
+
+Verified end to end rather than from the documentation. A sampled record --
+*Reclame voor de Beverwijksche Conservenfabriek*, 91 x 142 mm, with
+`Postkarte - Carte postale` printed on the verso -- resolved to a 5546 x 3633
+master, which served `!800,480` in 1.22s and `!1872,1404` in 1.98s.
+
+The one cost is that the image takes three hops to reach: the object record
+carries `shows` -> a VisualItem, which carries `subject_of` -> a DigitalObject,
+which finally carries the IIIF URL. Two extra requests per card on a monthly
+crawl, and cacheable like everything else.
+
+Worth adding for the region axis alone: it brings the Netherlands in properly,
+and Dutch colonial subjects should populate Asia, which is otherwise the
+thinnest region in the pool.
+
 ---
 
 ## Looked at and left out
 
 **Europeana** (154,196 openly-licensed postcards, 29 countries) is the obvious
-candidate for country breadth and it is the one that hurts to lose. Two things
-disqualify it as a primary source:
+candidate for breadth and it is the one that hurts to lose. Two things
+disqualify it *as a primary source*:
 
 - *Image size.* `edmIsShownBy` is a raw provider URL with no IIIF and no
   resizing. In a sample of 54 fetched images the median short side was **525
@@ -88,8 +111,13 @@ disqualify it as a primary source:
   pool), titles every record "Postkarte". The second largest, Estonia's muis.ee,
   titles them "Postkaart".
 
-Worth revisiting per-provider: a handful of Europeana providers do serve IIIF at
-full resolution with real captions, and could be allow-listed individually.
+The way back in is to use it as a **discovery engine** rather than a source.
+Europeana is an aggregator: it holds the metadata centrally but the image stays
+on the contributing institution's own server, which is exactly why the average
+is so poor. So query Europeana to find which individual providers serve
+full-resolution IIIF with real captions, allow-list those providers, and then
+fetch from them directly. That turns a fatal average into a usable subset, and
+it is how any further European postcard source is likely to be found.
 
 **Wikimedia Commons** is the other big one -- `Postcards of France` alone has
 86,235 files, `Postcards of Germany` 81,166, across ~180 country categories,
@@ -113,5 +141,18 @@ philatelic -- postal stationery and covers rather than picture postcards.
 Worth a proper count before adding.
 
 **NYPL Digital Collections** has substantial international postcard holdings at
-good resolution. It needs an access token issued by a request form. Next in
-line if the country axis needs more depth.
+good resolution. It needs an access token issued by a request form.
+
+**The Metropolitan Museum of Art** is key-free with CC0 images and is an
+excellent source of *objects*, but it holds no postcards to speak of: 142 hits
+for "postcard", 41 of them public domain, and the search is loose enough that a
+Patinir triptych came back among them.
+
+**The British Museum** is ruled out on licensing, not on quality. Its images are
+CC BY-NC-SA. The `SA` clause is survivable -- ShareAlike only bites on
+adaptations, and Creative Commons treats resizing as format-shifting rather than
+adaptation -- and `BY` costs nothing, since the credit is printed anyway. `NC`
+is the problem: a screen in someone's home is plainly non-commercial, but the
+recipe is published to a public library, on hardware someone sells, and can be
+installed in a shop. That is not a use anyone can promise stays
+non-commercial.

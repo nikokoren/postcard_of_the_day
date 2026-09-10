@@ -38,6 +38,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 POOL_PATH = os.path.join(HERE, "pool.json")
+CRAWL_PATH = os.path.join(HERE, "crawl.json")
 QUALITY_PATH = os.path.join(HERE, "quality.json")
 DIMS_PATH = os.path.join(HERE, "dimensions.json")
 
@@ -54,9 +55,19 @@ RETRIES = 5
 MAX_PAGE_FAILURES = 8   # consecutive
 REQUEST_DELAY = 1.0     # between search pages
 DIMS_WORKERS = 6        # parallel info.json fetches
-DIMS_BUDGET = 20000     # info.json fetches per run
+DIMS_BUDGET = 2500      # info.json fetches per run
 MEASURE_BUDGET = 900    # image fetches per run, for render quality
 POOL_VERSION = 1
+
+# A crawl of 60,000 records takes long enough that something will
+# interrupt it -- a runner timing out, a process reaped, a network that
+# gives up. Losing an hour's paging to that is the difference between a
+# refresh that finishes and one that never does, so each source's
+# progress is written to crawl.json as it goes and a later run picks up
+# from the page it stopped on. A cache older than this is re-crawled
+# from the start, because by then the collections have moved.
+CRAWL_MAX_AGE_DAYS = 20
+CRAWL_SAVE_EVERY = 10
 
 
 # ============================================================
@@ -136,6 +147,37 @@ LICENCE_OK = re.compile(
     r"(publicdomain|/zero/|no known|no copyright|"
     r"licenses/by/|licenses/by-sa/)", re.I)
 LICENCE_BAD = re.compile(r"(-nc|-nd|noncommercial|noderiv)", re.I)
+
+
+# ============================================================
+# the resumable crawl cache
+# ============================================================
+
+def load_crawl():
+    try:
+        with open(CRAWL_PATH) as fh:
+            data = json.load(fh)
+    except (OSError, ValueError):
+        return {}
+    fresh = time.time() - CRAWL_MAX_AGE_DAYS * 86400
+    return {key: state for key, state in (data.get("sources") or {}).items()
+            if state.get("started", 0) >= fresh}
+
+
+def save_crawl(cache):
+    with open(CRAWL_PATH, "w") as fh:
+        json.dump({"version": 1, "sources": cache}, fh,
+                  separators=(",", ":"), sort_keys=True)
+        fh.write("\n")
+
+
+def crawl_state(cache, source_key):
+    state = cache.get(source_key)
+    if not state:
+        state = {"page": 1, "done": False, "entries": [],
+                 "started": time.time()}
+        cache[source_key] = state
+    return state
 
 
 # ============================================================
@@ -495,13 +537,19 @@ def dc_evaluate(record, source_key, stats):
     return entry
 
 
-def dc_crawl(source_key, config, max_pages, stats):
+def dc_crawl(source_key, config, max_pages, stats, cache):
     params = {
         "f[genre_specific_ssim][]": "Postcards",
         "f[reuse_allowed_ssi][]": config["reuse"],
         "per_page": 100,
     }
-    entries, page, failures = [], 1, 0
+    state = crawl_state(cache, source_key)
+    if state["done"]:
+        sys.stderr.write(f"  resumed: complete, {len(state['entries'])} cards\n")
+        return state["entries"]
+    entries, page, failures = state["entries"], state["page"], 0
+    if page > 1:
+        sys.stderr.write(f"  resuming at page {page}, {len(entries)} cards so far\n")
     while page <= max_pages:
         url = DC_SEARCH + "?" + urllib.parse.urlencode(
             {**params, "page": page}, doseq=True)
@@ -519,6 +567,9 @@ def dc_crawl(source_key, config, max_pages, stats):
         rows = data.get("data") or []
         if not rows:
             break
+        if page % 10 == 0:
+            sys.stderr.write(f"  page {page}, {len(entries)} kept\n")
+            sys.stderr.flush()
         if page == 1:
             total = ((data.get("meta") or {}).get("pages") or {}).get(
                 "total_count")
@@ -529,7 +580,12 @@ def dc_crawl(source_key, config, max_pages, stats):
             if entry:
                 entries.append(entry)
         page += 1
+        if page % CRAWL_SAVE_EVERY == 0:
+            state["page"] = page
+            save_crawl(cache)
         time.sleep(REQUEST_DELAY)
+    state["page"], state["done"] = page, True
+    save_crawl(cache)
     return entries
 
 
@@ -667,7 +723,7 @@ def loc_evaluate(record, label, collection, stats):
     return entry
 
 
-def loc_crawl(source_key, config, max_pages, stats):
+def loc_crawl(source_key, config, max_pages, stats, cache):
     """Either a named collection or a faceted search; both page the same way."""
     if config.get("slug"):
         base = "https://www.loc.gov/collections/{}/".format(config["slug"])
@@ -678,7 +734,13 @@ def loc_crawl(source_key, config, max_pages, stats):
         query = {"fa": config["fa"]}
         collection = config.get("collection", "Library of Congress")
 
-    entries, page, failures = [], 1, 0
+    state = crawl_state(cache, source_key)
+    if state["done"]:
+        sys.stderr.write(f"  resumed: complete, {len(state['entries'])} cards\n")
+        return state["entries"]
+    entries, page, failures = state["entries"], state["page"], 0
+    if page > 1:
+        sys.stderr.write(f"  resuming at page {page}, {len(entries)} cards so far\n")
     while page <= max_pages:
         url = base + "?" + urllib.parse.urlencode(dict(
             query, fo="json", c=100, sp=page, at="results,pagination"))
@@ -696,6 +758,9 @@ def loc_crawl(source_key, config, max_pages, stats):
         rows = data.get("results") or []
         if not rows:
             break
+        if page % 10 == 0:
+            sys.stderr.write(f"  page {page}, {len(entries)} kept\n")
+            sys.stderr.flush()
         if page == 1:
             total = (data.get("pagination") or {}).get("of")
             sys.stderr.write(f"  {source_key}: {total} records\n")
@@ -707,7 +772,12 @@ def loc_crawl(source_key, config, max_pages, stats):
         if not (data.get("pagination") or {}).get("next"):
             break
         page += 1
+        if page % CRAWL_SAVE_EVERY == 0:
+            state["page"] = page
+            save_crawl(cache)
         time.sleep(REQUEST_DELAY)
+    state["page"], state["done"] = page, True
+    save_crawl(cache)
     return entries
 
 
@@ -758,6 +828,24 @@ def fill_dimensions(entries, cache, budget):
     todo = [e for e in entries
             if e.get("k") == "iiif" and e["id"] not in cache
             and not (e.get("w") and e.get("h_px"))]
+
+    # Measure the cards most likely to survive first. Most of an
+    # unmeasured backlog is American, and the per-country cap throws
+    # most of that away unmeasured anyway -- whereas a card from a
+    # country with two hundred behind it is one the region axis leans
+    # on. So walk the countries round-robin, rarest first: a budget that
+    # cannot cover everything then covers the thin countries whole
+    # rather than taking a slice off the top of the biggest one.
+    groups = collections.defaultdict(list)
+    for entry in todo:
+        groups[entry.get("c") or "unknown"].append(entry)
+    ordered = sorted(groups.values(), key=len)
+    todo, depth = [], 0
+    while len(todo) < budget and any(len(g) > depth for g in ordered):
+        for group in ordered:
+            if depth < len(group):
+                todo.append(group[depth])
+        depth += 1
     todo = todo[:budget]
     if not todo:
         return 0
@@ -768,8 +856,14 @@ def fill_dimensions(entries, cache, budget):
                 lambda e: fetch_dimensions(e["b"]), todo)):
             cache[entry["id"]] = list(dims) if dims else None
             done += 1
-            if done % 1000 == 0:
+            # Checkpoint. This phase is the long pole of a refresh, and
+            # a run that dies two thirds of the way through should leave
+            # those two thirds behind for the next one rather than
+            # asking for them all over again.
+            if done % 250 == 0:
+                save_cache(DIMS_PATH, cache, "measured")
                 sys.stderr.write(f"    {done}/{len(todo)}\n")
+                sys.stderr.flush()
     return done
 
 
@@ -881,10 +975,11 @@ def build_pool(max_pages, do_measure):
     stats = collections.Counter()
     entries, seen_ids = [], set()
 
+    cache = load_crawl()
     for source_key, kind, label, config in SOURCES:
         sys.stderr.write(f"\n{source_key} ({label})\n")
         crawler = CRAWLERS[kind]
-        found = crawler(source_key, config, max_pages, stats)
+        found = crawler(source_key, config, max_pages, stats, cache)
         added = 0
         for entry in found:
             if entry["id"] in seen_ids:

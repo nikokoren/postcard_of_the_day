@@ -500,7 +500,13 @@ def write_json(path, payload):
     return True
 
 
+class NoPoolYet(Exception):
+    """The repo is live but the first harvest has not landed."""
+
+
 def load_pool():
+    if not os.path.exists(POOL_PATH):
+        raise NoPoolYet
     with open(POOL_PATH) as fh:
         data = json.load(fh)
     entries = [e for e in data.get("entries") or [] if e.get("o") and e.get("b")]
@@ -609,7 +615,18 @@ def main():
 
     day = (date.fromisoformat(args.date) if args.date
            else date.fromtimestamp(time.time()))
-    entries = load_pool()
+    try:
+        entries = load_pool()
+    except NoPoolYet:
+        # The scheduled job starts running the moment the workflow file
+        # reaches the default branch, which is normally before the first
+        # harvest has been committed. That is a state to wait out, not a
+        # failure to shout about every morning -- so say so and exit
+        # clean. A pool that exists but is unusable still fails loudly.
+        sys.stderr.write(
+            "no pool.json yet, so there is nothing to publish. Run the "
+            "Refresh Postcard Pool workflow first.\n")
+        return 0
 
     if args.selftest:
         return selftest(entries, day)
