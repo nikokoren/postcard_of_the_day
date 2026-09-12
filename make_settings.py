@@ -97,8 +97,9 @@ AUTHOR_BIO = """\
     field_type: author_bio
     description: >-
       Miss getting postcards in the mail? This recipe has you covered. A
-      unique historical postcard from across the globe. Each and every day.
-      No friends and family required. <br><br> Real printed cards from the
+      unique historical postcard from across the globe, each and every day
+      -- and unlike your friends and family, it lets you choose where they
+      come from. <br><br> Real printed cards from the
       public archives -- the kind somebody bought at a station kiosk, wrote
       three lines on, and posted. {pool:,} of them so far, spanning
       {countries} countries and the years {first} to {last}, held by the
