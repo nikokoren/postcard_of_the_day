@@ -402,8 +402,13 @@ def title_line(entry):
     A title that fits a panel. Cut at a subtitle marker if there is one,
     then at a clause boundary, and only fall back to a word boundary --
     with an ellipsis to admit it -- if neither exists.
+
+    English wins where translate.py has produced one. It replaces the
+    original rather than joining it, because the panel has room for one
+    caption and a reader who cannot read Greek is not helped by being
+    shown the Greek as well. The original stays in the pool.
     """
-    title = entry["t"]
+    title = entry.get("te") or entry["t"]
     if len(title) <= TITLE_LIMIT:
         return balance_brackets(title)
     for marker in SUBTITLE_MARKERS:
@@ -574,6 +579,17 @@ def write_json(path, payload):
     return True
 
 
+TRANSLATIONS_PATH = os.path.join(HERE, "translations.json")
+
+
+def load_translations():
+    try:
+        with open(TRANSLATIONS_PATH) as fh:
+            return json.load(fh).get("titles") or {}
+    except (OSError, ValueError):
+        return {}
+
+
 class NoPoolYet(Exception):
     """The repo is live but the first harvest has not landed."""
 
@@ -591,10 +607,16 @@ def load_pool():
     # correcting -- whether Egypt files under Africa or the Middle East,
     # what to do with Hawaii -- and correcting it should not mean
     # re-crawling 30,000 records.
+    # Applied here rather than in harvest.py, so a better translation --
+    # or a corrected one -- never needs a re-crawl.
+    english = load_translations()
     for entry in entries:
         slug, label = region_for(entry.get("cn"), entry.get("ct"))
         if slug:
             entry["rg"], entry["rgn"] = slug, label
+        rendered = english.get(entry["t"])
+        if rendered and rendered.get("en"):
+            entry["te"] = rendered["en"]
     return entries
 
 
