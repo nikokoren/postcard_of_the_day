@@ -79,14 +79,22 @@ custom_fields:
     options:
       - true
       - false
-
-author_bio: >-
-  A postcard a day from the public archives -- a real printed card, the
-  kind somebody bought at a station kiosk, wrote three lines on and
-  posted. Every morning the recipe picks one from about 18,206 of them,
-  drawn from the Library of Congress and Digital Commonwealth, and shows
-  it with whatever the catalogue knows: what it shows, where, who
-  printed it and when. Sort by orientation, region or era, or leave the
-  settings alone and take the whole catalogue as it comes. Nothing
-  repeats until every card has had its day. Public domain and openly
-  licensed material only.
+  - keyname: about
+    name: About This Plugin
+    category: education,discovery
+    field_type: author_bio
+    description: >-
+      Miss getting postcards in the mail? This recipe has you covered. A
+      unique historical postcard from across the globe. Each and every day.
+      No friends and family required. <br><br> Real printed cards from the
+      public archives -- the kind somebody bought at a station kiosk, wrote
+      three lines on, and posted. 18,206 of them so far, spanning
+      115 countries and the years 1860 to 1975, held by the
+      Library of Congress, the Rijksmuseum, the University of Graz and
+      more. Each one arrives with whatever the catalogue knows: what it
+      shows, where, who printed it, and when. <br><br> Sort by orientation, region or era -- or change
+      nothing and take the whole world as it comes. No card repeats until
+      every one of them has had its day. <br><br> Public domain and openly
+      licensed material only. Install (don't Fork!) to receive future
+      updates.
+    email_address: isarworks@gmail.com

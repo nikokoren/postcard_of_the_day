@@ -86,17 +86,30 @@ def toggle_block(label, keyname, help_text, default):
     ).format(keyname, label, help_text, default)
 
 
-AUTHOR_BIO = """
-author_bio: >-
-  A postcard a day from the public archives -- a real printed card, the
-  kind somebody bought at a station kiosk, wrote three lines on and
-  posted. Every morning the recipe picks one from about {pool:,} of them,
-  drawn from the Library of Congress and Digital Commonwealth, and shows
-  it with whatever the catalogue knows: what it shows, where, who
-  printed it and when. Sort by orientation, region or era, or leave the
-  settings alone and take the whole catalogue as it comes. Nothing
-  repeats until every card has had its day. Public domain and openly
-  licensed material only.
+# The pitch, not the catalogue entry. Somebody scrolling a plugin list
+# wants to know what it feels like to have this on the wall, and the
+# numbers are there to make the promise credible rather than to be the
+# promise. Counts come from the pool so they never go stale.
+AUTHOR_BIO = """\
+  - keyname: about
+    name: About This Plugin
+    category: education,discovery
+    field_type: author_bio
+    description: >-
+      Miss getting postcards in the mail? This recipe has you covered. A
+      unique historical postcard from across the globe. Each and every day.
+      No friends and family required. <br><br> Real printed cards from the
+      public archives -- the kind somebody bought at a station kiosk, wrote
+      three lines on, and posted. {pool:,} of them so far, spanning
+      {countries} countries and the years {first} to {last}, held by the
+      Library of Congress, the Rijksmuseum, the University of Graz and
+      more. Each one arrives with whatever the catalogue knows: what it
+      shows, where, who printed it, and when. <br><br> Sort by orientation, region or era -- or change
+      nothing and take the whole world as it comes. No card repeats until
+      every one of them has had its day. <br><br> Public domain and openly
+      licensed material only. Install (don't Fork!) to receive future
+      updates.
+    email_address: isarworks@gmail.com
 """
 
 
@@ -129,7 +142,11 @@ def main():
     body.append(toggle_block(
         "Show the credit", "show_credit",
         "The holding archive and collection.", "false"))
-    body.append(AUTHOR_BIO.format(pool=len(entries)))
+    countries = len({e["c"] for e in entries if e.get("c")})
+    years = [e["y"] for e in entries]
+    body.append(AUTHOR_BIO.format(
+        pool=len(entries), countries=countries,
+        first=min(years), last=max(years)))
 
     with open(OUT, "w") as fh:
         fh.write("".join(body))
