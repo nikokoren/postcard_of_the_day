@@ -1,0 +1,171 @@
+{
+ "cell_keys": "all__all__all",
+ "cell_separator": "__",
+ "day": "2026-09-12",
+ "day_index": 20708,
+ "days": {
+  "20707": {
+   "all__all__all": [
+    "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:x346ft54w/full/!1872,1404/0/default.jpg",
+    "Greetings from Ciudad Juarez, Old Mexico",
+    "1930\u20131945",
+    "Ciudad Ju\u00e1rez, Mexico",
+    "Tichnor Bros., Inc.",
+    "Boston Public Library, Tichnor Brothers Postcard Collection"
+   ]
+  },
+  "20708": {
+   "all__all__all": [
+    "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:x346ft54w/full/!1872,1404/0/default.jpg",
+    "Greetings from Ciudad Juarez, Old Mexico",
+    "1930\u20131945",
+    "Ciudad Ju\u00e1rez, Mexico",
+    "Tichnor Bros., Inc.",
+    "Boston Public Library, Tichnor Brothers Postcard Collection"
+   ]
+  },
+  "20709": {
+   "all__all__all": [
+    "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:x346ft54w/full/!1872,1404/0/default.jpg",
+    "Greetings from Ciudad Juarez, Old Mexico",
+    "1930\u20131945",
+    "Ciudad Ju\u00e1rez, Mexico",
+    "Tichnor Bros., Inc.",
+    "Boston Public Library, Tichnor Brothers Postcard Collection"
+   ]
+  }
+ },
+ "default": "all__all__all",
+ "default_day": "20708",
+ "era_options": [
+  {
+   "key": "era-pre-1900",
+   "label": "Before 1900"
+  },
+  {
+   "key": "era-1900-1914",
+   "label": "1900 - 1914"
+  },
+  {
+   "key": "era-1915-1929",
+   "label": "1915 - 1929"
+  },
+  {
+   "key": "era-1930-1945",
+   "label": "1930 - 1945"
+  },
+  {
+   "key": "era-1946-on",
+   "label": "1946 onwards"
+  }
+ ],
+ "generated": "2026-09-12T22:47:50Z",
+ "keys_by_label": {
+  "1900 - 1914": "era-1900-1914",
+  "1900-1914": "era-1900-1914",
+  "1900_-_1914": "era-1900-1914",
+  "1900_1914": "era-1900-1914",
+  "1915 - 1929": "era-1915-1929",
+  "1915-1929": "era-1915-1929",
+  "1915_-_1929": "era-1915-1929",
+  "1915_1929": "era-1915-1929",
+  "1930 - 1945": "era-1930-1945",
+  "1930-1945": "era-1930-1945",
+  "1930_-_1945": "era-1930-1945",
+  "1930_1945": "era-1930-1945",
+  "1946 onwards": "era-1946-on",
+  "1946-onwards": "era-1946-on",
+  "1946_onwards": "era-1946-on",
+  "Africa": "africa",
+  "Asia": "asia",
+  "Before 1900": "era-pre-1900",
+  "Europe": "europe",
+  "Landscape": "landscape",
+  "Latin America & the Caribbean": "latin-america",
+  "Middle East": "middle-east",
+  "North America": "north-america",
+  "Portrait": "portrait",
+  "africa": "africa",
+  "asia": "asia",
+  "before 1900": "era-pre-1900",
+  "before-1900": "era-pre-1900",
+  "before_1900": "era-pre-1900",
+  "era-1900-1914": "era-1900-1914",
+  "era-1915-1929": "era-1915-1929",
+  "era-1930-1945": "era-1930-1945",
+  "era-1946-on": "era-1946-on",
+  "era-pre-1900": "era-pre-1900",
+  "era_1900_1914": "era-1900-1914",
+  "era_1915_1929": "era-1915-1929",
+  "era_1930_1945": "era-1930-1945",
+  "era_1946_on": "era-1946-on",
+  "era_pre_1900": "era-pre-1900",
+  "europe": "europe",
+  "landscape": "landscape",
+  "latin america & the caribbean": "latin-america",
+  "latin-america": "latin-america",
+  "latin-america-the-caribbean": "latin-america",
+  "latin_america": "latin-america",
+  "latin_america_&_the_caribbean": "latin-america",
+  "latin_america_the_caribbean": "latin-america",
+  "middle east": "middle-east",
+  "middle-east": "middle-east",
+  "middle_east": "middle-east",
+  "north america": "north-america",
+  "north-america": "north-america",
+  "north_america": "north-america",
+  "portrait": "portrait"
+ },
+ "orientation_options": [
+  {
+   "key": "landscape",
+   "label": "Landscape"
+  },
+  {
+   "key": "portrait",
+   "label": "Portrait"
+  }
+ ],
+ "pick_fields": [
+  "image",
+  "title",
+  "date",
+  "place",
+  "publisher",
+  "credit"
+ ],
+ "pool": 18206,
+ "region_options": [
+  {
+   "count": 8202,
+   "key": "europe",
+   "label": "Europe"
+  },
+  {
+   "count": 6136,
+   "key": "north-america",
+   "label": "North America"
+  },
+  {
+   "count": 674,
+   "key": "africa",
+   "label": "Africa"
+  },
+  {
+   "count": 521,
+   "key": "latin-america",
+   "label": "Latin America & the Caribbean"
+  },
+  {
+   "count": 307,
+   "key": "asia",
+   "label": "Asia"
+  },
+  {
+   "count": 150,
+   "key": "middle-east",
+   "label": "Middle East"
+  }
+ ],
+ "version": 1
+}

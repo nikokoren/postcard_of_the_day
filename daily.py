@@ -448,6 +448,34 @@ def place_line(entry):
     return ", ".join(bits)
 
 
+# Catalogues record a publisher as it is printed on the card, which is
+# a sentence rather than a name: "Made only by Tichnor Bros., Inc. Pub.
+# by Sandoval News Service, El Paso, Texas". The layout puts "Printed
+# by" in front of it, so the lead-in has to go or it reads "Printed by
+# Made only by", and the trailing distributor is more than a caption
+# line can hold.
+PUBLISHER_LEAD = re.compile(
+    r"^(?:made\s+(?:only\s+)?by|published\s+by|pub(?:lished)?\.?\s+by|"
+    r"printed\s+by|printed\s+for|copyright\s+by)\s+", re.I)
+PUBLISHER_TAIL = re.compile(
+    r"(\.)?\s+(?:pub(?:lished)?\.?\s+by|made\s+only\s+by|"
+    r"distributed\s+by|sold\s+by)\s+.*$", re.I)
+
+
+def publisher_line(entry):
+    name = PUBLISHER_LEAD.sub("", entry.get("pub") or "").strip()
+    # Keep a full stop that belongs to the abbreviation before the cut,
+    # so "Tichnor Bros., Inc. Pub. by ..." ends at "Inc." and not "Inc".
+    name = PUBLISHER_TAIL.sub(lambda m: m.group(1) or "", name).strip(" ,;")
+    if len(name) > 60:
+        name = name[:60].rsplit(" ", 1)[0]
+    # Catalogues gloss a non-Latin name in brackets. Half a bracket is
+    # worse than none, so drop an unclosed one rather than cut inside it.
+    if name.count("[") > name.count("]"):
+        name = name[:name.rindex("[")]
+    return name.strip(" ,;")
+
+
 def credit_line(entry):
     holder = entry.get("h") or ""
     collection = entry.get("col") or ""
@@ -474,7 +502,7 @@ def build_payload(entry):
         title_line(entry),
         date_line(entry),
         place_line(entry),
-        entry.get("pub") or "",
+        publisher_line(entry),
         credit_line(entry),
     ]
 
@@ -489,7 +517,7 @@ def full_payload(entry, day):
         "place": place_line(entry),
         "country": entry.get("cn") or "",
         "orientation": entry.get("o") or "",
-        "publisher": entry.get("pub") or "",
+        "publisher": publisher_line(entry),
         "credit": credit_line(entry),
         "rights": entry.get("r") or "",
         "source_url": entry.get("u") or "",
