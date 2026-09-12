@@ -1,771 +1,9 @@
 {
  "cell_keys": "all__africa__all,all__africa__era-1900-1914,all__africa__era-1915-1929,all__africa__era-1930-1945,all__all__all,all__all__era-1900-1914,all__all__era-1915-1929,all__all__era-1930-1945,all__all__era-1946-on,all__all__era-pre-1900,all__asia__all,all__asia__era-1900-1914,all__asia__era-1915-1929,all__asia__era-1946-on,all__asia__era-pre-1900,all__europe__all,all__europe__era-1900-1914,all__europe__era-1915-1929,all__europe__era-1930-1945,all__europe__era-1946-on,all__europe__era-pre-1900,all__latin-america__all,all__latin-america__era-1900-1914,all__latin-america__era-1915-1929,all__latin-america__era-1930-1945,all__latin-america__era-1946-on,all__middle-east__all,all__middle-east__era-1900-1914,all__north-america__all,all__north-america__era-1900-1914,all__north-america__era-1915-1929,all__north-america__era-1930-1945,all__north-america__era-1946-on,all__north-america__era-pre-1900,landscape__africa__all,landscape__africa__era-1900-1914,landscape__africa__era-1915-1929,landscape__africa__era-1930-1945,landscape__all__all,landscape__all__era-1900-1914,landscape__all__era-1915-1929,landscape__all__era-1930-1945,landscape__all__era-1946-on,landscape__all__era-pre-1900,landscape__asia__all,landscape__asia__era-1900-1914,landscape__asia__era-1915-1929,landscape__asia__era-1946-on,landscape__asia__era-pre-1900,landscape__europe__all,landscape__europe__era-1900-1914,landscape__europe__era-1915-1929,landscape__europe__era-1930-1945,landscape__europe__era-1946-on,landscape__europe__era-pre-1900,landscape__latin-america__all,landscape__latin-america__era-1900-1914,landscape__latin-america__era-1915-1929,landscape__latin-america__era-1930-1945,landscape__latin-america__era-1946-on,landscape__middle-east__all,landscape__middle-east__era-1900-1914,landscape__north-america__all,landscape__north-america__era-1900-1914,landscape__north-america__era-1915-1929,landscape__north-america__era-1930-1945,landscape__north-america__era-1946-on,landscape__north-america__era-pre-1900,portrait__africa__all,portrait__africa__era-1900-1914,portrait__africa__era-1915-1929,portrait__africa__era-1930-1945,portrait__all__all,portrait__all__era-1900-1914,portrait__all__era-1915-1929,portrait__all__era-1930-1945,portrait__all__era-1946-on,portrait__all__era-pre-1900,portrait__asia__all,portrait__asia__era-1946-on,portrait__europe__all,portrait__europe__era-1900-1914,portrait__europe__era-1915-1929,portrait__europe__era-1930-1945,portrait__europe__era-1946-on,portrait__europe__era-pre-1900,portrait__latin-america__all,portrait__latin-america__era-1900-1914,portrait__latin-america__era-1930-1945,portrait__middle-east__all,portrait__north-america__all,portrait__north-america__era-1900-1914,portrait__north-america__era-1915-1929,portrait__north-america__era-1930-1945,portrait__north-america__era-1946-on",
  "cell_separator": "__",
- "day": "2026-09-11",
- "day_index": 20707,
+ "day": "2026-09-12",
+ "day_index": 20708,
  "days": {
-  "20706": {
-   "all__africa__all": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b01000/1b01200/1b01253v.jpg",
-    "Cairo. Arab Street",
-    "1900",
-    "Egypt",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "all__africa__era-1900-1914": [
-    "https://tile.loc.gov/image-services/iiif/public:amed:2020760730:0001/full/!1872,1404/0/default.jpg",
-    "Massaua - Il Porto",
-    "1900",
-    "Eritrea",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "all__africa__era-1915-1929": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b01000/1b01300/1b01329v.jpg",
-    "Memphis - The Alabaster Sphinx",
-    "1924",
-    "Egypt",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "all__africa__era-1930-1945": [
-    "https://tile.loc.gov/image-services/iiif/public:amed:2020760511:0001/full/!1872,1404/0/default.jpg",
-    "II-6 La piazza di Maccall\u00e9, pochi giorni dopo la occupazione - (sullo sfondo il forte Galliano)",
-    "1935",
-    "Ethiopia",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "all__all__all": [
-    "https://iiif.micr.io/LrHFz/full/!1872,1404/0/default.jpg",
-    "Familieportret van Willem III, koning der Nederlanden, Sophie van W\u00fcrttemberg en twee zoons",
-    "1956",
-    "Netherlands",
-    "",
-    "Rijksmuseum"
-   ],
-   "all__all__era-1900-1914": [
-    "https://gams.uni-graz.at/iiif/o:gm.1657%2FRECTO/full/!1872,1404/0/default.jpg",
-    "Graz. Sparbersbachgasse",
-    "1909",
-    "Sparbersbachgasse Ecke Mandellstra\u00dfe, Austria",
-    "",
-    "University of Graz, GrazMuseum Ansichtskarten"
-   ],
-   "all__all__era-1915-1929": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1d00000/1d02000/1d02100/1d02101v.jpg",
-    "The Spouting Horn, Schooner Head",
-    "1922",
-    "United States",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "all__all__era-1930-1945": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1a10000/1a10000/1a10000/1a10072v.jpg",
-    "Greetings from Long Island, N.Y",
-    "1944",
-    "United States",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "all__all__era-1946-on": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1d00000/1d01000/1d01000/1d01081v.jpg",
-    "Hotel Wolford, Danville, Illinois",
-    "1947",
-    "United States",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "all__all__era-pre-1900": [
-    "https://gams.uni-graz.at/iiif/o:gm.1165%2FRECTO/full/!1872,1404/0/default.jpg",
-    "Gruss aus Graz. Gemaltes Haus",
-    "1895\u20131905",
-    "Blick auf das Gemalte Haus in der Herrengasse, Austria",
-    "",
-    "University of Graz, GrazMuseum Ansichtskarten"
-   ],
-   "all__asia__all": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b10000/1b13000/1b13500/1b13562v.jpg",
-    "Tro ve lang cu",
-    "1975",
-    "Vietnam",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "all__asia__era-1900-1914": [
-    "https://iiif.micr.io/JpckS/full/!1872,1404/0/default.jpg",
-    "Yoshiwara",
-    "1906",
-    "Japan",
-    "",
-    "Rijksmuseum"
-   ],
-   "all__asia__era-1915-1929": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b10000/1b10000/1b10600/1b10639v.jpg",
-    "The Matsuya Dept., a grand sight. Views on Sumida River (new Tokyo)",
-    "1920",
-    "Japan",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "all__asia__era-1946-on": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b10000/1b10000/1b10500/1b10508v.jpg",
-    "The Kabuki Theatre and Shochiku Central Theatre, Tokyo",
-    "1950",
-    "Japan",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "all__asia__era-pre-1900": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b00000/1b00800/1b00866v.jpg",
-    "Schonen Gruss aus Kiao-Tschau",
-    "1898",
-    "China",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "all__europe__all": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b10000/1b12000/1b12900/1b12932v.jpg",
-    "Gotlands Fornsal. S. Goranskapellet",
-    "1890",
-    "Sweden",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "all__europe__era-1900-1914": [
-    "https://gams.uni-graz.at/iiif/o:gm.3893%2FRECTO/full/!1872,1404/0/default.jpg",
-    "Graz. Ausblick vom Uhrturm",
-    "1914",
-    "Blick vom Schlo\u00dfberg gegen S\u00fcden, Austria",
-    "",
-    "University of Graz, GrazMuseum Ansichtskarten"
-   ],
-   "all__europe__era-1915-1929": [
-    "https://gams.uni-graz.at/iiif/o:gm.1268%2FRECTO/full/!1872,1404/0/default.jpg",
-    "Graz: Jakominiplatz",
-    "1920",
-    "Mariens\u00e4ule und Markt am Jakominiplatz in Richtung Norden, Austria",
-    "",
-    "University of Graz, GrazMuseum Ansichtskarten"
-   ],
-   "all__europe__era-1930-1945": [
-    "https://gams.uni-graz.at/iiif/o:gm.4210%2FRECTO/full/!1872,1404/0/default.jpg",
-    "Graz",
-    "1930",
-    "Uhrturm, Schlo\u00dfberg gegen Norden, Murbr\u00fccken, Austria",
-    "",
-    "University of Graz, GrazMuseum Ansichtskarten"
-   ],
-   "all__europe__era-1946-on": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b10000/1b11000/1b11800/1b11883v.jpg",
-    "Stroj Kielecki. Polish Folk Coustumes [i.e. Costumes]",
-    "1967",
-    "Poland",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "all__europe__era-pre-1900": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b04000/1b04300/1b04384v.jpg",
-    "Cathedrale de Chartres, Pourtour du Choeur (XVIe siecle), \"La Sainte Vierge se rendant au Temple\"",
-    "1890",
-    "France",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "all__latin-america__all": [
-    "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:x346fs58s/full/!1872,1404/0/default.jpg",
-    "Greetings from Jamaica, B.W.I. Errol Flynn's Navy Island - Port Antonio",
-    "1930\u20131945",
-    "Port Antonio, Jamaica",
-    "Copyright picture by Cleary & Elliott",
-    "Boston Public Library, Tichnor Brothers Postcard Collection"
-   ],
-   "all__latin-america__era-1900-1914": [
-    "https://iiif.micr.io/XURab/full/!1872,1404/0/default.jpg",
-    "Staande vrouw in koto",
-    "1900\u20131910",
-    "Suriname",
-    "",
-    "Rijksmuseum"
-   ],
-   "all__latin-america__era-1915-1929": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b01000/1b01300/1b01338v.jpg",
-    "Pozo en San Miguel (El Salvador)",
-    "1920",
-    "El Salvador",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "all__latin-america__era-1930-1945": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b01000/1b01000/1b01068v.jpg",
-    "Towers of the San Francisco Convent. Quito, Ecuador",
-    "1935",
-    "Ecuador",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "all__latin-america__era-1946-on": [
-    "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:pz50hk35b/full/!1872,1404/0/default.jpg",
-    "The Balmoral Beach Hotel, a Sonesta Hotel on Cable Beach",
-    "1960\u20131979",
-    "Nassau, Bahamas",
-    "",
-    "Boston Public Library, Tichnor Brothers Postcard Collection"
-   ],
-   "all__middle-east__all": [
-    "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:pn89gt20x/full/!1872,1404/0/default.jpg",
-    "Groupe de mendiants devant la Port Suleymaine. Constantinople",
-    "1907\u20131915",
-    "Turkey",
-    "Editeur M.J.C.",
-    "Boston Public Library, Nicholas Catsimpoolas Collection"
-   ],
-   "all__middle-east__era-1900-1914": [
-    "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:v692ws320/full/!1872,1404/0/default.jpg",
-    "Constantinople. Porte du Palais de Dolma-Baghtch\u00e9",
-    "1907\u20131915",
-    "Turkey",
-    "Editeur M.J.C.",
-    "Boston Public Library, Nicholas Catsimpoolas Collection"
-   ],
-   "all__north-america__all": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1a10000/1a12000/1a12000/1a12041v.jpg",
-    "Moravian Church, Bethlehem, Pa",
-    "1905",
-    "United States",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "all__north-america__era-1900-1914": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1d00000/1d07000/1d07100/1d07173v.jpg",
-    "Rice's Hotel, Heathsville, Va",
-    "1900",
-    "United States",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "all__north-america__era-1915-1929": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1d00000/1d02000/1d02100/1d02107v.jpg",
-    "The bridge, Rockefeller Road",
-    "1919",
-    "United States",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "all__north-america__era-1930-1945": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1d00000/1d01000/1d01000/1d01057v.jpg",
-    "Mexican Village, Chicago World's Fair - 1934",
-    "1934",
-    "United States",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "all__north-america__era-1946-on": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1d00000/1d03000/1d03800/1d03830v.jpg",
-    "Colonial homes and veteran's monument - Rye Center, N.H",
-    "1948",
-    "United States",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "all__north-america__era-pre-1900": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1a00000/1a03000/1a03400/1a03411v.jpg",
-    "A Vista, The Ponce de Leon, St. Augustine, Fla",
-    "1898",
-    "United States",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "landscape__africa__all": [
-    "https://tile.loc.gov/image-services/iiif/public:amed:2020760278:0001/full/!1872,1404/0/default.jpg",
-    "Asmara - Circolo Ufficiali e Comando Truppe",
-    "1925",
-    "Eritrea",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "landscape__africa__era-1900-1914": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b00000/1b00000/1b00012v.jpg",
-    "Au desert",
-    "1900",
-    "Algeria",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "landscape__africa__era-1915-1929": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b10000/1b11000/1b11000/1b11037v.jpg",
-    "Casablanca. La Place de France",
-    "1920",
-    "Morocco",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "landscape__africa__era-1930-1945": [
-    "https://tile.loc.gov/image-services/iiif/public:amed:2020761002:0001/full/!1872,1404/0/default.jpg",
-    "7. Tananarive (madagascar) - UNE Ordination LE 10 Juin 1933",
-    "1933",
-    "Madagascar",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "landscape__all__all": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b10000/1b11000/1b11700/1b11763v.jpg",
-    "Jerusalem. Tower of David",
-    "1910",
-    "Palestine (israel)",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "landscape__all__era-1900-1914": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1d00000/1d01000/1d01700/1d01710v.jpg",
-    "Okoboji",
-    "1909",
-    "United States",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "landscape__all__era-1915-1929": [
-    "https://gams.uni-graz.at/iiif/o:gm.3918%2FRECTO/full/!1872,1404/0/default.jpg",
-    "Graz vom Schlo\u00dfberg",
-    "1920\u20131930",
-    "Blick vom Schlo\u00dfberg auf die Altstadt gegen S\u00fcden, Austria",
-    "",
-    "University of Graz, GrazMuseum Ansichtskarten"
-   ],
-   "landscape__all__era-1930-1945": [
-    "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:1g05ff32w/full/!1872,1404/0/default.jpg",
-    "Departure of the Pilgrims from Delft Haven, 1620",
-    "1930\u20131945",
-    "Delft, Netherlands",
-    "Pub. by Smith's Inc., Plymouth, Mass. Tichnor Bros. Inc., Boston, Mass.",
-    "Boston Public Library, Tichnor Brothers Postcard Collection"
-   ],
-   "landscape__all__era-1946-on": [
-    "https://tile.loc.gov/image-services/iiif/public:amed:2020761163:0001/full/!1872,1404/0/default.jpg",
-    "Kano Nigeria [kano Nobles Riding Horses]",
-    "1961",
-    "Nigeria",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "landscape__all__era-pre-1900": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b09000/1b09600/1b09660v.jpg",
-    "Roma. Il Pincio. Urbe dormente",
-    "1898",
-    "Italy",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "landscape__asia__all": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b10000/1b10000/1b10500/1b10575v.jpg",
-    "Zojoji Temple in Tokyo, Japan?",
-    "1920",
-    "Japan",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "landscape__asia__era-1900-1914": [
-    "https://iiif.micr.io/soXfr/full/!1872,1404/0/default.jpg",
-    "Shono",
-    "1906",
-    "Japan",
-    "",
-    "Rijksmuseum"
-   ],
-   "landscape__asia__era-1915-1929": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b10000/1b10000/1b10600/1b10611v.jpg",
-    "Banks of the Sumida River from Azumabashi bridge to Kototoibashi bridge, Tokyo, Japan?",
-    "1920",
-    "Japan",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "landscape__asia__era-1946-on": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b10000/1b10000/1b10400/1b10483v.jpg",
-    "The statue of prayer for the peace",
-    "1970",
-    "Japan",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "landscape__asia__era-pre-1900": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b00000/1b00800/1b00866v.jpg",
-    "Schonen Gruss aus Kiao-Tschau",
-    "1898",
-    "China",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "landscape__europe__all": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b06000/1b06900/1b06936v.jpg",
-    "Frankfurt a. M., Goethe-Denkmal",
-    "1910",
-    "Germany",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "landscape__europe__era-1900-1914": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b09000/1b09700/1b09740v.jpg",
-    "Roma. Campidoglio",
-    "1900",
-    "Italy",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "landscape__europe__era-1915-1929": [
-    "https://gams.uni-graz.at/iiif/o:gm.3312%2FRECTO/full/!1872,1404/0/default.jpg",
-    "Graz von der Hilmwarte",
-    "1918",
-    "Blick auf die Stadt und den Schlo\u00dfberg vom Osten, Austria",
-    "",
-    "University of Graz, GrazMuseum Ansichtskarten"
-   ],
-   "landscape__europe__era-1930-1945": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b05000/1b05300/1b05338v.jpg",
-    "Exposition Coloniale Internationale - Paris 1931. Musee des Colonies",
-    "1931",
-    "France",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "landscape__europe__era-1946-on": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b10000/1b12000/1b12500/1b12568v.jpg",
-    "La suerte en la mano.\" Primer premio para fotos en blanco y negro (National Lottery)",
-    "1964",
-    "Spain",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "landscape__europe__era-pre-1900": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b06000/1b06100/1b06113v.jpg",
-    "Tours, Maison de Tristan Lhermite",
-    "1864",
-    "France",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "landscape__latin-america__all": [
-    "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:x346fx936/full/!1872,1404/0/default.jpg",
-    "Columbus Statue, Government House, Nassau, Bahamas",
-    "1930\u20131945",
-    "Nassau, Bahamas",
-    "Made only by Tichnor Bros., Inc. Distributed by P. M. Lightbourn, Nassau, Bahama",
-    "Boston Public Library, Tichnor Brothers Postcard Collection"
-   ],
-   "landscape__latin-america__era-1900-1914": [
-    "https://iiif.micr.io/MtvCi/full/!1872,1404/0/default.jpg",
-    "Landingsplaats Cabenda aan de Saramacca",
-    "1900\u20131910",
-    "Suriname",
-    "",
-    "Rijksmuseum"
-   ],
-   "landscape__latin-america__era-1915-1929": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b00000/1b00000/1b00088v.jpg",
-    "Casa Historica en Tucuman",
-    "1924",
-    "Argentina",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "landscape__latin-america__era-1930-1945": [
-    "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:x346fv411/full/!1872,1404/0/default.jpg",
-    "Interior view \"Florida Cafe\" dining room. We pride ourselves on serving the best food, Juarez, Old Mexico",
-    "1930\u20131945",
-    "Ciudad Ju\u00e1rez, Mexico",
-    "The Harrison Company",
-    "Boston Public Library, Tichnor Brothers Postcard Collection"
-   ],
-   "landscape__latin-america__era-1946-on": [
-    "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:pz50hk55t/full/!1872,1404/0/default.jpg",
-    "Illimani-panor\u00e1mica, La Paz Bolivia",
-    "1960\u20131979",
-    "La Paz, Bolivia",
-    "Editor Jimenez Cordero",
-    "Boston Public Library, Tichnor Brothers Postcard Collection"
-   ],
-   "landscape__middle-east__all": [
-    "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:00002k855/full/!1872,1404/0/default.jpg",
-    "Constantinople. Ste. Sophie et l'Hippodrome",
-    "1907\u20131926",
-    "Turkey",
-    "MB",
-    "Boston Public Library, Nicholas Catsimpoolas Collection"
-   ],
-   "landscape__middle-east__era-1900-1914": [
-    "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:d791w301b/full/!1872,1404/0/default.jpg",
-    "Constantinople. Mosqu\u00e9e de Ste. Sophie. Mosque Ste. Sophie",
-    "1907\u20131915",
-    "Turkey",
-    "FNH",
-    "Boston Public Library, Nicholas Catsimpoolas Collection"
-   ],
-   "landscape__north-america__all": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1d00000/1d04000/1d04300/1d04384v.jpg",
-    "Heart's Delight Farm, Chazy, N.Y., woods, roads and streams",
-    "1911",
-    "United States",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "landscape__north-america__era-1900-1914": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1d00000/1d01000/1d01000/1d01010v.jpg",
-    "Manhattan Beach, Chicago, Ill",
-    "1906",
-    "United States",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "landscape__north-america__era-1915-1929": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1d00000/1d04000/1d04700/1d04754v.jpg",
-    "Aquarium where Jenny Lind sung, N.Y",
-    "1924",
-    "United States",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "landscape__north-america__era-1930-1945": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1d00000/1d00000/1d00700/1d00748v.jpg",
-    "Union Depot, Washington, D.C",
-    "1933",
-    "United States",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "landscape__north-america__era-1946-on": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1d00000/1d02000/1d02000/1d02092v.jpg",
-    "The Boys' Room - Wadsworth-Longfellow House - Portland, Maine",
-    "1954",
-    "United States",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "landscape__north-america__era-pre-1900": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1a00000/1a02000/1a02600/1a02690v.jpg",
-    "Oral Tradition. Evolution of the Book Series",
-    "1896",
-    "United States",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "portrait__africa__all": [
-    "https://tile.loc.gov/image-services/iiif/public:amed:2020760330:0001/full/!1872,1404/0/default.jpg",
-    "unidentified woman, spouse of a high-ranking government dignitary",
-    "1900",
-    "Ethiopia",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "portrait__africa__era-1900-1914": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b01000/1b01200/1b01253v.jpg",
-    "Cairo. Arab Street",
-    "1900",
-    "Egypt",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "portrait__africa__era-1915-1929": [
-    "https://tile.loc.gov/image-services/iiif/public:amed:2020761355:0001/full/!1872,1404/0/default.jpg",
-    "Forest Ranger Fogbawa, A. Konno",
-    "1924",
-    "Sierra Leone",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "portrait__africa__era-1930-1945": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b01000/1b01100/1b01128v.jpg",
-    "The King's Diadem",
-    "1930",
-    "Egypt",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "portrait__all__all": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b05000/1b05500/1b05571v.jpg",
-    "Paris. Notre-Dame. Chimere, Chimaera",
-    "1864",
-    "France",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "portrait__all__era-1900-1914": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b10000/1b11000/1b11500/1b11560v.jpg",
-    "Norge. Brud fra Sogn",
-    "1900",
-    "Norway",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "portrait__all__era-1915-1929": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b05000/1b05000/1b05028v.jpg",
-    "Paris ... en Flanant. La Seine au Quai d'Orleans. The Seine river at the Orleans Wharf",
-    "1919",
-    "France",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "portrait__all__era-1930-1945": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b06000/1b06900/1b06922v.jpg",
-    "Weihnachtsbaumchen. Friedel Ohle",
-    "1930",
-    "Germany",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "portrait__all__era-1946-on": [
-    "https://tile.loc.gov/image-services/iiif/public:gdc:2018690698:npc01222/full/!1872,1404/0/default.jpg",
-    "Vladivostok. Pami\ufe20a\ufe21tnik zhertv Revoli\ufe20u\ufe21t\ufe20s\ufe21ii",
-    "1948",
-    "",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "portrait__all__era-pre-1900": [
-    "https://iiif.micr.io/jdMGf/full/!1872,1404/0/default.jpg",
-    "Portret van Emma, koningin-regentes der Nederlanden",
-    "1890\u20131915",
-    "",
-    "",
-    "Rijksmuseum"
-   ],
-   "portrait__asia__all": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b10000/1b10000/1b10400/1b10403v.jpg",
-    "Woman wearing a kimono, standing and posing near fence",
-    "1900",
-    "Japan",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "portrait__asia__era-1946-on": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b07000/1b07800/1b07862v.jpg",
-    "Birth of Buddha, Nepalese bronze image, 18th century A.D",
-    "1947",
-    "India",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "portrait__europe__all": [
-    "https://gams.uni-graz.at/iiif/o:gm.1516%2FRECTO/full/!1872,1404/0/default.jpg",
-    "Graz. Haus der Kaufmannschaft",
-    "1895\u20131905",
-    "Neutorgasse Ecke Opernring, Austria",
-    "",
-    "University of Graz, GrazMuseum Ansichtskarten"
-   ],
-   "portrait__europe__era-1900-1914": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b08000/1b08500/1b08516v.jpg",
-    "Bologna. Basilica di S. Stefano - Chiesa SS. Pietro e Paolo - La porta",
-    "1907",
-    "Italy",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "portrait__europe__era-1915-1929": [
-    "https://gams.uni-graz.at/iiif/o:gm.4751%2FRECTO/full/!1872,1404/0/default.jpg",
-    "Graz. Brunnen im Stadtpark",
-    "1918",
-    "Blick zum Stadtparkbrunnen, Austria",
-    "",
-    "University of Graz, GrazMuseum Ansichtskarten"
-   ],
-   "portrait__europe__era-1930-1945": [
-    "https://iiif.micr.io/RlLbW/full/!1872,1404/0/default.jpg",
-    "Portret van Juliana, koningin der Nederlanden, Beatrix, koningin der Nederlanden, en Irene, prinses der Nederlanden",
-    "1941\u20131943",
-    "Netherlands",
-    "",
-    "Rijksmuseum"
-   ],
-   "portrait__europe__era-1946-on": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b10000/1b11000/1b11900/1b11911v.jpg",
-    "Stroj Radomszczanski. Polish Folk Coustumes [i.e. Costumes]",
-    "1967",
-    "Poland",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "portrait__europe__era-pre-1900": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b03000/1b03800/1b03846v.jpg",
-    "Les Cathedrales de France. Cathedrale d'Amiens",
-    "1889",
-    "France",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "portrait__latin-america__all": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b07000/1b07700/1b07746v.jpg",
-    "Indians worshipping on the steps of St. Thomas Church, (from the painting by H. Garavito), Chichicastenango, Guatemala",
-    "1940",
-    "Guatemala",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "portrait__latin-america__era-1900-1914": [
-    "https://iiif.micr.io/hPFMj/full/!1872,1404/0/default.jpg",
-    "Mensen van Javaanse oorsprong",
-    "1900\u20131910",
-    "Suriname",
-    "",
-    "Rijksmuseum"
-   ],
-   "portrait__latin-america__era-1930-1945": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b01000/1b01000/1b01070v.jpg",
-    "Dome of \"La Merced\" Church. Quito, Ecuador",
-    "1935",
-    "Ecuador",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "portrait__middle-east__all": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b07000/1b07900/1b07966v.jpg",
-    "Jerusalem. Staps [i.e. steps] leading to the Sepulchre Church",
-    "1900",
-    "Israel",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "portrait__north-america__all": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1d00000/1d04000/1d04700/1d04777v.jpg",
-    "Stock Exchange, New York City",
-    "1900",
-    "United States",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "portrait__north-america__era-1900-1914": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1d00000/1d06000/1d06700/1d06772v.jpg",
-    "The grand stair case, State Capital, Pierre, S. Dak",
-    "1910",
-    "United States",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "portrait__north-america__era-1915-1929": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1a00000/1a00000/1a00900/1a00980v.jpg",
-    "First Palm Tree in California, 1769, Ramona's Marriage Place",
-    "1923",
-    "United States",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "portrait__north-america__era-1930-1945": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1a10000/1a10000/1a10700/1a10735v.jpg",
-    "New York Yesterday and Today",
-    "1932",
-    "United States",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ],
-   "portrait__north-america__era-1946-on": [
-    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1a00000/1a03000/1a03100/1a03113v.jpg",
-    "The Florida Mocking Bird; Poinsettia Blossoms",
-    "1947",
-    "United States",
-    "",
-    "Library of Congress, Prints and Photographs Division"
-   ]
-  },
   "20707": {
    "all__africa__all": [
     "https://tile.loc.gov/image-services/iiif/public:amed:2020761445:0001/full/!1872,1404/0/default.jpg",
@@ -2289,10 +1527,772 @@
     "",
     "Library of Congress, Prints and Photographs Division"
    ]
+  },
+  "20709": {
+   "all__africa__all": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b01000/1b01200/1b01235v.jpg",
+    "Cairo, Street scene",
+    "1903",
+    "Egypt",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "all__africa__era-1900-1914": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b01000/1b01300/1b01319v.jpg",
+    "Obelisque of Louxor",
+    "1900",
+    "Egypt",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "all__africa__era-1915-1929": [
+    "https://tile.loc.gov/image-services/iiif/public:amed:2020761347:0001/full/!1872,1404/0/default.jpg",
+    "Corporal Mandi Kabba- A Madingo",
+    "1924",
+    "Sierra Leone",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "all__africa__era-1930-1945": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b01000/1b01100/1b01118v.jpg",
+    "Tutankhamen and his Queen",
+    "1930",
+    "Egypt",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "all__all__all": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b09000/1b09000/1b09078v.jpg",
+    "Napoli. Chiesa di S. Francesco di Paola",
+    "1900",
+    "Italy",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "all__all__era-1900-1914": [
+    "https://iiif.micr.io/zoEom/full/!1872,1404/0/default.jpg",
+    "Kameyama",
+    "1906",
+    "Japan",
+    "",
+    "Rijksmuseum"
+   ],
+   "all__all__era-1915-1929": [
+    "https://gams.uni-graz.at/iiif/o:gm.2580%2FRECTO/full/!1872,1404/0/default.jpg",
+    "Graz. Schlo\u00dfbergbahn, Glockenturm und Castell",
+    "1915\u20131925",
+    "Blick zur Schlo\u00dfbergbahn, Austria",
+    "",
+    "University of Graz, GrazMuseum Ansichtskarten"
+   ],
+   "all__all__era-1930-1945": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1d00000/1d00000/1d00900/1d00970v.jpg",
+    "Black Forest Village, Chicago World's Fair",
+    "1934",
+    "United States",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "all__all__era-1946-on": [
+    "https://tile.loc.gov/image-services/iiif/public:gdc:2018690082:npc00606/full/!1872,1404/0/default.jpg",
+    "Omsk. Kinoteatr \"Khudozhestvenny\u012d\"",
+    "1957",
+    "",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "all__all__era-pre-1900": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b03000/1b03500/1b03543v.jpg",
+    "Les Saintes-Maries-de-la-Mer (Bouches-du-Rhone), Abside de l'Eglise",
+    "1890",
+    "France",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "all__asia__all": [
+    "https://iiif.micr.io/TgyFJ/full/!1872,1404/0/default.jpg",
+    "Yokaichi",
+    "1906",
+    "Japan",
+    "",
+    "Rijksmuseum"
+   ],
+   "all__asia__era-1900-1914": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b10000/1b10000/1b10600/1b10619v.jpg",
+    "Marunouchi building popularly called \"Maru Buil,\" Tokyo",
+    "1912",
+    "Japan",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "all__asia__era-1915-1929": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b10000/1b10000/1b10500/1b10549v.jpg",
+    "The main street of Shinjiku",
+    "1920",
+    "Japan",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "all__asia__era-1946-on": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b10000/1b10000/1b10400/1b10450v.jpg",
+    "Five-storeyed [i.e. storied] Pagoda, 106 ft high is a famous Buddhist building, 1818",
+    "1950",
+    "Japan",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "all__asia__era-pre-1900": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b07000/1b07400/1b07451v.jpg",
+    "Confucian Temple, Peking",
+    "1895",
+    "China",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "all__europe__all": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b06000/1b06800/1b06886v.jpg",
+    "Kuppelraum der Ruhmeshalle. Deckengemalde: Der Triumphzug von F. Geselschaft",
+    "1900",
+    "Germany",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "all__europe__era-1900-1914": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b05000/1b05200/1b05221v.jpg",
+    "Musee de Cluny. Chasse en bois sculpte. Art allemand (XVe s)",
+    "1900",
+    "France",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "all__europe__era-1915-1929": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b03000/1b03000/1b03026v.jpg",
+    "Ermenonville, Le Chateau et les Ecuries",
+    "1920",
+    "France",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "all__europe__era-1930-1945": [
+    "https://gams.uni-graz.at/iiif/o:gm.3603%2FRECTO/full/!1872,1404/0/default.jpg",
+    "Graz vom Rainerkogel",
+    "1930",
+    "Blick zum Schlo\u00dfberg vom Norden, Austria",
+    "",
+    "University of Graz, GrazMuseum Ansichtskarten"
+   ],
+   "all__europe__era-1946-on": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b07000/1b07100/1b07195v.jpg",
+    "Munchen. Ludwigstrasse und Stadtzentrum. Von rechts: Salvatorkirche, Fauenkirche, Theatinerkirche, Felhernhalle",
+    "1959",
+    "Germany",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "all__europe__era-pre-1900": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b10000/1b11000/1b11700/1b11705v.jpg",
+    "Trondhjem",
+    "1880",
+    "Norway",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "all__latin-america__all": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b07000/1b07700/1b07746v.jpg",
+    "Indians worshipping on the steps of St. Thomas Church, (from the painting by H. Garavito), Chichicastenango, Guatemala",
+    "1940",
+    "Guatemala",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "all__latin-america__era-1900-1914": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1a10000/1a13000/1a13100/1a13147v.jpg",
+    "Husking cocoanuts in Porto Rico",
+    "1912",
+    "Puerto Rico",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "all__latin-america__era-1915-1929": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b01000/1b01300/1b01341v.jpg",
+    "Entrada a Jucuapa (El Salvador)",
+    "1920",
+    "El Salvador",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "all__latin-america__era-1930-1945": [
+    "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:x346fs82v/full/!1872,1404/0/default.jpg",
+    "Greetings from Montego Bay, Jamaica, B.W.I. Beach scene at Hotel Casa Blanca, native dug-out in the foreground",
+    "1930\u20131945",
+    "Montego Bay, Jamaica",
+    "Copyright picture by Cleary & Elliott",
+    "Boston Public Library, Tichnor Brothers Postcard Collection"
+   ],
+   "all__latin-america__era-1946-on": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b07000/1b07400/1b07462v.jpg",
+    "Tras la victoria, con la guardia en alto",
+    "1950",
+    "Cuba",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "all__middle-east__all": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b10000/1b13000/1b13400/1b13482v.jpg",
+    "Constantinople. Boucherie Turque",
+    "1900",
+    "Turkey",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "all__middle-east__era-1900-1914": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b10000/1b13000/1b13400/1b13455v.jpg",
+    "Constantinople. Stamboul. Grand Bazar, Rue des cordonniers",
+    "1900",
+    "Turkey",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "all__north-america__all": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1d00000/1d08000/1d08000/1d08079v.jpg",
+    "The U.S. Forest Service Ground Wood Laboratory, Wausau, Wis. (experimental pulp mill)",
+    "1911",
+    "United States",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "all__north-america__era-1900-1914": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1a10000/1a11000/1a11900/1a11914v.jpg",
+    "Teepee, primitive dwelling, 1889, Oklahoma; House, Modern Dwelling, 1909",
+    "1910",
+    "United States",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "all__north-america__era-1915-1929": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1d00000/1d04000/1d04600/1d04660v.jpg",
+    "Poe Cottage in Poe Park",
+    "1921",
+    "United States",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "all__north-america__era-1930-1945": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1d00000/1d05000/1d05500/1d05567v.jpg",
+    "Lourdes Grotto - 6-15-34",
+    "1934",
+    "United States",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "all__north-america__era-1946-on": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1d00000/1d00000/1d00700/1d00711v.jpg",
+    "U.S. Capitol, Washington, D.C",
+    "1947",
+    "United States",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "all__north-america__era-pre-1900": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1a00000/1a02000/1a02300/1a02342v.jpg",
+    "Marjory Hendricks' Water Gate Inn",
+    "1890",
+    "United States",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "landscape__africa__all": [
+    "https://tile.loc.gov/image-services/iiif/public:amed:2020761109:0001/full/!1872,1404/0/default.jpg",
+    "Camping OUT (bauchi) Northern Nigeria",
+    "1900",
+    "Nigeria",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "landscape__africa__era-1900-1914": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b00000/1b00000/1b00048v.jpg",
+    "Alger. Les Rampes",
+    "1900",
+    "Algeria",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "landscape__africa__era-1915-1929": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b10000/1b11000/1b11000/1b11032v.jpg",
+    "Maroc. Les relieurs marocains",
+    "1920",
+    "Morocco",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "landscape__africa__era-1930-1945": [
+    "https://tile.loc.gov/image-services/iiif/public:amed:2020760786:0001/full/!1872,1404/0/default.jpg",
+    "Massaua - La nuava palazzina del Comando",
+    "1935",
+    "Eritrea",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "landscape__all__all": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1a00000/1a00000/1a00900/1a00914v.jpg",
+    "Corner of Botanical Building and Portion of Upper Lagoon. Balboa Park, San Diego, Calif",
+    "1908",
+    "United States",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "landscape__all__era-1900-1914": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b02000/1b02800/1b02860v.jpg",
+    "Chenonceaux, Le Chateau, Bas-relief de Goujon ornant anciennement la Facade du Chateau",
+    "1900",
+    "France",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "landscape__all__era-1915-1929": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b02000/1b02600/1b02618v.jpg",
+    "Musee Basque - Bayonne, La Chambre a Coucher",
+    "1920",
+    "France",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "landscape__all__era-1930-1945": [
+    "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:4m90f152h/full/!1872,1404/0/default.jpg",
+    "61 -- New born twins",
+    "1930\u20131945",
+    "Bradford, United States",
+    "Pub. by Jobber - Bradford News Co., Bradford, PA. \"Tichnor Quality Views,\" Reg. ",
+    "Boston Public Library, Tichnor Brothers Postcard Collection"
+   ],
+   "landscape__all__era-1946-on": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1d00000/1d06000/1d06300/1d06346v.jpg",
+    "Valley Forge. Washington Memorial Chapel",
+    "1946",
+    "United States",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "landscape__all__era-pre-1900": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b10000/1b11000/1b11600/1b11685v.jpg",
+    "Akershus Faestning",
+    "1880",
+    "Norway",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "landscape__asia__all": [
+    "https://iiif.micr.io/loaDU/full/!1872,1404/0/default.jpg",
+    "Kanagawa",
+    "1906",
+    "Japan",
+    "",
+    "Rijksmuseum"
+   ],
+   "landscape__asia__era-1900-1914": [
+    "https://iiif.micr.io/pBfYM/full/!1872,1404/0/default.jpg",
+    "No. 53. Kusatsu: one of the fifty-three noted places on Tokaido, painted by Hiroshige",
+    "1906",
+    "Japan",
+    "",
+    "Rijksmuseum"
+   ],
+   "landscape__asia__era-1915-1929": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b10000/1b10000/1b10500/1b10553v.jpg",
+    "Nippon-Theater, Tokyo",
+    "1920",
+    "Japan",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "landscape__asia__era-1946-on": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b10000/1b10000/1b10500/1b10516v.jpg",
+    "Ginza Street, Tokyo",
+    "1950",
+    "Japan",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "landscape__asia__era-pre-1900": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b07000/1b07400/1b07455v.jpg",
+    "Bund Tsingtan",
+    "1895",
+    "China",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "landscape__europe__all": [
+    "https://gams.uni-graz.at/iiif/o:gm.1023%2FRECTO/full/!1872,1404/0/default.jpg",
+    "Alt Graz: Rathaus",
+    "1880\u20131881",
+    "Ehemaliges klassizistisches Rathaus, Austria",
+    "",
+    "University of Graz, GrazMuseum Ansichtskarten"
+   ],
+   "landscape__europe__era-1900-1914": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b00000/1b00400/1b00452v.jpg",
+    "Bruxelles. Maison des anciens Ducs de Brabant (ancienne Bourse)",
+    "1910",
+    "Belgium",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "landscape__europe__era-1915-1929": [
+    "https://gams.uni-graz.at/iiif/o:gm.2439%2FRECTO/full/!1872,1404/0/default.jpg",
+    "Graz. Starkeh\u00e4uschen",
+    "1918",
+    "Starcke Haus am Schlo\u00dfberg gegen Nordwesten, Austria",
+    "",
+    "University of Graz, GrazMuseum Ansichtskarten"
+   ],
+   "landscape__europe__era-1930-1945": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b10000/1b11000/1b11600/1b11688v.jpg",
+    "Oslo. Radhuset. The City Hall",
+    "1940",
+    "Norway",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "landscape__europe__era-1946-on": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b10000/1b10000/1b10200/1b10292v.jpg",
+    "Venezia - Basilica di S. Marco. The Deesis - Mosaic of the XIII century",
+    "1950",
+    "Italy",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "landscape__europe__era-pre-1900": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b04000/1b04500/1b04557v.jpg",
+    "Musee de Dijon - Tombeau de Philippe le Hardi",
+    "1890",
+    "France",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "landscape__latin-america__all": [
+    "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:5h741n47g/full/!1872,1404/0/default.jpg",
+    "The Balmoral Beach Hotel, a Sonesta Hotel on Cable Beach",
+    "1960\u20131979",
+    "Nassau, Bahamas",
+    "",
+    "Boston Public Library, Tichnor Brothers Postcard Collection"
+   ],
+   "landscape__latin-america__era-1900-1914": [
+    "https://iiif.micr.io/zhtSz/full/!1872,1404/0/default.jpg",
+    "Kantoor van de Koloniale Spoorwegen",
+    "1900\u20131910",
+    "Suriname",
+    "",
+    "Rijksmuseum"
+   ],
+   "landscape__latin-america__era-1915-1929": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b10000/1b11000/1b11800/1b11850v.jpg",
+    "Santa Ana Church and Park, Panama City",
+    "1927",
+    "Panama",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "landscape__latin-america__era-1930-1945": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b07000/1b07700/1b07721v.jpg",
+    "Volcano \"Agua\" and Antigua (the City of Ruins) founded in 1543, Guatemala",
+    "1940",
+    "Guatemala",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "landscape__latin-america__era-1946-on": [
+    "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:5h741n45x/full/!1872,1404/0/default.jpg",
+    "The Balmoral Beach Hotel, a Sonesta Hotel on Cable Beach",
+    "1960\u20131979",
+    "Nassau, Bahamas",
+    "",
+    "Boston Public Library, Tichnor Brothers Postcard Collection"
+   ],
+   "landscape__middle-east__all": [
+    "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:6q185743z/full/!1872,1404/0/default.jpg",
+    "Constantinople. Sc\u00e8ne de rue \u00e0 Stamboul",
+    "1907\u20131915",
+    "Istanbul, Turkey",
+    "",
+    "Boston Public Library, Nicholas Catsimpoolas Collection"
+   ],
+   "landscape__middle-east__era-1900-1914": [
+    "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:dj52zr184/full/!1872,1404/0/default.jpg",
+    "Constantinople (Turkey) - Leander's Tower",
+    "1900\u20131907",
+    "Istanbul, Turkey",
+    "",
+    "Boston Public Library, Nicholas Catsimpoolas Collection"
+   ],
+   "landscape__north-america__all": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1a00000/1a02000/1a02500/1a02580v.jpg",
+    "U.S. Treasury, Washington, D.C",
+    "1903",
+    "United States",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "landscape__north-america__era-1900-1914": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1a10000/1a11000/1a11900/1a11944v.jpg",
+    "The Columbia near Bonnefille",
+    "1908",
+    "United States",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "landscape__north-america__era-1915-1929": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1a00000/1a00000/1a00300/1a00398v.jpg",
+    "Mission San Luis Obispo de Tolosa, founded 1772",
+    "1923",
+    "United States",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "landscape__north-america__era-1930-1945": [
+    "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:h128ng754/full/!1872,1404/0/default.jpg",
+    "\"1680\" House, Yarmouth, Mass",
+    "1930\u20131945",
+    "Yarmouth, United States",
+    "(Photo by Hicks) Pub. by H. L. Moore Co., West Yarmouth, Mass. Tichnor Bros. Inc",
+    "Boston Public Library, Tichnor Brothers Postcard Collection"
+   ],
+   "landscape__north-america__era-1946-on": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1a00000/1a00000/1a00400/1a00472v.jpg",
+    "Balboa, Balboa Island. Newport Harbor, California. Sailboats, ferry boats",
+    "1958",
+    "United States",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "landscape__north-america__era-pre-1900": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1a00000/1a03000/1a03300/1a03348v.jpg",
+    "A Banyan Tree at Palm Beach, Fla",
+    "1898",
+    "United States",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "portrait__africa__all": [
+    "https://tile.loc.gov/image-services/iiif/public:amed:2020760350:0001/full/!1872,1404/0/default.jpg",
+    "Donna Abissina",
+    "1900",
+    "Ethiopia",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "portrait__africa__era-1900-1914": [
+    "https://tile.loc.gov/image-services/iiif/public:amed:2020760285:0001/full/!1872,1404/0/default.jpg",
+    "Colonia Eritrea (Africa Italiana): ASMARA - ENTRATA AL FORTE BALDISSERA",
+    "1900",
+    "Eritrea",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "portrait__africa__era-1915-1929": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b01000/1b01200/1b01295v.jpg",
+    "Denderah. Ptolomy offering to Hathor and Horus",
+    "1924",
+    "Egypt",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "portrait__africa__era-1930-1945": [
+    "https://tile.loc.gov/image-services/iiif/public:amed:2020760689:0001/full/!1872,1404/0/default.jpg",
+    "Addis Abeba 2 Ottobre Xiii, 5 Maggio XIV",
+    "1936",
+    "Ethiopia",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "portrait__all__all": [
+    "https://iiif.micr.io/WxcHw/full/!1872,1404/0/default.jpg",
+    "Bezoek van Juliana, koningin der Nederlanden",
+    "1937",
+    "Netherlands",
+    "",
+    "Rijksmuseum"
+   ],
+   "portrait__all__era-1900-1914": [
+    "https://tile.loc.gov/storage-services/service/pnp/ppmsca/39600/39626v.jpg",
+    "Do it now",
+    "1906",
+    "",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "portrait__all__era-1915-1929": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b03000/1b03000/1b03078v.jpg",
+    "Honfleur, Portail de Saint-Leonard",
+    "1920",
+    "France",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "portrait__all__era-1930-1945": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b02000/1b02700/1b02793v.jpg",
+    "Savoie Tourisme - Chambery. Le Portail Saint-Dominique, d'architecture gothique du XVe siecle ornait, autrefois",
+    "1930",
+    "France",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "portrait__all__era-1946-on": [
+    "https://iiif.micr.io/LrHFz/full/!1872,1404/0/default.jpg",
+    "Familieportret van Willem III, koning der Nederlanden, Sophie van W\u00fcrttemberg en twee zoons",
+    "1956",
+    "Netherlands",
+    "",
+    "Rijksmuseum"
+   ],
+   "portrait__all__era-pre-1900": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b03000/1b03600/1b03688v.jpg",
+    "Vendome, La Statue de Rochambeau et la Tour Saint-Martin",
+    "1890",
+    "France",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "portrait__asia__all": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b10000/1b13000/1b13500/1b13560v.jpg",
+    "Co giao lien dong Thap",
+    "1975",
+    "Vietnam",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "portrait__asia__era-1946-on": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b07000/1b07800/1b07882v.jpg",
+    "Avalokitesvara with thousand arms, Nepalese bronnze, 18th century A.D",
+    "1947",
+    "India",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "portrait__europe__all": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b01000/1b01600/1b01627v.jpg",
+    "Bath Abbey, the Nave",
+    "1900",
+    "United Kingdom",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "portrait__europe__era-1900-1914": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b10000/1b10000/1b10300/1b10394v.jpg",
+    "Trento. Castello del Buon Consiglio. Particolare del Castel Vecchio",
+    "1900",
+    "Italy",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "portrait__europe__era-1915-1929": [
+    "https://iiif.micr.io/eRnQs/full/!1872,1404/0/default.jpg",
+    "Portret van Emma, koningin-regentes der Nederlanden",
+    "1925\u20131934",
+    "Netherlands",
+    "",
+    "Rijksmuseum"
+   ],
+   "portrait__europe__era-1930-1945": [
+    "https://gams.uni-graz.at/iiif/o:gm.3904%2FRECTO/full/!1872,1404/0/default.jpg",
+    "Grazer Blick vom Herbersteingarten am Schlo\u00dfberg",
+    "1930",
+    "Blick vom Schlo\u00dfberg auf die Altstadt gegen S\u00fcden, Austria",
+    "",
+    "University of Graz, GrazMuseum Ansichtskarten"
+   ],
+   "portrait__europe__era-1946-on": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b10000/1b12000/1b12100/1b12164v.jpg",
+    "Praca do Principe Real",
+    "1970",
+    "Portugal",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "portrait__europe__era-pre-1900": [
+    "https://gams.uni-graz.at/iiif/o:gm.1774%2FRECTO/full/!1872,1404/0/default.jpg",
+    "Uhrturm. Graz",
+    "1895\u20131905",
+    "Uhrturm gegen S\u00fcden, Austria",
+    "",
+    "University of Graz, GrazMuseum Ansichtskarten"
+   ],
+   "portrait__latin-america__all": [
+    "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:x346fp118/full/!1872,1404/0/default.jpg",
+    "Catedral, Chihuahua, Chih., Mexico",
+    "1930\u20131945",
+    "Chihuahua, Mexico",
+    "Made only by Tichnor Bros., Inc. Pub. por Hector E. Delgado, AP Post, No. 613, C",
+    "Boston Public Library, Tichnor Brothers Postcard Collection"
+   ],
+   "portrait__latin-america__era-1900-1914": [
+    "https://iiif.micr.io/KjXUC/full/!1872,1404/0/default.jpg",
+    "Ansichtkaart met foto van Hindostaanse vrouw",
+    "1900\u20131910",
+    "Suriname",
+    "",
+    "Rijksmuseum"
+   ],
+   "portrait__latin-america__era-1930-1945": [
+    "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:x346fx60n/full/!1872,1404/0/default.jpg",
+    "Edificio Ministerio de Hacienda, Lima, Per\u00fa",
+    "1930\u20131945",
+    "Lima, Lima, Peru",
+    "Made only by Tichnor Bros., Inc. F. P. Seminario, Fotografias de Todo El Peru, F",
+    "Boston Public Library, Tichnor Brothers Postcard Collection"
+   ],
+   "portrait__middle-east__all": [
+    "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:ws85d294r/full/!1872,1404/0/default.jpg",
+    "Constantinople. La marcheur Oriental",
+    "1907\u20131915",
+    "Istanbul, Turkey",
+    "Editeur S. N. Nicola\u00ef\u00e9vitch",
+    "Boston Public Library, Nicholas Catsimpoolas Collection"
+   ],
+   "portrait__north-america__all": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1d00000/1d02000/1d02200/1d02268v.jpg",
+    "Edge of the grove, Abbot Academy, Andover, Mass",
+    "1910",
+    "United States",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "portrait__north-america__era-1900-1914": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1d00000/1d01000/1d01100/1d01111v.jpg",
+    "Embury M.E. Church, Freeport, Ill",
+    "1911",
+    "United States",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "portrait__north-america__era-1915-1929": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1a00000/1a01000/1a01100/1a01197v.jpg",
+    "Down Market and Montgomery Streets, Hobart Building in Foreground, San Francisco, California",
+    "1920",
+    "United States",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "portrait__north-america__era-1930-1945": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1d00000/1d07000/1d07100/1d07106v.jpg",
+    "Singing bird, Smugglers Notch, VT",
+    "1933",
+    "United States",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ],
+   "portrait__north-america__era-1946-on": [
+    "https://tile.loc.gov/storage-services/service/pnp/pcrd/1d00000/1d01000/1d01200/1d01238v.jpg",
+    "Presbyterian Church, Wenona, Ill",
+    "1957",
+    "United States",
+    "",
+    "Library of Congress, Prints and Photographs Division"
+   ]
   }
  },
  "default": "all__all__all",
- "default_day": "20707",
+ "default_day": "20708",
  "era_options": [
   {
    "key": "era-pre-1900",
@@ -2315,7 +2315,7 @@
    "label": "1946 onwards"
   }
  ],
- "generated": "2026-09-11T04:24:33Z",
+ "generated": "2026-09-12T04:23:59Z",
  "keys_by_label": {
   "1900 - 1914": "era-1900-1914",
   "1900-1914": "era-1900-1914",
