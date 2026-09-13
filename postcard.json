@@ -1,17 +1,17 @@
 {
- "country": "",
+ "country": "Italy",
  "credit": "Library of Congress, Prints and Photographs Division",
- "date": "1906",
- "day": "2026-09-12",
- "generated": "2026-09-12T23:34:07Z",
- "id": "loc:2018689951",
- "image": "https://tile.loc.gov/image-services/iiif/public:gdc:2018689951:npc00475/full/!1872,1404/0/default.jpg",
+ "date": "1900",
+ "day": "2026-09-13",
+ "generated": "2026-09-13T04:46:02Z",
+ "id": "loc:2025711868",
+ "image": "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b09000/1b09000/1b09078v.jpg",
  "orientation": "landscape",
- "place": "",
+ "place": "Italy",
  "pool": 18206,
  "publisher": "",
  "rights": "No known restrictions on publication",
- "source_url": "https://www.loc.gov/item/2018689951/",
- "title": "Omsk. Kirgizski, aul",
- "year": 1906
+ "source_url": "https://www.loc.gov/item/2025711868/",
+ "title": "Napoli. Chiesa di S. Francesco di Paola",
+ "year": 1900
 }
