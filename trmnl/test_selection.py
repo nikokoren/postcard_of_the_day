@@ -46,7 +46,8 @@ picks = {
 }
 feed = {
   "default":"all__all__all",
-  "day_index": 20705,
+  # A real feed builds day_index and default_day from the same day.
+  "day_index": DAY,
   "cell_keys": ",".join(sorted(_cells)),
   "keys_by_label": {
      "landscape":"landscape","Landscape":"landscape",
@@ -68,12 +69,19 @@ feed = {
 #             the 20707; Berlin and Los Angeles are still on the 20706.
 #   EARLY   = 02:00 UTC on day 20706. Los Angeles (-7) is still 19:00 on
 #             the 20705; Berlin and Auckland are on the 20706.
+#   LATE    = 23:00 UTC on day 20706. Berlin (+2) is on the 20707 while
+#             UTC is not. That is the gap the cell rotation used to fall
+#             into: the day's picks moved on at local midnight and the
+#             cell picked out of them did not, so anyone with more than
+#             one cell in rotation got last night's card again for two
+#             hours.
 #
 # A case whose expected day is not "today" asserts on the marker title
 # baked into that day's picks, so a markup that quietly ignored the
 # device clock would fail here rather than pass silently.
 EVENING = DAY * 86400 + 20 * 3600
 EARLY = DAY * 86400 + 2 * 3600
+LATE = DAY * 86400 + 23 * 3600
 
 OFFSETS = {
   "Auckland, evening UTC":    12 * 3600,
@@ -81,6 +89,7 @@ OFFSETS = {
   "Los Angeles, early UTC":   -7 * 3600,
   "Berlin, early UTC":         2 * 3600,
   "device clock missing":      2 * 3600,
+  "Berlin, past local midnight": 2 * 3600,
 }
 CLOCKS = {
   "Auckland, evening UTC":   EVENING,
@@ -88,6 +97,7 @@ CLOCKS = {
   "Los Angeles, early UTC":  EARLY,
   "Berlin, early UTC":       EARLY,
   "device clock missing":    None,
+  "Berlin, past local midnight": LATE,
 }
 EXPECT = {
   "Auckland, evening UTC":   "TOMORROW",
@@ -95,7 +105,12 @@ EXPECT = {
   "Los Angeles, early UTC":  "YESTERDAY",
   "Berlin, early UTC":       "",
   "device clock missing":    "",
+  "Berlin, past local midnight": "TOMORROW",
 }
+
+# Where a case pins the cell as well as the day. Europe and Africa rotate
+# two-wide: the 20706 lands on the first, the 20707 on the second.
+EXPECT_KEY = {"Berlin, past local midnight": "all__africa__all"}
 
 CASES = [
   ("Auckland, evening UTC", {}),
@@ -103,6 +118,7 @@ CASES = [
   ("Los Angeles, early UTC", {}),
   ("Berlin, early UTC", {}),
   ("device clock missing", {}),
+  ("Berlin, past local midnight", {"region":["europe","africa"]}),
   ("nothing selected", {}),
   ("orientation only", {"orientation":["landscape"]}),
   ("two regions", {"region":["europe","africa"]}),
@@ -135,6 +151,9 @@ for name, settings in CASES:
         title = tail.split("|")[1]
         ok = title.startswith(want) if want else not (
             title.startswith("YESTERDAY") or title.startswith("TOMORROW"))
+    want_key = EXPECT_KEY.get(name)
+    if ok and want_key is not None:
+        ok = tail.split("|")[0] == want_key
     bad += 0 if ok else 1
     print(f"  {'ok  ' if ok else 'FAIL'} {name:32s} {tail}")
 sys.exit(1 if bad else 0)
