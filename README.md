@@ -344,6 +344,46 @@ itself.
     python3 score.py --budget 2000 --upcoming 21
     python3 score.py --report
 
+## Subject balance
+
+The per-country cap is the only thing standing between one holding and
+the whole catalogue, and at 6,000 it has never once bound. It also
+counts the wrong thing: nobody notices a country, they notice a subject.
+
+The Rijksmuseum's postcards turn out to be, in large part, the photo
+archive of the Dutch royal house. 240 cards — only **1.4%** of the pool,
+but **26% of Portrait + Europe + 1930-1945**, one every four days,
+because that cell holds 139 cards in total. The same collection
+contributes 239 studio portraits of people the museum itself cannot
+name.
+
+Two rules, and deliberately not a third:
+
+- A card whose subject is a sitter nobody can identify is not a postcard
+  from anywhere. It goes.
+- A monarch photographed against a studio curtain is the same problem
+  with a name attached, so that goes too — but the royal cards that show
+  something *happening somewhere* stay: the funeral cortège at Delft,
+  the stork at Paleis Noordeinde, the state visit to Leeuwarden. What is
+  left is capped at two per identical caption, because the archive holds
+  ten photographs of one wedding and a viewer cannot tell them apart
+  from the line under the picture.
+
+Together that takes the royals down by 53% and the worst cell from 26%
+to 10.4% — one every ten days instead of one every four. Across the
+whole catalogue they fall to 0.7%, one every 153 days.
+
+The third rule, a general cap on repeated captions, is deliberately
+absent. 108 cards in this pool are titled simply `Graz`, and they are
+different views of a city somebody wants to keep seeing. `daily.py
+--selftest` holds that case alongside the rest.
+
+Like the region table and the translations, this is applied where
+`daily.py` loads the pool, so the judgement can be revised without a
+re-crawl.
+
+---
+
 One filter that only exists because somebody looked: the Rijksmuseum
 files **boxes, albums and mounted lots** under the same type as single
 cards, and an album spread renders as four stamps of a picture. The

@@ -635,6 +635,16 @@ def load_pool():
         if not entries:
             raise SystemExit("every card was dropped on render score")
 
+    # And the subject balance, for the same reason: what counts as one
+    # holding's speciality swamping the catalogue is a judgement that
+    # will want revising, and revising it should not mean re-crawling
+    # 30,000 records.
+    import harvest
+    before = len(entries)
+    entries = harvest.balance_subjects(entries)
+    if before != len(entries):
+        sys.stderr.write(f"{before - len(entries)} cards dropped on subject\n")
+
     english = load_translations()
     for entry in entries:
         slug, label = region_for(entry.get("cn"), entry.get("ct"))
@@ -662,6 +672,42 @@ def selftest(entries, day):
     ids = [e["id"] for e in entries]
     check("ids are unique", len(ids) == len(set(ids)),
           f"{len(ids) - len(set(ids))} duplicates")
+
+    # The subject rule, at the captions that decided where it sits. A
+    # sitter nobody can name goes; a monarch against a studio curtain
+    # goes; a monarch doing something somewhere stays, and so does a
+    # street named after one. Graz is here because it must never be
+    # caught by any of it.
+    import harvest
+    subjects = [
+        (False, "Portret van een onbekende vrouw"),
+        (False, "Studioportret van een onbekende jongen met een hoed"),
+        (False, "Portret van Juliana, koningin der Nederlanden"),
+        (False, "Portret van Wilhelmina, koningin der Nederlanden"),
+        (True,  "Bezoek van H.M. de koningin aan Leeuwarden"),
+        (True,  "De Rouwkoets van de begrafenisstoet van Emma"),
+        (True,  "Ooievaar aan de poort van Paleis Noordeinde te Den Haag"),
+        (True,  "Amsterdam. Prins Hendrikkade"),
+        (True,  "Koninginnekerk. Rotterdam"),
+        (True,  "Graz"),
+        (True,  "Graz gegen Norden"),
+        (True,  "Gruss aus Graz"),
+    ]
+    for want, title in subjects:
+        card = [{"id": "x", "t": title}]
+        got = bool(harvest.balance_subjects(card))
+        check(f"subject: {'keeps' if want else 'drops'} {title[:48]}", got is want)
+
+    # And the cap, which only bites on the third copy of one caption.
+    same = [{"id": f"r{n}", "t": "Doop van Juliana, koningin der Nederlanden"}
+            for n in range(5)]
+    check("subject: five photographs of one christening become two",
+          len(harvest.balance_subjects(same)) == harvest.ROYAL_REPEAT,
+          f"kept {len(harvest.balance_subjects(same))}")
+    graz = [{"id": f"g{n}", "t": "Graz"} for n in range(9)]
+    check("subject: nine views of Graz are nine views of Graz",
+          len(harvest.balance_subjects(graz)) == 9,
+          f"kept {len(harvest.balance_subjects(graz))}")
 
     key = cell_key("all", "all", "all")
     total = len(entries)

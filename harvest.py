@@ -126,6 +126,42 @@ TITLE_REJECT_RE = re.compile(
 TITLE_LIMIT = 240
 PER_COUNTRY_CAP = 6000
 
+# Subject balance.
+#
+# The per-country cap is the only thing standing between one holding and
+# the whole catalogue, and at 6,000 it has never once bound. It also
+# counts the wrong thing: nobody notices a country, they notice a
+# subject. The Rijksmuseum's postcards turn out to be, in large part,
+# the photo archive of the Dutch royal house -- 240 cards, and while
+# that is only 1.4% of the pool it is 26% of Portrait + Europe +
+# 1930-1945, one every four days, because that cell holds 139 cards in
+# total. The same collection contributes 239 studio portraits of people
+# the museum itself cannot name.
+#
+# Two rules, and deliberately not a third. A card whose subject is a
+# sitter nobody can identify is not a postcard from anywhere, so it
+# goes. A monarch photographed against a studio curtain is the same
+# problem with a name attached, so that goes too -- but the royal cards
+# that show something happening somewhere stay, the funeral cortege at
+# Delft, the stork at Paleis Noordeinde, the state visit to Leeuwarden.
+# What is left is capped at two per identical caption, because the
+# archive holds ten photographs of one wedding and a viewer cannot tell
+# them apart from the line under the picture. Together that takes the
+# royals down by about half.
+#
+# The third rule, a general cap on repeated captions, is deliberately
+# absent: 108 cards in this pool are titled simply "Graz", and they are
+# different views of a city somebody wants to keep seeing.
+SITTER_UNKNOWN = re.compile(
+    r"^(?:studio|groeps)?portret van .{0,40}\bonbekend", re.I)
+PLAIN_PORTRAIT = re.compile(r"^(?:studio|groeps)?portret van\b", re.I)
+ROYAL_NAME = re.compile(
+    r"\b(?:Wilhelmina|Juliana|Beatrix|Bernhard|Willem-Alexander|M[a\u00e1]xima"
+    r"|Margriet|Christina|Armgard)\b")
+ROYAL_WORD = re.compile(
+    r"\bkoningin\b|\bkoning\b|\bregentes\b|\bprinses\b|\bprins\b|\btroon\b", re.I)
+ROYAL_REPEAT = 2            # photographs of one occasion, per caption
+
 # Render quality, calibrated on 2-bit greyscale -- what the panels
 # actually show. See README.
 # Mean edge magnitude, below which a scan is too flat to look at. This
@@ -1636,6 +1672,8 @@ def build_pool(max_pages, do_measure, dims_budget=DIMS_BUDGET,
         fill_quality(entries, quality, MEASURE_BUDGET)
         save_cache(QUALITY_PATH, quality, "scored")
 
+    entries = balance_subjects(entries, stats)
+
     kept = []
     for entry in entries:
         score = quality.get(entry["id"])
@@ -1660,6 +1698,41 @@ def build_pool(max_pages, do_measure, dims_budget=DIMS_BUDGET,
     final.sort(key=lambda e: e["id"])
 
     return final, stats, len(quality), len(dims_cache)
+
+
+def is_royal(title):
+    """A card whose subject is a member of a royal house."""
+    return bool(ROYAL_NAME.search(title) or ROYAL_WORD.search(title))
+
+
+def balance_subjects(entries, stats=None):
+    """
+    Keep one holding's speciality from becoming the catalogue's.
+
+    Applied where daily.py loads the pool as well as here, so the
+    judgement above can be revised without a re-crawl. Deterministic:
+    the cap keeps the lowest ids, so the same cards survive every run.
+    """
+    kept = []
+    seen = collections.Counter()
+    for entry in sorted(entries, key=lambda e: e["id"]):
+        title = entry.get("t") or ""
+        if SITTER_UNKNOWN.search(title):
+            if stats is not None:
+                stats["sitter unknown"] += 1
+            continue
+        if is_royal(title):
+            if PLAIN_PORTRAIT.match(title):
+                if stats is not None:
+                    stats["royal portrait"] += 1
+                continue
+            if seen[title] >= ROYAL_REPEAT:
+                if stats is not None:
+                    stats["royal repeat"] += 1
+                continue
+            seen[title] += 1
+        kept.append(entry)
+    return kept
 
 
 def describe(entries):
