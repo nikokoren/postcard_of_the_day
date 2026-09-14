@@ -128,7 +128,15 @@ PER_COUNTRY_CAP = 6000
 
 # Render quality, calibrated on 2-bit greyscale -- what the panels
 # actually show. See README.
-UNREADABLE_DETAIL = 14.0    # a flat, empty scan
+# Mean edge magnitude, below which a scan is too flat to look at. This
+# was 14.0, set before anything had ever been measured, and the first
+# real run showed where that lands: on 3,000 cards it is the 5th
+# percentile, and it was throwing out the Jakominiplatz, the Graz
+# Herrengasse, the Erechtheion and the Library of Congress -- ordinary,
+# perfectly sharp cards whose only fault was a soft archive scan. 10.0
+# is the 1st percentile, and the band beneath it really is washed out:
+# faded studio portraits, a blank card back, ghosts of photographs.
+UNREADABLE_DETAIL = 10.0    # a flat, empty scan
 TEXT_RATIO = 3.0            # the address side got in anyway
 MEASURE_SIZE = "!800,480"
 
@@ -162,20 +170,53 @@ MEASURE_SIZE = "!800,480"
 # 0.07 of its strip above the usual paper cut and 0.73 of it near its
 # own tone.
 #
-# Calibrated on 1,839 cards drawn at random from the pool. The rule
-# rejects 9 of them, 0.49%: three cards that are nothing but a printed
-# poem, two portraits with the poem set beside them, a card written
-# across in ink, a scan with a photographic step wedge in the frame, a
-# board of toll rates, and the Milano card. Nothing that is a picture.
-PANEL_RULED = 0.40          # strength of the line rhythm down the strip
+# Calibrated on 2,725 cards drawn at random from the pool, every
+# rejection looked at. The rule drops 12 of them, 0.44%: four cards that
+# are nothing but a printed poem or a board of rates, three portraits
+# with the poem set beside them, two written across in ink, a scan with
+# a photographic step wedge in the frame, and both Milano cards. Nothing
+# that is a picture.
+#
+# Set for precision over recall, because the two failures are not
+# equal: a false positive quietly deletes a good card from the
+# catalogue, where a miss only means somebody gets a dull morning. The
+# cards that sit just inside the line are real pictures that happen to
+# repeat -- a YWCA cafeteria's shelves of tins reach 0.483, and a Graz
+# card with a handwritten third reaches 0.486, so the two are not
+# separable and the cut goes above both. Known misses, accepted: that
+# Graz card, a Boulogne quay with a table of shipping fares beside it,
+# and a French chateau with its history printed alongside.
+PANEL_RULED = 0.50          # strength of the line rhythm down the strip
 PANEL_FLAT = 0.48           # ... on a strip that is a printed surface
 PAGE_RULED = 0.30           # a weaker rhythm will do if the card is
-PAGE_FLAT = 0.70            # ... a page of print from edge to edge
+PAGE_FLAT = 0.78            # ... a page of print from edge to edge
 PANEL_WIDTH = 0.25          # strip width, as a fraction of the card
 PANEL_STEP = 0.0625         # and how far it slides each time
-PANEL_PITCH = (8, 36)       # plausible line spacing, in pixels
+# The ceiling has to clear the widest line spacing anybody sets. It was
+# 36 while the mount was still in frame, and taking the mount off makes
+# the card fill more of the 900 and every pitch grow with it: The New
+# Colossus, which is nothing but the sonnet, fell from 0.413 to 0.069
+# because its lines had walked out of the range being searched.
+PANEL_PITCH = (8, 44)       # plausible line spacing, in pixels
 PANEL_TONE = (16, 24)       # how near the modal tone still counts as it
 PANEL_WIDE = 900            # measured at this width, so the pitch holds
+
+# Several archives scan the card on a dark board and keep the board.
+# Graz does it on almost every card, sometimes at half the frame. Every
+# measurement above is an average over what it is given, so the mount
+# quietly ruins all of them: it halved `detail` on perfectly sharp
+# street scenes and pushed 101 of them under the blank-scan limit, and
+# a strip of plain board is flat by definition, which had the panel
+# rule throwing out a Graz street with a horse cart on it.
+#
+# So the mount comes off first and everything is measured on the card.
+# A row of mount is flat, so the card is the run of rows and columns
+# whose spread rises clear of the flattest -- and if that leaves less
+# than a third of the frame the crop is refused, on the grounds that
+# something other than a mount is going on.
+MOUNT_LIVE = 0.25           # a live row's spread, against the busiest
+MOUNT_FLOOR = 3.0           # ... and never less than this
+MOUNT_MIN = 0.35            # refuse a crop that keeps less of the frame
 
 
 # ============================================================
@@ -1393,6 +1434,34 @@ def apply_dimensions(entries, cache, stats):
 # render quality
 # ============================================================
 
+def card_only(image):
+    """The card, with the scanning board cropped off."""
+    try:
+        import numpy as np
+    except ImportError:
+        return image
+    frame = np.asarray(image, dtype=np.float64)
+    if frame.ndim != 2 or min(frame.shape) < 24:
+        return image
+    height, width = frame.shape
+
+    def live(spread, length):
+        limit = max(float(spread.max()) * MOUNT_LIVE, MOUNT_FLOOR)
+        rows = np.where(spread >= limit)[0]
+        if rows.size == 0:
+            return 0, length
+        first, last = int(rows[0]), int(rows[-1]) + 1
+        if last - first < length * MOUNT_MIN:
+            return 0, length
+        return first, last
+
+    top, bottom = live(frame.std(axis=1), height)
+    left, right = live(frame.std(axis=0), width)
+    if (top, left) == (0, 0) and (bottom, right) == (height, width):
+        return image
+    return image.crop((left, top, right, bottom))
+
+
 def ruled_panel(image):
     """
     (rhythm, flat) for the most text-like strip of a card.
@@ -1466,6 +1535,7 @@ def measure(entry):
         image = Image.open(io.BytesIO(raw)).convert("L")
     except Exception:
         return None
+    image = card_only(image)
     pixels = list(image.getdata())
     total = len(pixels) or 1
     ink = sum(1 for p in pixels if p < 90) / total

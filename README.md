@@ -222,11 +222,12 @@ Postcards are small, and a lot of what an archive files under "postcards"
 is the *back* of one — an address panel, a postmark and someone's
 handwriting. That is a real card and a useless picture.
 
-Each card is fetched at panel size in greyscale and measured:
+Each card is fetched at panel size in greyscale, **the mount is cropped
+off**, and the card is measured:
 
 | metric | what it catches |
 | --- | --- |
-| `detail` | mean edge magnitude. A flat, empty or blank scan scores low. |
+| `detail` | mean edge magnitude. A flat, empty or blank scan scores low. Limit 10.0 — see below. |
 | `texty` | how much more the darkness alternates down the card than across it. Ruled lines of writing sit at 3 and up; a picture side sits near 1.5. |
 | `rhythm` | how strongly the brightness down the most text-like quarter-width strip repeats at one fixed line pitch. |
 | `flat` | how much of that same strip sits within a narrow band of its own commonest tone. |
@@ -255,11 +256,59 @@ absolute brightness test threw away every dark one. *La Brabançonne* —
 the Belgian anthem printed in full, nothing else on the card — has 0.07
 of its strip above a normal paper cut and 0.73 of it near its own tone.
 
-Calibrated on 1,839 cards drawn at random from the pool, the rule
-rejects 9, or 0.49%: three cards that are nothing but a printed poem,
-two portraits with the poem set beside them, a card written across in
-ink, a scan with a photographic step wedge in the frame, a board of toll
-rates, and the Milano card. Nothing that is a picture.
+### The mount
+
+Several archives scan the card on a dark board and keep the board. Graz
+does it on nearly every card, sometimes at half the frame. Every metric
+here is an average over what it is given, so the mount quietly ruins all
+of them — and it did. Turning scoring on for the first time dropped 101
+cards as blank scans, of which 26 were sharp Graz street scenes whose
+`detail` had been halved by the board around them; and a strip of plain
+board is flat by definition, so the panel rule threw out a Graz street
+with a horse cart on it, at 0.492 and 0.72.
+
+So the mount comes off before anything is measured. A row of mount is
+flat, so the card is the run of rows and columns whose spread rises
+clear of the flattest; if that leaves less than a third of the frame the
+crop is refused, on the grounds that something other than a mount is
+going on.
+
+It also settled the flat-scan limit, which had been 14.0 since before
+anything was ever measured. On the first real run of 3,000 cards that
+turns out to be the **5th percentile**, and it was throwing out the
+Jakominiplatz, the Graz Herrengasse, the Erechtheion and the Library of
+Congress — ordinary, perfectly sharp cards whose only fault was a soft
+archive scan. It is now 10.0, the 1st percentile, and the band beneath
+it really is washed out: faded studio portraits, ghosts of photographs,
+one blank card back. Rejections overall went from 4.7% of a scored
+batch to 1.6%.
+
+Taking the mount off moves every number, which is why the panel
+thresholds were calibrated twice. It also enlarges the card inside the fixed measuring
+width, so every line pitch grows with it: *The New Colossus* fell from
+0.413 to 0.069 because its lines had walked out of the range being
+searched, and the ceiling went from 36 pixels to 44.
+
+### Where the line is
+
+Calibrated on 2,725 cards drawn at random, every rejection looked at:
+the rule drops **12, or 0.44%**. Four cards that are nothing but a
+printed poem or a board of rates, three portraits with the poem set
+beside them, two written across in ink, a scan with a photographic step
+wedge in the frame, and both Milano cards. Nothing that is a picture.
+
+It is set for precision over recall, because the two failures are not
+equal: a false positive quietly deletes a good card from the catalogue,
+where a miss only means somebody gets a dull morning. The cards just
+inside the line are real pictures that happen to repeat — a YWCA
+cafeteria's shelves of tins reach 0.483, a Graz card with a handwritten
+third reaches 0.486 — so the two are not separable, and the cut goes
+above both. Known misses, accepted: that Graz card, a Boulogne quay with
+a table of shipping fares beside it, and a French château with its
+history printed alongside.
+
+`score.py --selftest` holds all twenty-two of those measurements, and
+both workflows run it.
 
 `mush` is measured but not used as a rejection, and that is deliberate.
 An earlier version of this filter was calibrated at 1-bit, where every
@@ -278,7 +327,15 @@ exactly how the Milano card got out.
 The order is what makes it useful on day one. The schedule is
 arithmetic, so the cards due on a screen this fortnight are knowable
 rather than guessable, and those are measured first; the rest of the
-pool follows a budget at a time. The verdict is applied when `daily.py`
+pool follows a budget at a time.
+
+One trap, worth knowing because both `score.py` and `translate.py` fell
+into it: work that walks the schedule must load the pool through
+`daily.load_pool()`, never straight from `pool.json`. Regions are
+attached at load time, so raw entries carry no `rg`, every region cell
+selects nothing, and the walk silently returns a fraction of the
+schedule and calls it the whole of it — 375 cards instead of 1,693,
+missing the one that was on a screen that morning. The verdict is applied when `daily.py`
 loads the pool, not when `harvest.py` writes it, so a card that scores
 badly is out of tomorrow's picks rather than out of whichever month the
 next crawl lands in. An unmeasured card is still not held against

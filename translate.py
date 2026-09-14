@@ -178,8 +178,14 @@ def main():
     ap.add_argument("--report", action="store_true")
     args = ap.parse_args()
 
-    with open(POOL_PATH) as fh:
-        entries = json.load(fh)["entries"]
+    # daily.load_pool() rather than json.load(pool.json): regions are
+    # attached when daily.py loads the pool, so raw entries have no
+    # "rg" and every region cell of the schedule selects nothing --
+    # which left upcoming_titles walking a fraction of the schedule and
+    # calling it the whole of it.
+    sys.path.insert(0, HERE)
+    import daily
+    entries = daily.load_pool()
     cache = load_cache()
 
     if args.report:

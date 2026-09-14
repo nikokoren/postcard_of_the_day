@@ -46,6 +46,29 @@ SAVE_EVERY = 250
 
 
 def load_pool():
+    """
+    The pool as daily.py sees it.
+
+    Not json.load(pool.json): regions are attached when daily.py loads
+    the pool, not when harvest.py writes it, so raw entries have no
+    "rg" and every region cell of the schedule quietly selects nothing.
+    Reading the file directly left the upcoming list holding 375 cards
+    instead of 1,693, and missing the card that was on a screen that
+    morning.
+    """
+    sys.path.insert(0, HERE)
+    import daily
+    return daily.load_pool()
+
+
+def load_pool_raw():
+    """
+    Every card in the file, rejects included.
+
+    The reader above hands back what survives the filter, which is what
+    the schedule runs on but useless for reporting on the filter --
+    asked how many cards it rejects, it would always answer none.
+    """
     with open(POOL_PATH) as fh:
         return json.load(fh).get("entries") or []
 
@@ -141,35 +164,41 @@ def report(entries, cache):
               f"{(entry.get('t') or '')[:54]}")
 
 
-# Ten cards this filter rejects and nine it keeps, all real
-# measurements, all looked at. The pair of thresholds is a judgement
-# call about where a picture stops being a picture, so if anybody moves
-# them this table says what they just let through -- or threw away.
+# Eleven cards this filter drops and eleven it keeps, all real
+# measurements taken on the card with the mount off, all looked at. The
+# thresholds are a judgement call about where a picture stops being a
+# picture, so if anybody moves them this table says what they just let
+# through -- or threw away.
 #
-# The awkward ones are the last three kept: a Kyoto woodblock and a
-# Bruges view are flat-toned enough to look like paper, and a YWCA
-# cafeteria rules up almost hard enough to look like type. Each fails
-# the other half of the test, which is the whole reason there are two.
+# The instructive ones are the kept: a cafeteria's shelves of tins rule
+# up to 0.483 and a Bruges view is flat-toned to 0.76, each failing the
+# other half of the test, which is the whole reason there are two. The
+# Wormgasse row is the mount: with the scanning board still in frame it
+# read 0.492 and 0.72 and was thrown out, and it is a street with a
+# horse cart on it.
 SELFTEST = [
-    (False, "Gone West -- illustration, and a poem beside it", 0.693, 0.49),
-    (False, "Wilhelmina, with the poem set beside her",        0.644, 0.62),
-    (False, "Russia and Japanese peace envoys, written across", 0.557, 0.59),
-    (False, "La Brabanconne -- the anthem, printed in full",   0.517, 0.73),
-    (False, "Wilhelmina again",                                0.510, 0.76),
-    (False, "Addison PA -- a board of toll rates",             0.488, 0.57),
-    (False, "Milano. Castello Sforzesco. Sala delle Asse",     0.485, 0.66),
-    (False, "Gaynor Rowlands -- a step wedge in the frame",    0.454, 0.60),
-    (False, "Milano. Castello Sforzesco. Pusterla dei Fabbri", 0.409, 0.69),
-    (False, "The New Colossus -- nothing but the sonnet",      0.339, 0.76),
-    (True,  "Philadelphia gateway -- brickwork, not type",     0.641, 0.31),
-    (True,  "Pistoia. Battistero -- masonry courses",          0.535, 0.46),
-    (True,  "Portret van Juliana",                             0.407, 0.47),
-    (True,  "Zuiderzee dyke, running to the horizon",          0.402, 0.45),
-    (True,  "Amsterdam. Frederiksplein",                       0.402, 0.05),
-    (True,  "Cafeteria, Y.W.C.A -- shelves of tins",           0.378, 0.58),
-    (True,  "Kyoto -- a woodblock, flat-toned sky",            0.359, 0.65),
-    (True,  "The mills by the Kruispoort, Bruges",             0.310, 0.67),
-    (True,  "12in mortar, Fort H. G. Wright",                  0.309, 0.65),
+    (False, "Milano. Castello Sforzesco. Sala delle Asse",     0.934, 0.73),
+    (False, "Milano. Castello Sforzesco. Pusterla dei Fabbri", 0.799, 0.73),
+    (False, "Gone West -- illustration, and a poem beside it", 0.718, 0.50),
+    (False, "Wilhelmina, with the poem set beside her",        0.686, 0.84),
+    (False, "Wilhelmina again",                                0.656, 0.55),
+    (False, "Addison PA -- a board of toll rates",             0.593, 0.59),
+    (False, "Gaynor Rowlands -- a step wedge in the frame",    0.562, 0.65),
+    (False, "La Brabanconne -- the anthem, printed in full",   0.528, 0.78),
+    (False, "Russia and Japanese peace envoys, written across", 0.527, 0.71),
+    (False, "The New Colossus -- nothing but the sonnet",      0.413, 0.78),
+    (False, "Koninklijk Postkantoor, written across",          0.300, 0.86),
+    (True,  "A Philadelphia gateway -- brickwork, not type",   0.743, 0.32),
+    (True,  "Pistoia. Battistero -- masonry courses",          0.554, 0.47),
+    (True,  "Cafeteria, Y.W.C.A -- shelves of tins",           0.483, 0.73),
+    (True,  "Toledo. Capilla de Santiago -- gothic tombs",     0.419, 0.55),
+    (True,  "Graz. Wormgasse -- a street, and a horse cart",   0.418, 0.44),
+    (True,  "Amsterdam. Frederiksplein",                       0.409, 0.43),
+    (True,  "Graz. Schlossberg - Uhrturm, against a flat sky", 0.371, 0.70),
+    (True,  "Musee de Marine -- a galley, oars repeating",     0.328, 0.73),
+    (True,  "The mills by the Kruispoort, Bruges",             0.312, 0.76),
+    (True,  "Lustgarten, Berlin -- a colonnade and a lawn",    0.302, 0.74),
+    (True,  "Yasaka Shrine, Kyoto",                            0.185, 0.47),
 ]
 
 
@@ -185,9 +214,21 @@ def selftest():
         print(f"  {'ok  ' if ok else 'FAIL'} {verb} {name} "
               f"(rhythm {rhythm}, flat {flat})")
 
-    print("the older rules, and the cards nobody has measured")
+    # The flat-scan limit, at the four cards that argued it down from
+    # 14.0 to 10.0, and the two that hold it where it is.
+    print("the flat-scan limit, and the cards nobody has measured")
     for want, name, score in (
-            (False, "a flat, empty scan",   [40.0, 9.0, 1.2, 0.05, 0.30]),
+            (True,  "Graz, Jakominiplatz -- a soft archive scan",
+                                            [40.0, 14.0, 1.2, 0.05, 0.30]),
+            (True,  "Gruss aus Graz. Herrengasse",
+                                            [40.0, 13.8, 1.2, 0.05, 0.30]),
+            (True,  "The Erechtheion, Athens",
+                                            [40.0, 13.9, 1.2, 0.05, 0.30]),
+            (True,  "Library of Congress, Washington",
+                                            [40.0, 13.6, 1.2, 0.05, 0.30]),
+            (False, "a faded studio portrait",
+                                            [40.0, 8.5, 1.2, 0.05, 0.30]),
+            (False, "a blank card back",    [40.0, 4.7, 1.2, 0.05, 0.30]),
             (False, "the address side",     [40.0, 45.0, 3.4, 0.05, 0.30]),
             (True,  "not measured yet",     None),
             (True,  "measured without numpy", [40.0, 45.0, 1.2, None, None]),
@@ -222,12 +263,13 @@ def main():
         return 0
 
     import harvest
-    entries = load_pool()
     cache = load_cache()
 
     if args.report:
-        report(entries, cache)
+        report(load_pool_raw(), cache)
         return 0
+
+    entries = load_pool()
 
     queue, soon = to_measure(entries, cache, args.upcoming, args.budget)
     if not queue:
