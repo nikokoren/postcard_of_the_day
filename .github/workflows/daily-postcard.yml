@@ -18,7 +18,7 @@ concurrency:
 jobs:
   pick-postcard:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 60
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -27,6 +27,20 @@ jobs:
           # job was running, without cloning the whole daily history.
           fetch-depth: 20
 
+      - name: Install the image libraries
+        run: pip install --quiet pillow numpy
+
+      - name: Check the picture filter still agrees with our eyes
+        run: python3 score.py --selftest
+
+      - name: Score a batch of cards for whether they read on a panel
+        # Cards on their way to a screen first, so a bad one is caught
+        # before anybody sees it rather than after. Budgeted, cached
+        # forever, and a failure here must not cost the day's picks --
+        # an unscored card is kept, which is the old behaviour.
+        continue-on-error: true
+        run: python3 score.py --budget 1200 --upcoming 21
+
       - name: Pick today's postcard
         run: python3 daily.py
 
@@ -34,7 +48,7 @@ jobs:
         run: |
           git config user.name "GitHub Action"
           git config user.email "action@github.com"
-          git add postcard.json today.json
+          git add postcard.json today.json quality.json
 
           if git diff --staged --quiet; then
             echo "Same postcard as the last run, nothing to commit"

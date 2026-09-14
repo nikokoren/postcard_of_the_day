@@ -222,14 +222,44 @@ Postcards are small, and a lot of what an archive files under "postcards"
 is the *back* of one — an address panel, a postmark and someone's
 handwriting. That is a real card and a useless picture.
 
-`harvest.py` fetches each card at panel size in greyscale and measures
-three things:
+Each card is fetched at panel size in greyscale and measured:
 
 | metric | what it catches |
 | --- | --- |
 | `detail` | mean edge magnitude. A flat, empty or blank scan scores low. |
 | `texty` | how much more the darkness alternates down the card than across it. Ruled lines of writing sit at 3 and up; a picture side sits near 1.5. |
+| `rhythm` | how strongly the brightness down the most text-like quarter-width strip repeats at one fixed line pitch. |
+| `flat` | how much of that same strip sits within a narrow band of its own commonest tone. |
 | `mush` | the share of mid-grey. Recorded, not judged — see below. |
+
+`texty` is a whole-card average, which means it only catches a card that
+is text all over. It is blind to the commonest spoiler of the lot: a
+card that is *half* picture and half small print. "Milano. Castello
+Sforzesco. Sala delle Asse" is two thirds of a photograph and one third
+of a column of Italian history set in six-point type; it scored 1.17
+against a limit of 3.0, and went out as a postcard of the day.
+
+`rhythm` and `flat` look for the panel rather than for a texty card.
+Lines of type repeat at a fixed spacing and keep repeating for the
+height of the panel, which is what separates them from the things in a
+photograph that also repeat — masonry courses, balconies, railings,
+waves — since those drift and die out within a few cycles. And type is a
+few dark marks on one flat ground, so most of the strip sits near a
+single tone; a photograph's tones are spread out. Both are needed: a
+Philadelphia gateway scores 0.64 on its brickwork and holds only 0.31 of
+its strip near one tone.
+
+`flat` is measured against the strip's own modal tone rather than
+against white, because half these scans are sepia or underexposed and an
+absolute brightness test threw away every dark one. *La Brabançonne* —
+the Belgian anthem printed in full, nothing else on the card — has 0.07
+of its strip above a normal paper cut and 0.73 of it near its own tone.
+
+Calibrated on 1,839 cards drawn at random from the pool, the rule
+rejects 9, or 0.49%: three cards that are nothing but a printed poem,
+two portraits with the poem set beside them, a card written across in
+ink, a scan with a photographic step wedge in the frame, a board of toll
+rates, and the Milano card. Nothing that is a picture.
 
 `mush` is measured but not used as a rejection, and that is deliberate.
 An earlier version of this filter was calibrated at 1-bit, where every
@@ -238,9 +268,24 @@ Most TRMNL panels are 2-bit or 4-bit. Re-rendered at the depth the
 hardware actually has, cards that looked unreadable at 1-bit read fine,
 so the threshold came off.
 
-Measurement is budgeted (900 cards a run) and cached in `quality.json`,
-so each monthly refresh covers more of the pool than the last. An
-unmeasured card is not held against itself.
+Measuring lives in **`score.py`**, which the daily job runs, and is
+cached forever in `quality.json`. `harvest.py` can do it too, but it
+only runs monthly and has a crawl to get through first, so at its budget
+the pool would have been covered some time in 2046 — and until a card is
+measured it is eligible to be somebody's postcard of the day. That is
+exactly how the Milano card got out.
+
+The order is what makes it useful on day one. The schedule is
+arithmetic, so the cards due on a screen this fortnight are knowable
+rather than guessable, and those are measured first; the rest of the
+pool follows a budget at a time. The verdict is applied when `daily.py`
+loads the pool, not when `harvest.py` writes it, so a card that scores
+badly is out of tomorrow's picks rather than out of whichever month the
+next crawl lands in. An unmeasured card is still not held against
+itself.
+
+    python3 score.py --budget 2000 --upcoming 21
+    python3 score.py --report
 
 One filter that only exists because somebody looked: the Rijksmuseum
 files **boxes, albums and mounted lots** under the same type as single
@@ -312,6 +357,7 @@ length — and the markup uses that one warmed URL.
 | `harvest.py` | monthly crawl of every source into `pool.json` |
 | `daily.py` | the day's picks → `postcard.json`, `today.json` |
 | `make_settings.py` | regenerates `trmnl/settings.yml` from the pool |
+| `score.py` | measures cards for whether they read on a panel |
 | `preview.py` | contact sheet at panel grey depth |
 | `sources.md` | every source considered, and why each is in or out |
 | `pool.json` | the cached catalogue |
@@ -377,8 +423,9 @@ python3 harvest.py --report                 # what is in the pool
 python3 preview.py --cell landscape__europe__all --days 24
 ```
 
-`harvest.py` needs Pillow only for the quality pass; `--no-measure`
-skips it.
+`harvest.py` and `score.py` need Pillow and numpy for the quality pass.
+`harvest.py --no-measure` skips it; `score.py` without them scores
+nothing rather than scoring wrongly, and an unmeasured card is kept.
 
 ---
 

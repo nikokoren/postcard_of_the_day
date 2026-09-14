@@ -132,6 +132,51 @@ UNREADABLE_DETAIL = 14.0    # a flat, empty scan
 TEXT_RATIO = 3.0            # the address side got in anyway
 MEASURE_SIZE = "!800,480"
 
+# The ratio above is a whole-card average, so it only catches a card
+# that is text all over. It is blind to the commonest spoiler of the
+# lot: a card that is half picture and half small print, an Italian view
+# with a column of history set beside it. The picture half pulls the
+# average back down and the card sails through -- "Milano. Castello
+# Sforzesco. Sala delle Asse" scored 1.17 against a limit of 3.0 and
+# went out as a postcard of the day.
+#
+# So look for the panel itself rather than for a texty card: a tall
+# strip of paper ruled into regular lines. Lines of type repeat at a
+# fixed pitch and keep repeating for the height of the panel, which is
+# what separates them from the things in a photograph that also repeat
+# -- masonry courses, balconies, railings, waves -- since those drift
+# and die out within a few cycles.
+#
+# Rhythm alone is not enough, because a brick wall in the right light
+# rules a card as neatly as a typesetter does. The second half of the
+# test is that the strip be a printed surface: type is a few dark marks
+# on one flat tone, so most of the strip sits within a narrow band of
+# its own commonest tone. A photograph's tones are spread out -- the
+# Philadelphia gateway that scored 0.64 on its brickwork holds only 0.31
+# of its strip near one tone, against 0.66 for the Milano panel.
+#
+# Deliberately measured against the strip's *own* modal tone rather than
+# against white: half these scans are sepia or underexposed, and an
+# absolute brightness test threw away every dark one. La Brabanconne --
+# the Belgian anthem, printed in full, nothing else on the card -- has
+# 0.07 of its strip above the usual paper cut and 0.73 of it near its
+# own tone.
+#
+# Calibrated on 1,839 cards drawn at random from the pool. The rule
+# rejects 9 of them, 0.49%: three cards that are nothing but a printed
+# poem, two portraits with the poem set beside them, a card written
+# across in ink, a scan with a photographic step wedge in the frame, a
+# board of toll rates, and the Milano card. Nothing that is a picture.
+PANEL_RULED = 0.40          # strength of the line rhythm down the strip
+PANEL_FLAT = 0.48           # ... on a strip that is a printed surface
+PAGE_RULED = 0.30           # a weaker rhythm will do if the card is
+PAGE_FLAT = 0.70            # ... a page of print from edge to edge
+PANEL_WIDTH = 0.25          # strip width, as a fraction of the card
+PANEL_STEP = 0.0625         # and how far it slides each time
+PANEL_PITCH = (8, 36)       # plausible line spacing, in pixels
+PANEL_TONE = (16, 24)       # how near the modal tone still counts as it
+PANEL_WIDE = 900            # measured at this width, so the pitch holds
+
 
 # ============================================================
 # sources
@@ -1348,8 +1393,66 @@ def apply_dimensions(entries, cache, stats):
 # render quality
 # ============================================================
 
+def ruled_panel(image):
+    """
+    (rhythm, flat) for the most text-like strip of a card.
+
+    rhythm is how strongly the brightness down that strip repeats at one
+    fixed spacing -- the autocorrelation peak over plausible line
+    pitches, after a moving average takes out the slow shading that
+    every scan has. flat is how much of the strip sits within a narrow
+    band of the strip's own commonest tone.
+
+    Both are needed. Lines of type give rhythm on a flat ground; a
+    flight of steps gives rhythm on stone.
+
+    (None, None) when numpy is not installed, which reads downstream as
+    not measured rather than as clean.
+    """
+    try:
+        import numpy as np
+    except ImportError:
+        return None, None
+    if image.width != PANEL_WIDE:
+        height = max(int(PANEL_WIDE * image.height / image.width), 1)
+        image = image.resize((PANEL_WIDE, height))
+    card = np.asarray(image, dtype=np.float64)
+    height, width = card.shape
+    low, high = PANEL_PITCH
+    if height < 3 * high:
+        return None, None
+
+    window = 19
+    strip_w = max(int(width * PANEL_WIDTH), 8)
+    step = max(int(width * PANEL_STEP), 1)
+    best = (0.0, 0.0)
+    for left in range(0, width - strip_w + 1, step):
+        strip = card[:, left:left + strip_w]
+        down = strip.mean(axis=1)
+        down = down - down.mean()
+        # Subtract the local mean: a scan that darkens towards one edge
+        # correlates with itself at every lag, and would score as type.
+        padded = np.pad(down, window // 2, mode="edge")
+        down = down - np.convolve(padded, np.ones(window) / window,
+                                  mode="valid")[:height]
+        energy = float(down @ down) or 1e-9
+        rhythm = max(float(down[:height - lag] @ down[lag:]) / energy
+                     for lag in range(low, high + 1))
+        if rhythm > best[0]:
+            bins = np.histogram(strip, bins=32, range=(0, 256))[0]
+            tone = int(np.argmax(bins)) * 8
+            near, above = PANEL_TONE
+            flat = float(((strip >= tone - near) &
+                          (strip <= tone + above)).mean())
+            best = (rhythm, flat)
+    return round(best[0], 3), round(best[1], 3)
+
+
 def measure(entry):
-    """(mush, detail, texty) for one card, or None if it could not be fetched."""
+    """
+    (mush, detail, texty, rhythm, flat) for one card, or None if it
+    could not be fetched.
+    """
     try:
         from PIL import Image, ImageFilter
     except ImportError:
@@ -1386,7 +1489,8 @@ def measure(entry):
     col_alt = sum(abs(cols[i + 1] - cols[i])
                   for i in range(len(cols) - 1)) / max(len(cols) - 1, 1)
     texty = row_alt / max(col_alt, 0.01)
-    return round(mush, 1), round(detail, 1), round(texty, 2)
+    rhythm, flat = ruled_panel(image)
+    return round(mush, 1), round(detail, 1), round(texty, 2), rhythm, flat
 
 
 def readable(score):
@@ -1395,7 +1499,15 @@ def readable(score):
         return True
     detail = score[1]
     texty = score[2] if len(score) > 2 else 0.0
-    return detail > UNREADABLE_DETAIL and texty < TEXT_RATIO
+    if not (detail > UNREADABLE_DETAIL and texty < TEXT_RATIO):
+        return False
+    rhythm = score[3] if len(score) > 3 else None
+    flat = score[4] if len(score) > 4 else None
+    if rhythm is None or flat is None:
+        return True
+    if rhythm >= PANEL_RULED and flat >= PANEL_FLAT:
+        return False                       # a ruled panel beside the picture
+    return not (rhythm >= PAGE_RULED and flat >= PAGE_FLAT)
 
 
 def fill_quality(entries, cache, budget):

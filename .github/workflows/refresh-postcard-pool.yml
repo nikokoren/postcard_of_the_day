@@ -31,7 +31,7 @@ jobs:
           fetch-depth: 20
 
       - name: Install Pillow, and the offline translator
-        run: pip install --quiet pillow argostranslate langdetect
+        run: pip install --quiet pillow numpy argostranslate langdetect
 
       - name: Harvest the postcard pool
         run: python3 harvest.py --pages "${{ github.event.inputs.pages || 400 }}"
@@ -45,6 +45,9 @@ jobs:
 
       - name: Prove the schedule still behaves
         run: python3 daily.py --selftest
+
+      - name: Check the picture filter still agrees with our eyes
+        run: python3 score.py --selftest
 
       - name: Regenerate the plugin settings
         run: python3 make_settings.py

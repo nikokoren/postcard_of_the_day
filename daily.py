@@ -580,6 +580,15 @@ def write_json(path, payload):
 
 
 TRANSLATIONS_PATH = os.path.join(HERE, "translations.json")
+QUALITY_PATH = os.path.join(HERE, "quality.json")
+
+
+def load_quality():
+    try:
+        with open(QUALITY_PATH) as fh:
+            return json.load(fh).get("scored") or {}
+    except (OSError, ValueError):
+        return {}
 
 
 def load_translations():
@@ -609,6 +618,23 @@ def load_pool():
     # re-crawling 30,000 records.
     # Applied here rather than in harvest.py, so a better translation --
     # or a corrected one -- never needs a re-crawl.
+    # Same reasoning for the render scores: score.py measures a budget
+    # of cards a day and a card that turns out to be a column of small
+    # print is out of tomorrow's picks, rather than out of whichever
+    # month the next crawl lands in. A card nobody has measured yet is
+    # kept, as it always was.
+    scores = load_quality()
+    if scores:
+        import harvest
+        before = len(entries)
+        entries = [e for e in entries
+                   if harvest.readable(scores.get(e["id"]))]
+        dropped = before - len(entries)
+        if dropped:
+            sys.stderr.write(f"{dropped} cards dropped on render score\n")
+        if not entries:
+            raise SystemExit("every card was dropped on render score")
+
     english = load_translations()
     for entry in entries:
         slug, label = region_for(entry.get("cn"), entry.get("ct"))
