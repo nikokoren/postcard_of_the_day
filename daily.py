@@ -444,7 +444,7 @@ def date_line(entry):
 
 
 def place_line(entry):
-    bits = [entry.get("pl"), entry.get("cn")]
+    bits = [entry.get("ple") or entry.get("pl"), entry.get("cn")]
     bits = [b for b in bits if b]
     if not bits:
         return ""
@@ -592,9 +592,11 @@ def load_quality():
 
 
 def load_translations():
+    """Version 1 called this "titles", before place lines joined them."""
     try:
         with open(TRANSLATIONS_PATH) as fh:
-            return json.load(fh).get("titles") or {}
+            data = json.load(fh)
+        return data.get("texts") or data.get("titles") or {}
     except (OSError, ValueError):
         return {}
 
@@ -653,6 +655,13 @@ def load_pool():
         rendered = english.get(entry["t"])
         if rendered and rendered.get("en"):
             entry["te"] = rendered["en"]
+        # The place line too. At Graz it is the catalogue's own German
+        # description of the view rather than a place name, and it was
+        # the one line on the panel still speaking German.
+        if entry.get("pl"):
+            rendered = english.get(entry["pl"])
+            if rendered and rendered.get("en"):
+                entry["ple"] = rendered["en"]
     return entries
 
 

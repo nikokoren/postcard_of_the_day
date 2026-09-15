@@ -447,6 +447,59 @@ length — and the markup uses that one warmed URL.
 
 ---
 
+## Captions in English
+
+Just under a third of the pool is catalogued in the language of whoever
+wrote the card. Faithful to the object, no use at all to someone who
+cannot read it, and a panel has room for one caption rather than two —
+so the English replaces the original rather than sitting beside it. The
+original stays in `pool.json` either way, because a machine translation
+is not the record.
+
+Translation is offline and free: Argos Translate, no key, no service to
+depend on. Roughly a second per string, so it is budgeted per run and
+cached forever in `translations.json`, keyed by the **string** rather
+than by the card — 17,785 cards carry about 16,800 distinct captions, and the
+duplicates are free. Applied when `daily.py` loads the pool, so a better
+translation never needs a re-crawl.
+
+**Both lines of the caption, not just the title.** The place line is a
+real place name at Digital Commonwealth ("Kingston", "Istanbul"), but at
+Graz it is the catalogue's own German description of the view — *"Blick
+zum Schloßberg vom Süden mit Tegetthoffbrücke"*. That is the more
+interesting of the two lines, and for 3,001 cards it was going out
+untranslated underneath a setting that calls it the place. Proper nouns
+survive the trip: Schloßberg, Herrengasse and Hauptplatz come back
+intact, and Tegetthoffbrücke becomes Tegetthoff Bridge.
+
+Three things the translator gets wrong, and a guard against each. A
+place name at the head of a caption is vocabulary to a translator —
+"Dameron. Le coin des laveuses" came back as "Lady. The corner of the
+washing machines" — so the head is held back and only the rest is
+translated, for Latin-script heads where holding it back still leaves
+something readable. Detection on a five-word caption is a coin toss
+between neighbouring languages, so where a source speaks one language
+its word beats the detector's guess.
+
+And a full stop is not always the end of anything. Half the
+abbreviations a catalogue uses end in one, and splitting the head there
+hands the translator a fragment starting mid-phrase. Both ways that
+goes wrong were live until somebody read the output: *"Arkaden im
+Innenhof Hauptplatz Nr. 16"* split after "Nr" and translated "16", so
+the German went out untouched; and *"'Vulcan Face' in Mt. Lassen
+eruption"* split after "Mt" and translated the remainder as German,
+where *lassen* means *let*, so it went out as **"Mt. Let eruption"**.
+A lone capital is the same trap wearing a hat: *"Vier portretten van
+acteur M. Lüzenkirchen"* split after the M and handed the surname to
+the translator on its own.
+
+1,279 captions were being cut at an abbreviation or an initial, and
+they were redone. `translate.py --selftest` holds all of these next to
+the four heads that must still be held back, so the next person to
+touch the expression can see what each clause is for.
+
+---
+
 ## Files
 
 | file | what it is |
@@ -455,10 +508,12 @@ length — and the markup uses that one warmed URL.
 | `daily.py` | the day's picks → `postcard.json`, `today.json` |
 | `make_settings.py` | regenerates `trmnl/settings.yml` from the pool |
 | `score.py` | measures cards for whether they read on a panel |
+| `translate.py` | puts the captions into English |
 | `preview.py` | contact sheet at panel grey depth |
 | `sources.md` | every source considered, and why each is in or out |
 | `pool.json` | the cached catalogue |
 | `quality.json` | render measurements, accumulated across runs |
+| `translations.json` | English captions, accumulated across runs |
 | `dimensions.json` | pixel sizes from IIIF `info.json`, accumulated |
 | `today.json` | **the polling URL** — one pick per cell |
 | `postcard.json` | today's card for the full catalogue, on its own |

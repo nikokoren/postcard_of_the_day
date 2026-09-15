@@ -49,6 +49,21 @@ MIN_CONFIDENCE = 0.55
 # description is translated.
 HEAD_SPLIT = re.compile(r"^(.{2,40}?)((?:\.\s+|\s+[-–]\s+))(.+)$")
 
+# ... except that a full stop is not always the end of anything. Half
+# the abbreviations a catalogue uses end in one, and splitting there
+# hands the translator a fragment starting mid-phrase. Two ways that
+# goes wrong, both live before this was added: "Arkaden im Innenhof
+# Hauptplatz Nr. 16" split after "Nr" and translated "16", so the
+# German went out untouched; and "'Vulcan Face' in Mt. Lassen eruption"
+# split after "Mt" and translated the remainder as German, where lassen
+# means let -- it went out as "Mt. Let eruption".
+# A lone capital is an initial -- "Vier portretten van acteur M.
+# Lüzenkirchen" split after the M and translated the surname as Dutch.
+ABBREV_HEAD = re.compile(
+    r"(?:\b(?:Nr|No|Nos|N|St|Ste|Str|Sta|Dr|Mr|Mrs|Ms|Prof|Sgt|Capt|Gen|Col"
+    r"|Bd|Av|Ave|Blvd|Pl|Sq|Rd|Ft|Mt|Mts|Is|Co|Cos|Inc|Ltd|Bros"
+    r"|vol|no|ca|cca|p|pp|fig|ch)|(?<![^\W\d_])[A-Z])$", re.I)
+
 # Detection on a five-word caption is a coin toss between neighbouring
 # languages -- "Constantinople. Obelisque de Theodose" came back as
 # Portuguese, which turned Constantinople into Constantine. Where the
@@ -63,10 +78,22 @@ NON_LATIN = re.compile(r"[^\x00-\x7F\u00C0-\u024F\u1E00-\u1EFF]")
 SKIP_LANGS = {"en", "af", "no", "da", "sw", "tl", "cy", "so", "et"}
 
 
-def upcoming_titles(entries, days):
+def texts_of(entry):
+    """Every string on a card that reaches the panel as prose."""
+    return [t for t in (entry.get("t"), entry.get("pl")) if t]
+
+
+def upcoming_captions(entries, days):
     """
-    The titles that will actually be on a screen in the next `days`,
+    The captions that will actually be on a screen in the next `days`,
     soonest first.
+
+    Both lines of the caption, not just the title. The place line is a
+    real place name at Digital Commonwealth, but at Graz it is the
+    catalogue's own German description of the view -- "Blick zum
+    Schloßberg vom Süden mit Tegetthoffbrücke" -- which is the more
+    interesting of the two lines and was going out untranslated under a
+    setting that calls it the place.
 
     The schedule is arithmetic, so this is knowable rather than guessable
     -- and it is the difference between a translation pass that shows up
@@ -92,17 +119,26 @@ def upcoming_titles(entries, days):
             index = position + step
             entry = (run[index] if index < total
                      else daily.order_for(subset, key, cycle + 1)[index - total])
-            if entry["t"] not in seen:
-                seen.add(entry["t"])
-                ordered.append((step, entry["t"]))
+            for text in texts_of(entry):
+                if text not in seen:
+                    seen.add(text)
+                    ordered.append((step, text))
     ordered.sort(key=lambda row: row[0])
-    return [title for _, title in ordered]
+    return [text for _, text in ordered]
 
 
 def load_cache():
+    """
+    Every string we have looked at, keyed by the string itself.
+
+    Version 1 called this "titles", because titles were all it held.
+    Read both, so the 11,590 already in the file are not thrown away
+    when the place lines join them.
+    """
     try:
         with open(CACHE_PATH) as fh:
-            return json.load(fh).get("titles") or {}
+            data = json.load(fh)
+        return data.get("texts") or data.get("titles") or {}
     except (OSError, ValueError):
         return {}
 
@@ -110,7 +146,7 @@ def load_cache():
 def save_cache(cache):
     tmp = CACHE_PATH + ".tmp"
     with open(tmp, "w") as fh:
-        json.dump({"version": 1, "count": len(cache), "titles": cache},
+        json.dump({"version": 2, "count": len(cache), "texts": cache},
                   fh, ensure_ascii=False, separators=(",", ":"),
                   sort_keys=True)
         fh.write("\n")
@@ -125,6 +161,10 @@ def split_head(title):
     head, sep, rest = m.groups()
     # A head with a verb in it is a sentence, not a place name.
     if len(head.split()) > 5:
+        return None, "", title
+    # And a head ending in an abbreviation is not a head at all -- the
+    # stop belongs to the abbreviation, not to the caption.
+    if ABBREV_HEAD.search(head.rstrip()):
         return None, "", title
     # Only hold back a head the reader could already read. Protecting a
     # Greek or Cyrillic one leaves the caption unreadable, which is the
@@ -170,18 +210,62 @@ def ensure_pack(code, available, installed):
     return True
 
 
+# Where the head-split must and must not cut, at the captions that
+# taught it each rule. None means "translate the whole thing".
+SPLIT_CASES = [
+    ("Dameron",         "Dameron. Le coin des laveuses"),
+    ("Constantinople",  "Constantinople. Obelisque de Theodose"),
+    ("Graz",            "Graz. Schillerplatz"),
+    ("Milano",          "Milano. Castello Sforzesco"),
+    # An abbreviation's full stop is not the end of a head. Splitting
+    # here translated "16" and let the German through, or handed the
+    # translator "Lassen eruption" and got back "Let eruption".
+    (None, "Arkaden im Innenhof Hauptplatz Nr. 16"),
+    (None, "Alt-Graz Sackstraße Nr. 11 im Dezember 1911"),
+    (None, '"Vulcan Face" in Mt. Lassen eruption, 8, 22, 14'),
+    (None, "10th St. Bridge and dam, Beaver"),
+    (None, "Baker's River & Mt. Moosilauke, Warren, N.H"),
+    (None, "Advance Design Inc. Parsons (T-square) tables"),
+    (None, "Vier portretten van acteur M. Lüzenkirchen in een rol"),
+    (None, "Portret van J. P. Coen"),
+    # A head with a verb in it is a sentence, not a place name.
+    (None, "Blick vom Schlossberg auf die Altstadt - Graz"),
+    # And a head the reader cannot read is worth nothing held back.
+    (None, "Άνατολικὴ ἄποψις τῶν Προπυλαίων - Άθῆναι"),
+]
+
+
+def selftest():
+    bad = 0
+    print("where the caption splits")
+    for want, caption in SPLIT_CASES:
+        got, _, rest = split_head(caption)
+        ok = got == want
+        bad += 0 if ok else 1
+        how = f"holds back {got!r}" if got else "translates the whole line"
+        print(f"  {'ok  ' if ok else 'FAIL'} {how:34s} {caption[:44]}")
+    return bad
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--budget", type=int, default=BUDGET)
     ap.add_argument("--upcoming", type=int, default=45, metavar="DAYS",
                     help="translate what is due in the next N days first")
     ap.add_argument("--report", action="store_true")
+    ap.add_argument("--selftest", action="store_true",
+                    help="check the head-split against captions we looked at")
     args = ap.parse_args()
+
+    if args.selftest:
+        failed = selftest()
+        print(f"\n{failed} failed" if failed else "\nall good")
+        return 1 if failed else 0
 
     # daily.load_pool() rather than json.load(pool.json): regions are
     # attached when daily.py loads the pool, so raw entries have no
     # "rg" and every region cell of the schedule selects nothing --
-    # which left upcoming_titles walking a fraction of the schedule and
+    # which left upcoming_captions walking a fraction of the schedule and
     # calling it the whole of it.
     sys.path.insert(0, HERE)
     import daily
@@ -189,10 +273,12 @@ def main():
     cache = load_cache()
 
     if args.report:
-        done = sum(1 for e in entries if e["t"] in cache)
         langs = collections.Counter(v.get("lang") for v in cache.values())
-        print(f"{len(cache)} titles translated, covering {done} of "
-              f"{len(entries)} cards")
+        print(f"{len(cache)} captions looked at")
+        for field, label in (("t", "titles"), ("pl", "place lines")):
+            have = [e for e in entries if e.get(field)]
+            done = sum(1 for e in have if e[field] in cache)
+            print(f"  {label:12s} {done:6d} of {len(have):6d} cards covered")
         for code, n in langs.most_common(12):
             print(f"  {code}  {n}")
         return 0
@@ -205,8 +291,8 @@ def main():
     installed = installed_pairs()
 
     # What is due soon goes first, then everything else.
-    queue = upcoming_titles(entries, args.upcoming) if args.upcoming else []
-    rest = [e["t"] for e in entries]
+    queue = upcoming_captions(entries, args.upcoming) if args.upcoming else []
+    rest = [text for e in entries for text in texts_of(e)]
     titles = [t for t in dict.fromkeys(queue + rest) if t not in cache]
     if queue:
         due = len([t for t in dict.fromkeys(queue) if t not in cache])
@@ -217,8 +303,9 @@ def main():
     for entry in entries:
         code = SOURCE_LANG.get(entry.get("src"))
         if code:
-            hints.setdefault(entry["t"], code)
-    sys.stderr.write(f"{len(titles)} untranslated titles, budget "
+            for text in texts_of(entry):
+                hints.setdefault(text, code)
+    sys.stderr.write(f"{len(titles)} untranslated captions, budget "
                      f"{args.budget}\n")
 
     done = skipped = 0

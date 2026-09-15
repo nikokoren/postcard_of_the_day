@@ -49,6 +49,9 @@ jobs:
       - name: Check the picture filter still agrees with our eyes
         run: python3 score.py --selftest
 
+      - name: Check the captions still split where they should
+        run: python3 translate.py --selftest
+
       - name: Regenerate the plugin settings
         run: python3 make_settings.py
 

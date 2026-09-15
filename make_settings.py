@@ -139,7 +139,7 @@ def main():
         "The card's own title, and its date.", "true"))
     body.append(toggle_block(
         "Show the place", "show_place",
-        "Where the card is from, under the title.", "true"))
+        "What the card shows and where, under the title.", "true"))
     body.append(toggle_block(
         "Show the credit", "show_credit",
         "The holding archive and collection.", "false"))
