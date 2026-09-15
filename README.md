@@ -618,3 +618,26 @@ and there is enough material without them.
 
 Every pick carries its own `rights` string and a `source_url` back to the
 catalogue record. `sources.md` has the per-source detail.
+
+### Europeana, and the one secret
+
+Europeana is an aggregator: the metadata is central, the image stays on the
+contributing museum's own server. Asked for openly-licensed postcard images it
+offers 202,453, and a pooled sample of those has a median short side of 525
+pixels — so it is a **discovery engine**, not a source. Providers are
+allow-listed one at a time, each checked by hand before it goes in.
+
+Germany, checked in full: 59,433 openly-licensed postcard images, of which
+49,795 are Deutsche Fotothek's — excellent scans, and every card titled
+`Postkarte`, with the real caption unreachable through Europeana, their own
+site, or the Deutsche Digitale Bibliothek. Two providers clear everything, and
+they are the two that are in.
+
+This is the only part of the repo that needs a credential. It reads
+`EUROPEANA_KEY` from the environment and is set in Actions as a repository
+secret; **the key is never a file in the repo**. Without it the source prints a
+line and skips itself, and the rest of the harvest runs exactly as before, so a
+clone works unchanged.
+
+    python3 harvest.py            # Europeana skipped, everything else runs
+    EUROPEANA_KEY=... python3 harvest.py

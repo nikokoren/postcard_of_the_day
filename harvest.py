@@ -259,6 +259,50 @@ MOUNT_MIN = 0.35            # refuse a crop that keeps less of the frame
 # sources
 # ============================================================
 
+# Europeana is an aggregator: it holds the metadata centrally and leaves
+# the image on the contributing institution's server. That makes it a
+# discovery engine rather than a source -- asked for openly-licensed
+# postcard images it offers 202,453, and a pooled sample of those came
+# back with a median short side of 525 pixels. Asked provider by
+# provider, the picture is quite different, so the providers are
+# allow-listed one at a time, each one checked by hand first.
+#
+# Germany, checked in full. 59,433 openly-licensed postcard images, and
+# 49,795 of them are Deutsche Fotothek's, whose images are excellent --
+# ten of ten loaded, 1,017 to 1,271 pixels -- and whose every card is
+# titled "Postkarte". The caption is not missing from the collection,
+# only from what can be reached: Europeana carries no place, no spatial
+# field and a description about the digitisation programme; their own
+# site answers with a proof-of-work challenge; and the Deutsche
+# Digitale Bibliothek, which the record also points at, wants a key of
+# its own and blocks the web route the same way. So the largest German
+# collection stays out, for want of a caption rather than a picture.
+#
+# Of the rest, Badisches Landesmuseum Karlsruhe (1,002) and the State
+# Archives of Baden-Württemberg (525) sit at 500-720 pixels, under the
+# bar. These two clear everything.
+# (provider as Europeana spells it, collection for the credit line).
+# The collection is deliberately blank where the museum is the whole
+# answer: Europeana's dataset names are catalogue plumbing --
+# "1420_DDB_Friedrichshain_KreuzbergMuseum" -- and the credit reads
+# better as the museum alone.
+EUROPEANA_DE = [
+    ("FHXB Friedrichshain-Kreuzberg Museum", ""),   # 5,332, ~1,500px
+    ("Museum im Schloss Bad Pyrmont", ""),          # 2,228, ~1,050px
+]
+
+EUROPEANA_BASE = "https://api.europeana.eu/record/v2"
+EUROPEANA_QUERY = ("Postkarte OR Ansichtskarte OR Bildpostkarte OR postcard "
+                   "OR Grußkarte")
+EUROPEANA_ROWS = 100
+# The search index almost never carries a year -- one record in fifty --
+# so the date comes from the full record, one request per card, and the
+# image has to be opened to be measured because these are plain JPEGs
+# rather than IIIF. Two requests a card, budgeted and cached like the
+# Rijksmuseum's three.
+EUROPEANA_BUDGET = 1200
+EUROPEANA_WORKERS = 4
+
 SOURCES = [
     # (key, kind, label, config)
     ("loc-postcards", "loc_search", "Library of Congress",
@@ -273,6 +317,8 @@ SOURCES = [
     ("graz", "gams", "University of Graz",
      {"prefix": "o:gm.", "max_id": 9000,
       "collection": "GrazMuseum Ansichtskarten"}),
+    ("europeana-de", "europeana", "Europeana",
+     {"providers": EUROPEANA_DE, "country": "Germany"}),
 ]
 
 # Resolving one Rijksmuseum card costs three requests -- the object, the
@@ -977,6 +1023,213 @@ CRAWLERS = {
 
 
 # ============================================================
+# source: Europeana
+# ============================================================
+
+# Dates arrive in whatever the contributing museum types into the field:
+# "#1900", "1900 (?) (Veröffentlicht)", "ca. 1906 (Production
+# Herstellung)", "#1908%2F1930", "1904-01-01/1916-12-31". Rather than
+# parse a dozen shapes, take every four-digit year in the string and use
+# the span. "1. Hälfte 20. Jh." yields nothing and the card is dropped,
+# which is the right answer: a card with no date cannot sit on the era
+# axis and would show a blank line.
+EU_YEAR = re.compile(r"\b(1[89]\d\d)\b")
+EU_DATE_FIELDS = ("dctermsCreated", "dcDate", "dctermsIssued",
+                  "dctermsTemporal")
+
+# Every FHXB card is titled "Ansichtskarte ..." -- picture postcard,
+# which the reader can see for themselves. The lead comes off, and the
+# quotes the museum wraps the card's own words in come off with it.
+EU_TITLE_LEAD = re.compile(
+    r"^(?:ansichts|post|gru[sß]{1,2}|bild(?:post)?)karte\s*[:,-]?\s*", re.I)
+
+
+def eu_langs(node):
+    """Europeana's language-aware maps: prefer English, take anything."""
+    if isinstance(node, list):
+        return [squash(x) for x in node if squash(x)]
+    if not isinstance(node, dict):
+        return [squash(node)] if squash(node) else []
+    out = []
+    for key in ("en", "de", "def", "zxx"):
+        for value in node.get(key) or []:
+            if squash(value):
+                out.append(squash(value))
+    for key, values in node.items():
+        if key in ("en", "de", "def", "zxx"):
+            continue
+        for value in values or []:
+            if squash(value):
+                out.append(squash(value))
+    return out
+
+
+def eu_years(proxies):
+    """(year, year2) from whatever the museum typed, or (None, None)."""
+    found = []
+    for proxy in proxies:
+        for field in EU_DATE_FIELDS:
+            for text in eu_langs(proxy.get(field)):
+                found += [int(y) for y in EU_YEAR.findall(
+                    urllib.parse.unquote(text))]
+    found = sorted(y for y in found if MIN_YEAR <= y <= MAX_YEAR)
+    if not found:
+        return None, None
+    return found[0], (found[-1] if found[-1] != found[0] else None)
+
+
+# German typography quotes with low-high pairs. Stripping the opening
+# one off the front leaves its partner orphaned mid-title, so they are
+# normalised rather than removed: "Ansichtskarte \u201eModellier Postkarte\u201c,
+# Wasserfall im Viktoriapark" should keep the quoted phrase quoted.
+EU_QUOTES = str.maketrans({"\u201e": '"', "\u201c": '"', "\u201d": '"',
+                           "\u00ab": '"', "\u00bb": '"'})
+
+
+def eu_title(item, proxies):
+    for candidate in (eu_langs(item.get("title")) +
+                      [t for p in proxies for t in eu_langs(p.get("dcTitle"))]):
+        title = squash(EU_TITLE_LEAD.sub("", candidate.translate(EU_QUOTES)))
+        if title and len(title) > 2:
+            return title[:TITLE_LIMIT]
+    return None
+
+
+def eu_measure(url):
+    """(width, height) by opening as little of the JPEG as it takes."""
+    try:
+        from PIL import Image
+    except ImportError:
+        return None, None
+    raw = fetch(url, accept="image/jpeg", raw=True, tries=2)
+    if not raw:
+        return None, None
+    try:
+        return Image.open(io.BytesIO(raw)).size
+    except Exception:
+        return None, None
+
+
+def eu_record(item, label, collection):
+    """One search hit plus its full record, or None if it is unusable."""
+    record = fetch(f"{EUROPEANA_BASE}{item['id']}.json?wskey={eu_key()}")
+    if not record:
+        return None
+    proxies = ((record.get("object") or {}).get("proxies")) or []
+
+    year, year2 = eu_years(proxies)
+    if year is None:
+        return None
+    title = eu_title(item, proxies)
+    if not title or TITLE_REJECT_RE.search(title):
+        return None
+    image = (item.get("edmIsShownBy") or [None])[0]
+    if not image:
+        return None
+    rights = (item.get("rights") or [""])[0]
+    if not LICENCE_OK.search(rights) or LICENCE_BAD.search(rights):
+        return None
+
+    width, height = eu_measure(image)
+    if not width or not height:
+        return None
+
+    country = (item.get("country") or [None])[0]
+    entry = {
+        "id": "eu:" + item["id"].strip("/").replace("/", "-"),
+        "src": "europeana",
+        "t": title,
+        "b": image,
+        "k": "fixed",
+        "w": width,
+        "h_px": height,
+        "y": year,
+        "r": rights,
+        "h": (item.get("dataProvider") or [label])[0],
+        "col": collection,
+        "u": (item.get("edmIsShownAt") or [item.get("guid", "")])[0],
+        "cn": country,
+        "c": country_slug(country),
+    }
+    if year2:
+        entry["y2"] = year2
+    return entry
+
+
+def eu_key():
+    return os.environ.get("EUROPEANA_KEY", "").strip()
+
+
+def eu_search(provider, cursor):
+    params = urllib.parse.urlencode({
+        "wskey": eu_key(), "query": EUROPEANA_QUERY, "rows": EUROPEANA_ROWS,
+        "profile": "standard", "reusability": "open", "cursorMark": cursor,
+    })
+    params += "&qf=" + urllib.parse.quote("TYPE:IMAGE")
+    params += "&qf=" + urllib.parse.quote(f'DATA_PROVIDER:"{provider}"')
+    return fetch(f"{EUROPEANA_BASE}/search.json?{params}")
+
+
+def europeana_crawl(source_key, config, max_pages, stats, cache):
+    """
+    Walk the allow-listed providers, resolving a budget of cards a run.
+
+    The key is never committed: it comes from EUROPEANA_KEY in the
+    environment, and without it the source is skipped rather than
+    failing the harvest, so the repo works for anyone who clones it.
+    """
+    if not eu_key():
+        sys.stderr.write("  no EUROPEANA_KEY in the environment, skipping\n")
+        return []
+
+    state = crawl_state(cache, source_key)
+    state.setdefault("resolved", {})
+    state.setdefault("cursors", {})
+    resolved, cursors = state["resolved"], state["cursors"]
+    budget = config.get("budget", EUROPEANA_BUDGET)
+    spent = 0
+
+    for provider, collection in config["providers"]:
+        cursor = cursors.get(provider, "*")
+        if cursor is None:
+            continue                       # this provider is walked out
+        pages = 0
+        while spent < budget and pages < max_pages:
+            page = eu_search(provider, cursor)
+            if not page:
+                stats["europeana page failed"] += 1
+                break
+            items = [i for i in (page.get("items") or [])
+                     if i.get("id") not in resolved]
+            pages += 1
+            todo = items[:budget - spent]
+            if todo:
+                with ThreadPoolExecutor(max_workers=EUROPEANA_WORKERS) as pool:
+                    for item, entry in zip(todo, pool.map(
+                            lambda i: eu_record(i, provider, collection),
+                            todo)):
+                        resolved[item["id"]] = entry
+                        stats["europeana kept" if entry
+                              else "europeana unusable"] += 1
+                spent += len(todo)
+                save_crawl(cache)
+            nxt = page.get("nextCursor")
+            if not nxt or len(page.get("items") or []) < EUROPEANA_ROWS:
+                cursors[provider] = None   # walked out
+                break
+            cursors[provider] = cursor = nxt
+        sys.stderr.write(f"  {provider[:44]}: {spent} resolved this run\n")
+        if spent >= budget:
+            break
+
+    save_crawl(cache)
+    return [e for e in resolved.values() if e]
+
+
+CRAWLERS["europeana"] = europeana_crawl
+
+
+# ============================================================
 # source: GAMS, University of Graz
 # ============================================================
 
@@ -1644,9 +1897,9 @@ def build_pool(max_pages, do_measure, dims_budget=DIMS_BUDGET,
     for source_key, kind, label, config in SOURCES:
         sys.stderr.write(f"\n{source_key} ({label})\n")
         crawler = CRAWLERS[kind]
-        found = crawler(source_key, dict(config, budget=(
-                            rijks_budget if kind == "rijksmuseum"
-                            else GAMS_BUDGET)),
+        budget = {"rijksmuseum": rijks_budget,
+                  "europeana": EUROPEANA_BUDGET}.get(kind, GAMS_BUDGET)
+        found = crawler(source_key, dict(config, budget=budget),
                         max_pages, stats, cache)
         added = 0
         for entry in found:

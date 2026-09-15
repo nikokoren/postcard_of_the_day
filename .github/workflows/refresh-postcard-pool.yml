@@ -34,6 +34,11 @@ jobs:
         run: pip install --quiet pillow numpy argostranslate langdetect
 
       - name: Harvest the postcard pool
+        # EUROPEANA_KEY is a repository secret, never a file in the repo.
+        # Without it the Europeana source skips itself and the rest of
+        # the harvest runs exactly as before, so a fork works unchanged.
+        env:
+          EUROPEANA_KEY: ${{ secrets.EUROPEANA_KEY }}
         run: python3 harvest.py --pages "${{ github.event.inputs.pages || 400 }}"
 
       - name: Put more captions into English

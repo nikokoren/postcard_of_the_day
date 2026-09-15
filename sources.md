@@ -208,6 +208,51 @@ another field.
 Building it needs a free Europeana API key in an Actions secret; the survey
 above ran on the public demo key, which is not for production use.
 
+### Re-checked on a real key, provider by provider
+
+The demo-key survey did not survive verification, and the corrections matter
+more than the original numbers did:
+
+| provider | records | images | date | verdict |
+| --- | --- | --- | --- | --- |
+| FHXB Friedrichshain-Kreuzberg | 5,332 | 1,494-1,518 px, 8/8 | `dcDate` | **in** |
+| Museum im Schloss Bad Pyrmont | 2,228 | 1,021-1,081 px, 8/8 | `ca. 1906` | **in** |
+| National Heritage Institute, Bucharest | 6,074 | 1,683 px, 8/8 | **none anywhere** | out |
+| Digital Library Trentino | 5,623 | only 6 of 24 clear 900 px | - | out |
+| National Library of Latvia | 4,288 | **400 on every image** | - | out |
+| Badisches Landesmuseum Karlsruhe | 1,002 | 534-720 px | - | out |
+| State Archives of Baden-Württemberg | 525 | 500-703 px | - | out |
+
+Latvia's own server refuses the image URLs Europeana advertises, with or
+without a Referer. Bucharest has the sharpest scans of the lot and no date
+field at all -- not in the search index, not in the full record, which carries
+only Getty subject URIs -- and a card with no year cannot sit on the era axis.
+
+### Deutsche Fotothek, settled
+
+49,795 records, 84% of every openly-licensed German postcard on Europeana, and
+the images are excellent: ten of ten loaded, 1,017 to 1,271 pixels. Every one
+is titled `Postkarte`.
+
+The caption is not missing from the collection, only from everywhere it can be
+reached. Europeana's record carries no place, no `dctermsSpatial`, zero
+`places`, and a `dcDescription` about the Saxon digitisation programme. Their
+own site answers `deutschefotothek.de` requests with a proof-of-work challenge.
+The Deutsche Digitale Bibliothek, which the record also points at, returns 403
+without a key of its own and puts the same anti-bot wall in front of the web
+route.
+
+So it stays out for want of a caption rather than a picture. Reopening it needs
+a DDB API key, and that is a second key for one source.
+
+### What the search index will not tell you
+
+A year, mostly. One record in fifty carries one, and Pécs carries no date field
+at all in the index, so the date has to come from the full record -- one request
+per card. The image has to be opened to be measured as well, since these are
+plain JPEGs rather than IIIF. Two requests a card, budgeted at 1,200 a run and
+cached in `crawl.json` like everything else.
+
 **Wikimedia Commons** is the other big one -- `Postcards of France` alone has
 86,235 files, `Postcards of Germany` 81,166, across ~180 country categories,
 with arbitrary-width thumbnails via `iiurlwidth`. It is the best answer to the
