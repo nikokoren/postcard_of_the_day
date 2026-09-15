@@ -64,6 +64,37 @@ ABBREV_HEAD = re.compile(
     r"|Bd|Av|Ave|Blvd|Pl|Sq|Rd|Ft|Mt|Mts|Is|Co|Cos|Inc|Ltd|Bros"
     r"|vol|no|ca|cca|p|pp|fig|ch)|(?<![^\W\d_])[A-Z])$", re.I)
 
+# The head is held back on the assumption that it is a name, and up to
+# five words of it were taken on trust. That swept in whole phrases:
+# "Deutscher Gruß aus Graz. Jakominiplatz" held back everything before
+# the stop and went out with the German intact, and so did "Aus
+# Vorarlberg", "Blick auf Riga" and "Gruss aus Baden bei Wien". A head
+# that opens with a preposition or with greetings-from / view-of, or
+# that carries a German particle between its words, is a sentence
+# fragment and not a name, so it goes through with the rest.
+#
+# French and Italian name particles are deliberately absent from both:
+# "Musee de Cluny" and "Abbaye St Germain des Pres" are names, and the
+# translator leaves them alone anyway.
+PHRASE_LEAD = re.compile(
+    r"^(?:aus|auf|von|vom|zum|zur|bei|um|gruss|gruß|grüsse|grüße|gruesse"
+    r"|blick|ansicht|partie|souvenir|groeten|uit|vue)\b", re.I)
+PHRASE_WORD = re.compile(
+    r"\s(?:aus|auf|von|vom|zum|zur|bei|mit|gegen|um|nach|über|unter|im|am)\s",
+    re.I)
+
+# And a handful of terms the translator will not touch at any length,
+# because it reads them as names. "Alt-Graz" is the archive's word for
+# its historical-views series -- old Graz -- and came through as
+# "Alt-Graz" with context and as "Old Great" without it, having decided
+# Graz was a superlative. Applied after translation, to captions that
+# were translated, so an English caption is never rewritten.
+GLOSSARY = [
+    (re.compile(r"\bAlt[-\s]Graz\b", re.I), "Old Graz"),
+    (re.compile(r"\bGru(?:ss|ß)\b"), "Greetings"),
+    (re.compile(r"\bDeutscher Greetings\b"), "German greetings"),
+]
+
 # Detection on a five-word caption is a coin toss between neighbouring
 # languages -- "Constantinople. Obelisque de Theodose" came back as
 # Portuguese, which turned Constantinople into Constantine. Where the
@@ -166,6 +197,9 @@ def split_head(title):
     # stop belongs to the abbreviation, not to the caption.
     if ABBREV_HEAD.search(head.rstrip()):
         return None, "", title
+    # Nor is a phrase a name.
+    if PHRASE_LEAD.match(head) or PHRASE_WORD.search(head):
+        return None, "", title
     # Only hold back a head the reader could already read. Protecting a
     # Greek or Cyrillic one leaves the caption unreadable, which is the
     # thing this whole exercise is for: "Άνατολικὴ ἄποψις ... - Άθῆναι"
@@ -173,6 +207,13 @@ def split_head(title):
     if NON_LATIN.search(head):
         return None, "", title
     return head, sep, rest
+
+
+def apply_glossary(english):
+    """What the translator would not translate, said in English."""
+    for pattern, replacement in GLOSSARY:
+        english = pattern.sub(replacement, english)
+    return english
 
 
 def detect(text):
@@ -230,8 +271,34 @@ SPLIT_CASES = [
     (None, "Portret van J. P. Coen"),
     # A head with a verb in it is a sentence, not a place name.
     (None, "Blick vom Schlossberg auf die Altstadt - Graz"),
+    # Nor is a phrase. These held back whole German clauses.
+    (None, "Deutscher Gruß aus Graz. Jakominiplatz"),
+    (None, "Aus Vorarlberg. Dornbirn, Burg Glopper"),
+    (None, "Blick auf Riga - Sloof"),
+    (None, "Gruss aus Baden bei Wien. Ruine Rauheneck"),
+    (None, "Graz im Schnee. Hauptplatz"),
+    # But a name with a French particle in it is still a name.
+    ("Musee de Cluny",             "Musee de Cluny. Salle des thermes"),
+    ("Abbaye St Germain des Pres", "Abbaye St Germain des Pres. Le choeur"),
     # And a head the reader cannot read is worth nothing held back.
     (None, "Άνατολικὴ ἄποψις τῶν Προπυλαίων - Άθῆναι"),
+]
+
+
+# What the translator will not translate, and what we say instead.
+GLOSSARY_CASES = [
+    ("Alt-Graz. Admontergäßchen against the Paradeishof",
+     "Old Graz. Admontergäßchen against the Paradeishof"),
+    ("Alt Graz: Town Hall at the corner of Schmiedgasse",
+     "Old Graz: Town Hall at the corner of Schmiedgasse"),
+    ("ALT-GRAZ. Burgwehr and French from the town hall",
+     "Old Graz. Burgwehr and French from the town hall"),
+    ("Gruss from Altenburg", "Greetings from Altenburg"),
+    # A compound is not the word: Schlossberg keeps its Schloss, and
+    # Altenburg and Altona keep their Alt.
+    ("View to Schloss Eggenberg and Schlossberg from the west",
+     "View to Schloss Eggenberg and Schlossberg from the west"),
+    ("Altona town hall", "Altona town hall"),
 ]
 
 
@@ -244,6 +311,13 @@ def selftest():
         bad += 0 if ok else 1
         how = f"holds back {got!r}" if got else "translates the whole line"
         print(f"  {'ok  ' if ok else 'FAIL'} {how:34s} {caption[:44]}")
+
+    print("what the translator would not translate")
+    for before, want in GLOSSARY_CASES:
+        got = apply_glossary(before)
+        ok = got == want
+        bad += 0 if ok else 1
+        print(f"  {'ok  ' if ok else 'FAIL'} {got[:64]}")
     return bad
 
 
@@ -329,6 +403,7 @@ def main():
             continue
         if head:
             english = head + sep + english
+        english = apply_glossary(english)
         # A translation identical to the original is a proper name that
         # came through untouched, which is the right answer and not worth
         # a second copy.

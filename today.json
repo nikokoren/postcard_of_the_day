@@ -39,7 +39,7 @@
    ],
    "all__all__all": [
     "https://gams.uni-graz.at/iiif/o:gm.2625%2FRECTO/full/!1872,1404/0/default.jpg",
-    "Alt Graz: Schlossbergsteig View northwest",
+    "Old Graz: Schlossbergsteig View northwest",
     "1910\u20131916",
     "Schlo\u00dfbergsteig towards the northwest, Austria",
     "",
@@ -351,7 +351,7 @@
    ],
    "landscape__all__era-pre-1900": [
     "https://gams.uni-graz.at/iiif/o:gm.3512%2FRECTO/full/!1872,1404/0/default.jpg",
-    "Gruss from Graz (Steiermark) Schlossbergbahn",
+    "Greetings from Graz (Steiermark) Schlossbergbahn",
     "1895\u20131905",
     "View of Schlo\u00dfberg from the west, Austria",
     "",
@@ -647,7 +647,7 @@
    ],
    "portrait__europe__all": [
     "https://gams.uni-graz.at/iiif/o:gm.3301%2FRECTO/full/!1872,1404/0/default.jpg",
-    "A piece of \"Alt-Graz\" with Schlossberg",
+    "A piece of \"Old Graz\" with Schlossberg",
     "1915",
     "View from a backyard in the Sporgasse to the Clock Tower and Cerrini Castle, Austria",
     "",
@@ -687,7 +687,7 @@
    ],
    "portrait__europe__era-pre-1900": [
     "https://gams.uni-graz.at/iiif/o:gm.3877%2FRECTO/full/!1872,1404/0/default.jpg",
-    "Gruss aus Graz. View from Schlo\u00dfberg",
+    "Greetings from Graz. View from Schlo\u00dfberg",
     "1895\u20131905",
     "View from Schlo\u00dfberg towards the south, Austria",
     "",
@@ -841,7 +841,7 @@
    ],
    "all__all__era-pre-1900": [
     "https://gams.uni-graz.at/iiif/o:gm.2431%2FRECTO/full/!1872,1404/0/default.jpg",
-    "Gruss v. Schlossberg in Graz",
+    "Greetings v. Schlossberg in Graz",
     "1895\u20131905",
     "Starcke House and Cannon Bastion to the Northwest, Austria",
     "",
@@ -2211,7 +2211,7 @@
    ],
    "portrait__europe__era-pre-1900": [
     "https://gams.uni-graz.at/iiif/o:gm.2431%2FRECTO/full/!1872,1404/0/default.jpg",
-    "Gruss v. Schlossberg in Graz",
+    "Greetings v. Schlossberg in Graz",
     "1895\u20131905",
     "Starcke House and Cannon Bastion to the Northwest, Austria",
     "",
@@ -2315,7 +2315,7 @@
    "label": "1946 onwards"
   }
  ],
- "generated": "2026-09-15T08:24:25Z",
+ "generated": "2026-09-15T08:58:35Z",
  "keys_by_label": {
   "1900 - 1914": "era-1900-1914",
   "1900-1914": "era-1900-1914",

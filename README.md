@@ -494,9 +494,36 @@ acteur M. Lüzenkirchen"* split after the M and handed the surname to
 the translator on its own.
 
 1,279 captions were being cut at an abbreviation or an initial, and
-they were redone. `translate.py --selftest` holds all of these next to
-the four heads that must still be held back, so the next person to
-touch the expression can see what each clause is for.
+they were redone.
+
+### A head is only held back if it is a name
+
+The head rule took up to five words on trust, which swept in whole
+German clauses. *"Deutscher Gruß aus Graz. Jakominiplatz"* held back
+everything before the stop and went out with the German intact, and so
+did *"Aus Vorarlberg"*, *"Blick auf Riga"* and *"Gruss aus Baden bei
+Wien"* — 166 captions. A head that opens with a preposition or with
+greetings-from / view-of, or that carries a German particle between its
+words, is a sentence fragment, so it now goes through with the rest.
+French and Italian name particles are deliberately not in that test:
+"Musee de Cluny" and "Abbaye St Germain des Pres" are names.
+
+### And a short glossary, for what the translator will not touch
+
+Some terms it reads as names at any length. **`Alt-Graz`** is the
+archive's own word for its historical-views series — *old Graz* — and it
+came back as `Alt-Graz` when translated in context, and as **"Old
+Great"** when translated alone, the translator having decided *Graz* was
+a superlative. `Gruss` survives the same way.
+
+So a handful of terms are substituted after translation, against
+captions that were translated, never against English ones. The guard
+that matters is the word boundary: `Schlossberg` keeps its *Schloss*,
+and Altenburg and Altona keep their *Alt*. `translate.py --selftest`
+holds those three as must-not-change alongside the substitutions
+themselves, and holds every rule above next to the heads that must
+still be held back — Dameron, Constantinople, Graz, Milano — so the
+next person to touch the expression can see what each clause is for.
 
 ---
 
