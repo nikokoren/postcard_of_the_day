@@ -122,11 +122,18 @@ AUTHOR_BIO = """\
       {countries} countries and the years {first} to {last}, held by the
       Library of Congress, the Rijksmuseum, the University of Graz and
       more. Each one arrives with whatever the catalogue knows: what it
-      shows, where, who printed it, and when. <br><br> Sort by orientation, region or era -- or change
+      shows, where, and when. <br><br> Sort by orientation, region or era -- or change
       nothing and take the whole world as it comes. No card repeats until
       every one of them has had its day. <br><br> Public domain and openly
       licensed material only. Install (don't Fork!) to receive future
-      updates.
+      updates. <br><br> Cards from the University of Graz (GrazMuseum
+      Ansichtskarten) are licensed <a
+      href="https://creativecommons.org/licenses/by-sa/3.0/at/">CC BY-SA
+      3.0 AT</a> and are used with thanks; browse the collection at <a
+      href="https://gams.uni-graz.at/">gams.uni-graz.at</a>. Everything
+      else is public domain or CC0, from the Library of Congress, the
+      Rijksmuseum and Digital Commonwealth. All images are converted to
+      greyscale and dithered for e-ink.
     email_address: isarworks@gmail.com
 """
 
