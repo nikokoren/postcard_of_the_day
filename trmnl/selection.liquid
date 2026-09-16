@@ -58,15 +58,28 @@
   reader turned it off. An untouched field arrives as nothing, so the
   default matters: the caption is on unless switched off, the credit off
   unless switched on. A fresh install shows a captioned card.
+
+  The string is what TRMNL sends today -- the map recipe has read its
+  booleans this way since it was built. But their documentation
+  describes what a field DECLARES, not what Liquid RECEIVES, so every
+  other shape an unchecked box could plausibly arrive as is accepted
+  too. Being wrong about it would fail silently, in a published plugin,
+  and the cost of covering it is four words.
 {% endcomment %}
+{% assign off = "false,0,no,off" | split: "," %}
+{% assign on = "true,1,yes,on" | split: "," %}
+
 {% assign want_caption = true %}
-{% if settings.show_caption == "false" %}{% assign want_caption = false %}{% endif %}
+{% assign said = settings.show_caption | downcase %}
+{% if off contains said %}{% assign want_caption = false %}{% endif %}
 
 {% assign want_place = true %}
-{% if settings.show_place == "false" %}{% assign want_place = false %}{% endif %}
+{% assign said = settings.show_place | downcase %}
+{% if off contains said %}{% assign want_place = false %}{% endif %}
 
 {% assign want_credit = false %}
-{% if settings.show_credit == "true" %}{% assign want_credit = true %}{% endif %}
+{% assign said = settings.show_credit | downcase %}
+{% if on contains said %}{% assign want_credit = true %}{% endif %}
 
 {% comment %}
   What the reader saw -> the keys this feed uses. keys_by_label carries

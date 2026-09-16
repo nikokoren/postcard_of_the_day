@@ -11,7 +11,7 @@ name. So it gets run.
 
     pip install python-liquid && python3 trmnl/test_selection.py
 """
-import os, sys
+import os, re, sys
 from liquid import Environment
 
 env = Environment()
@@ -112,6 +112,23 @@ EXPECT = {
 # two-wide: the 20706 lands on the first, the 20707 on the second.
 EXPECT_KEY = {"Berlin, past local midnight": "all__africa__all"}
 
+# (caption, place, credit) as the markup should resolve them.
+EXPECT_FLAGS = {
+  "nothing selected":        (True,  True,  False),
+  "caption off":             (False, True,  False),
+  "credit on":               (True,  True,  True),
+  "caption off, real false": (False, True,  False),
+  "caption off, zero":       (False, True,  False),
+  "caption off, no":         (False, True,  False),
+  "caption untouched":       (True,  True,  False),
+  "caption on, real true":   (True,  True,  False),
+  "place off, real false":   (True,  False, False),
+  "place untouched":         (True,  True,  False),
+  "credit on, real true":    (True,  True,  True),
+  "credit on, one":          (True,  True,  True),
+  "credit untouched":        (True,  True,  False),
+}
+
 CASES = [
   ("Auckland, evening UTC", {}),
   ("Berlin, evening UTC", {}),
@@ -129,6 +146,21 @@ CASES = [
   ("unknown value", {"region":["atlantis"]}),
   ("caption off", {"show_caption":"false"}),
   ("credit on", {"show_credit":"true"}),
+  # Every shape an unchecked or checked box could plausibly arrive as.
+  # TRMNL sends the strings today; these cost nothing and mean a change
+  # at their end cannot silently strand a toggle. The empty case is the
+  # one that matters most -- an untouched field arrives as nothing and
+  # must keep its default, not read as off. It did read as off, once.
+  ("caption off, real false", {"show_caption": False}),
+  ("caption off, zero",       {"show_caption": "0"}),
+  ("caption off, no",         {"show_caption": "No"}),
+  ("caption untouched",       {"show_caption": ""}),
+  ("caption on, real true",   {"show_caption": True}),
+  ("place off, real false",   {"show_place": False}),
+  ("place untouched",         {"show_place": None}),
+  ("credit on, real true",    {"show_credit": True}),
+  ("credit on, one",          {"show_credit": "1"}),
+  ("credit untouched",        {"show_credit": ""}),
   ("one region", {"region":["europe"]}),
   ("both orientations", {"orientation":["landscape","portrait"]}),
   ("region + orientation", {"region":["europe"],"orientation":["portrait"]}),
@@ -154,6 +186,38 @@ for name, settings in CASES:
     want_key = EXPECT_KEY.get(name)
     if ok and want_key is not None:
         ok = tail.split("|")[0] == want_key
+    want_flags = EXPECT_FLAGS.get(name)
+    if ok and want_flags is not None:
+        got = tuple(tail.split("|")[i][1:] == "true" for i in (3, 4, 5))
+        ok = got == want_flags
     bad += 0 if ok else 1
     print(f"  {'ok  ' if ok else 'FAIL'} {name:32s} {tail}")
+# ---------------------------------------------------------------
+# The plugin runs example-markup.liquid, not this file. They hold the
+# same selection logic because a private plugin has no {% include %},
+# and for three days in September they did not: the local-midnight
+# rotation was fixed here and nowhere else, so the fix never reached a
+# device. Everything above tests the wrong file if these two drift.
+# ---------------------------------------------------------------
+
+def logic_lines(text):
+    text = re.sub(r"\{%-?\s*comment\s*-?%\}.*?\{%-?\s*endcomment\s*-?%\}",
+                  "", text, flags=re.S)
+    return [line.strip() for line in text.splitlines() if line.strip()]
+
+
+mine = logic_lines(src)
+theirs = logic_lines(open(os.path.join(HERE, "example-markup.liquid")).read())
+if theirs[:len(mine)] == mine:
+    print("  ok   example-markup.liquid carries this exact logic")
+else:
+    bad += 1
+    print("  FAIL example-markup.liquid has drifted from selection.liquid")
+    for n, (a, b) in enumerate(zip(mine, theirs)):
+        if a != b:
+            print(f"       first difference at logic line {n}")
+            print(f"         selection.liquid     {a[:76]}")
+            print(f"         example-markup.liquid {b[:76]}")
+            break
+
 sys.exit(1 if bad else 0)

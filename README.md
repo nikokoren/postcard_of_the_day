@@ -560,7 +560,15 @@ next person to touch the expression can see what each clause is for.
 
 A private plugin has no loader for `{% include %}`, so
 `example-markup.liquid` contains `selection.liquid` verbatim followed by
-the layout. If you edit one, keep the other in step.
+the layout. If you edit one, keep the other in step — and
+`trmnl/test_selection.py` now checks that you did.
+
+That check exists because they drifted. The local-midnight rotation was
+fixed in `selection.liquid` on 14 September and not in the markup, so
+for three days the fix was in the repo and not on any screen. **The
+plugin runs `example-markup.liquid`; every test above reads
+`selection.liquid`.** A divergence means the tests are passing against a
+file nobody runs.
 
 The markup gets `pick` (the day's card) and `card_image` (its URL, ready
 to use at any panel size). The rest is layout.
@@ -572,9 +580,9 @@ to use at any panel size). The rest is layout.
 | `orientation` | multi-select | empty — both |
 | `region` | multi-select | empty — everywhere |
 | `era` | multi-select | empty — every era |
-| `show_caption` | true/false | true |
-| `show_place` | true/false | true |
-| `show_credit` | true/false | false |
+| `show_caption` | boolean | true |
+| `show_place` | boolean | true |
+| `show_credit` | boolean | false |
 
 Two things about TRMNL settings that cost real debugging time and are
 worth knowing before you edit the Liquid:
@@ -582,7 +590,10 @@ worth knowing before you edit the Liquid:
 - **A boolean arrives as the string `"true"` or `"false"`.** So
   `{% if show_caption %}` is true even when the reader switched it off.
   Compare against `"true"`, and give every field a sensible default for
-  when it arrives as nothing at all.
+  when it arrives as nothing at all. The markup accepts `false`, `"0"`
+  and `"no"` as well — the string is what TRMNL sends today, but their
+  docs describe what a field *declares*, not what Liquid *receives*, and
+  guessing wrong here fails silently.
 - **A select sends back a value derived from the label, not the label.**
   "Latin America & the Caribbean" comes back as something like `latin_america_the_caribbean`. The exact derivation is
   not documented, so the feed ships a `keys_by_label` map carrying every

@@ -53,32 +53,28 @@ custom_fields:
       - 1930 - 1945
       - 1946 onwards
   - keyname: show_caption
-    field_type: select
+    field_type: boolean
     name: Show the caption
     description: The card's own title, and its date.
     optional: true
-    default: "true"
-    options:
-      - true
-      - false
+    default: true
   - keyname: show_place
-    field_type: select
+    field_type: boolean
     name: Show the place
-    description: What the card shows and where, under the title.
+    description: Adds where the card is from to the line under the title.
     optional: true
-    default: "true"
-    options:
-      - true
-      - false
+    default: true
+    help_text: >-
+      Turns <em>1908</em> into <em>United States &middot; 1908</em>.
+      How much detail depends on the archive -- some cards name a
+      street, most know only a country, and some know nothing and
+      stay as they are.
   - keyname: show_credit
-    field_type: select
+    field_type: boolean
     name: Show the credit
     description: The holding archive and collection.
     optional: true
-    default: "false"
-    options:
-      - true
-      - false
+    default: false
   - keyname: about
     name: About This Plugin
     category: education,discovery

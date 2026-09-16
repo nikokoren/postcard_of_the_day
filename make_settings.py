@@ -22,6 +22,7 @@ when left empty. One rule, no invalid state.
 import json
 import os
 import sys
+import textwrap
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from daily import ERAS, ORIENTATIONS, load_pool, regions_in  # noqa: E402
@@ -72,18 +73,34 @@ def option_block(label, keyname, help_text, options, multiple=True):
     return "\n".join(lines) + "\n"
 
 
-def toggle_block(label, keyname, help_text, default):
-    return (
+# TRMNL has a real boolean field. These were selects offering "true"
+# and "false", which renders as a dropdown containing the word "true" --
+# ugly, slow to test, and carrying a latent bug: the options parsed as
+# YAML booleans while the default was a quoted string, which is exactly
+# the mismatch TRMNL's own docs warn about.
+#
+# The map recipe has used booleans from the start and reads them with
+# the same string comparison the markup here does, so this is a proven
+# shape rather than a hopeful one: a TRMNL boolean reaches Liquid as the
+# STRING "true" or "false". It declares no default, though; the default
+# below is what the docs prescribe and makes the panel show the state
+# the markup will actually render. If the editor ever disagrees, that
+# line is the first thing to drop.
+def toggle_block(label, keyname, description, default, help_text=None):
+    block = (
         "  - keyname: {}\n"
-        "    field_type: select\n"
+        "    field_type: boolean\n"
         "    name: {}\n"
         "    description: {}\n"
         "    optional: true\n"
-        "    default: \"{}\"\n"
-        "    options:\n"
-        "      - true\n"
-        "      - false\n"
-    ).format(keyname, label, help_text, default)
+        "    default: {}\n"
+    ).format(keyname, label, description, "true" if default else "false")
+    if help_text:
+        block += "    help_text: >-\n"
+        block += textwrap.fill(help_text, width=68,
+                               initial_indent="      ",
+                               subsequent_indent="      ") + "\n"
+    return block
 
 
 # The pitch, not the catalogue entry. Somebody scrolling a plugin list
@@ -136,13 +153,24 @@ def main():
         [label for _, label, _, _ in ERAS]))
     body.append(toggle_block(
         "Show the caption", "show_caption",
-        "The card's own title, and its date.", "true"))
+        "The card's own title, and its date.", True))
+    # This one took a marketplace reviewer a while to work out, and the
+    # reason is that it does not add or remove a line: it changes one
+    # that is there either way, from "1908" to "United States - 1908".
+    # So the help text shows the change rather than describing it, and
+    # says outright that a tenth of the pool has no place at all, where
+    # the toggle does nothing whatsoever.
     body.append(toggle_block(
         "Show the place", "show_place",
-        "What the card shows and where, under the title.", "true"))
+        "Adds where the card is from to the line under the title.", True,
+        help_text=(
+            "Turns <em>1908</em> into <em>United States &middot; 1908</em>. "
+            "How much detail depends on the archive -- some cards name a "
+            "street, most know only a country, and some know nothing and "
+            "stay as they are.")))
     body.append(toggle_block(
         "Show the credit", "show_credit",
-        "The holding archive and collection.", "false"))
+        "The holding archive and collection.", False))
     countries = len({e["c"] for e in entries if e.get("c")})
     years = [e["y"] for e in entries]
     body.append(AUTHOR_BIO.format(

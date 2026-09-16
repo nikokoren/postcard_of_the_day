@@ -65,15 +65,28 @@
   reader turned it off. An untouched field arrives as nothing, so the
   default matters: the caption is on unless switched off, the credit off
   unless switched on. A fresh install shows a captioned card.
+
+  The string is what TRMNL sends today -- the map recipe has read its
+  booleans this way since it was built. But their documentation
+  describes what a field DECLARES, not what Liquid RECEIVES, so every
+  other shape an unchecked box could plausibly arrive as is accepted
+  too. Being wrong about it would fail silently, in a published plugin,
+  and the cost of covering it is four words.
 {% endcomment %}
+{% assign off = "false,0,no,off" | split: "," %}
+{% assign on = "true,1,yes,on" | split: "," %}
+
 {% assign want_caption = true %}
-{% if settings.show_caption == "false" %}{% assign want_caption = false %}{% endif %}
+{% assign said = settings.show_caption | downcase %}
+{% if off contains said %}{% assign want_caption = false %}{% endif %}
 
 {% assign want_place = true %}
-{% if settings.show_place == "false" %}{% assign want_place = false %}{% endif %}
+{% assign said = settings.show_place | downcase %}
+{% if off contains said %}{% assign want_place = false %}{% endif %}
 
 {% assign want_credit = false %}
-{% if settings.show_credit == "true" %}{% assign want_credit = true %}{% endif %}
+{% assign said = settings.show_credit | downcase %}
+{% if on contains said %}{% assign want_credit = true %}{% endif %}
 
 {% comment %}
   What the reader saw -> the keys this feed uses. keys_by_label carries
@@ -169,8 +182,24 @@
   {% assign n = 1 %}
 {% endif %}
 
-{% comment %} Today's cell: the nth non-empty entry, n rotating by day. {% endcomment %}
-{% assign i = day_index | modulo: n %}
+{% comment %}
+  Which day is it *here*? The long note further down explains why this is
+  not the UTC day; it has to be worked out up here because the rotation
+  over cells must turn over on the same tick the day's picks do. When they
+  disagree -- and they did -- a viewer east of UTC spends the hours between
+  their own midnight and midnight UTC on tomorrow's picks but yesterday's
+  cell, which hands them a card they have already seen.
+
+  A device with no usable clock gets `default_day`, the day the feed was
+  built for, which is the old behaviour. Any real local day is a
+  five-figure number, so that one comparison catches nil, 0 and garbage.
+{% endcomment %}
+{% assign local_seconds = trmnl.system.timestamp_utc | plus: trmnl.user.utc_offset %}
+{% assign local_day = local_seconds | divided_by: 86400 %}
+{% if local_day < 10000 %}{% assign local_day = default_day | plus: 0 %}{% endif %}
+
+{% comment %} Today's cell: the nth non-empty entry, n rotating by local day. {% endcomment %}
+{% assign i = local_day | modulo: n %}
 {% assign j = 0 %}
 {% assign chosen_key = default %}
 {% for k in wanted_list %}
@@ -199,8 +228,6 @@
   time). Missing or odd values fall back to the day the feed was built
   for, which is what the old behaviour was.
 {% endcomment %}
-{% assign local_seconds = trmnl.system.timestamp_utc | plus: trmnl.user.utc_offset %}
-{% assign local_day = local_seconds | divided_by: 86400 %}
 {% assign day_key = local_day | append: "" %}
 {% assign day_picks = days[day_key] %}
 {% if day_picks == nil %}{% assign day_picks = days[default_day] %}{% endif %}
