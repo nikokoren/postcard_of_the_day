@@ -168,9 +168,6 @@ def main():
             "How much detail depends on the archive -- some cards name a "
             "street, most know only a country, and some know nothing and "
             "stay as they are.")))
-    body.append(toggle_block(
-        "Show the credit", "show_credit",
-        "The holding archive and collection.", False))
     countries = len({e["c"] for e in entries if e.get("c")})
     years = [e["y"] for e in entries]
     body.append(AUTHOR_BIO.format(

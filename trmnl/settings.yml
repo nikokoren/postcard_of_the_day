@@ -69,12 +69,6 @@ custom_fields:
       How much detail depends on the archive -- some cards name a
       street, most know only a country, and some know nothing and
       stay as they are.
-  - keyname: show_credit
-    field_type: boolean
-    name: Show the credit
-    description: The holding archive and collection.
-    optional: true
-    default: false
   - keyname: about
     name: About This Plugin
     category: education,discovery
@@ -85,7 +79,7 @@ custom_fields:
       -- and unlike your friends and family, it lets you choose where they
       come from. <br><br> Real printed cards from the
       public archives -- the kind somebody bought at a station kiosk, wrote
-      three lines on, and posted. 17,785 of them so far, spanning
+      three lines on, and posted. 17,779 of them so far, spanning
       115 countries and the years 1860 to 1975, held by the
       Library of Congress, the Rijksmuseum, the University of Graz and
       more. Each one arrives with whatever the catalogue knows: what it

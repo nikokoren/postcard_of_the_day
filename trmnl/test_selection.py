@@ -112,21 +112,18 @@ EXPECT = {
 # two-wide: the 20706 lands on the first, the 20707 on the second.
 EXPECT_KEY = {"Berlin, past local midnight": "all__africa__all"}
 
-# (caption, place, credit) as the markup should resolve them.
+# (caption, place) as the markup should resolve them. The credit
+# toggle and the printer line were removed from the layout.
 EXPECT_FLAGS = {
-  "nothing selected":        (True,  True,  False),
-  "caption off":             (False, True,  False),
-  "credit on":               (True,  True,  True),
-  "caption off, real false": (False, True,  False),
-  "caption off, zero":       (False, True,  False),
-  "caption off, no":         (False, True,  False),
-  "caption untouched":       (True,  True,  False),
-  "caption on, real true":   (True,  True,  False),
-  "place off, real false":   (True,  False, False),
-  "place untouched":         (True,  True,  False),
-  "credit on, real true":    (True,  True,  True),
-  "credit on, one":          (True,  True,  True),
-  "credit untouched":        (True,  True,  False),
+  "nothing selected":        (True,  True),
+  "caption off":             (False, True),
+  "caption off, real false": (False, True),
+  "caption off, zero":       (False, True),
+  "caption off, no":         (False, True),
+  "caption untouched":       (True,  True),
+  "caption on, real true":   (True,  True),
+  "place off, real false":   (True,  False),
+  "place untouched":         (True,  True),
 }
 
 CASES = [
@@ -145,7 +142,6 @@ CASES = [
   ("string not array", {"orientation":"portrait"}),
   ("unknown value", {"region":["atlantis"]}),
   ("caption off", {"show_caption":"false"}),
-  ("credit on", {"show_credit":"true"}),
   # Every shape an unchecked or checked box could plausibly arrive as.
   # TRMNL sends the strings today; these cost nothing and mean a change
   # at their end cannot silently strand a toggle. The empty case is the
@@ -158,14 +154,11 @@ CASES = [
   ("caption on, real true",   {"show_caption": True}),
   ("place off, real false",   {"show_place": False}),
   ("place untouched",         {"show_place": None}),
-  ("credit on, real true",    {"show_credit": True}),
-  ("credit on, one",          {"show_credit": "1"}),
-  ("credit untouched",        {"show_credit": ""}),
   ("one region", {"region":["europe"]}),
   ("both orientations", {"orientation":["landscape","portrait"]}),
   ("region + orientation", {"region":["europe"],"orientation":["portrait"]}),
 ]
-probe = src + "\n<<{{ chosen_key }}|{{ card_title }}|{{ card_image }}|c{{ want_caption }}|p{{ want_place }}|r{{ want_credit }}>>"
+probe = src + "\n<<{{ chosen_key }}|{{ card_title }}|{{ card_image }}|c{{ want_caption }}|p{{ want_place }}>>"
 t2 = env.from_string(probe)
 bad = 0
 for name, settings in CASES:
@@ -188,7 +181,7 @@ for name, settings in CASES:
         ok = tail.split("|")[0] == want_key
     want_flags = EXPECT_FLAGS.get(name)
     if ok and want_flags is not None:
-        got = tuple(tail.split("|")[i][1:] == "true" for i in (3, 4, 5))
+        got = tuple(tail.split("|")[i][1:] == "true" for i in (3, 4))
         ok = got == want_flags
     bad += 0 if ok else 1
     print(f"  {'ok  ' if ok else 'FAIL'} {name:32s} {tail}")

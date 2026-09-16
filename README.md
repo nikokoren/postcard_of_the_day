@@ -181,6 +181,15 @@ budget. `selection.liquid` unpacks one into `card_image`, `card_title`,
 `card_date`, `card_place`, `card_publisher` and `card_credit` so the
 layout stays readable.
 
+The last two are unpacked but no longer drawn: the printer line and the
+credit line came out of the layout, and `show_credit` with them. They
+still ride in the payload, which costs **27KB of the 89KB feed** — worth
+knowing, because `daily.py` drops cells to stay under the cap, so dead
+fields are paid for in selectable combinations. Note before removing
+them that 2,999 cards -- every Graz card, 16.9% of the pool -- are
+CC BY-SA and their licence asks for the attribution that credit line
+carried.
+
 ### What that costs at each hop
 
 | step | when |
@@ -582,7 +591,6 @@ to use at any panel size). The rest is layout.
 | `era` | multi-select | empty — every era |
 | `show_caption` | boolean | true |
 | `show_place` | boolean | true |
-| `show_credit` | boolean | false |
 
 Two things about TRMNL settings that cost real debugging time and are
 worth knowing before you edit the Liquid:

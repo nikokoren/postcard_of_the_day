@@ -74,7 +74,6 @@
   and the cost of covering it is four words.
 {% endcomment %}
 {% assign off = "false,0,no,off" | split: "," %}
-{% assign on = "true,1,yes,on" | split: "," %}
 
 {% assign want_caption = true %}
 {% assign said = settings.show_caption | downcase %}
@@ -83,10 +82,6 @@
 {% assign want_place = true %}
 {% assign said = settings.show_place | downcase %}
 {% if off contains said %}{% assign want_place = false %}{% endif %}
-
-{% assign want_credit = false %}
-{% assign said = settings.show_credit | downcase %}
-{% if on contains said %}{% assign want_credit = true %}{% endif %}
 
 {% comment %}
   What the reader saw -> the keys this feed uses. keys_by_label carries
@@ -262,9 +257,9 @@
     card_place      "Athens, Region of Attica, Greece"
     card_publisher  who printed it, when the archive knows
     card_credit     the holding institution and collection
+                    -- both still in the payload, neither drawn
     want_caption    whether to draw the caption block at all
     want_place      whether that block includes the place line
-    want_credit     whether to print the credit
 {% endcomment %}
 
 {% comment %} ---------- layout ---------- {% endcomment %}
@@ -289,13 +284,7 @@
             <span class="label label--small">{{ card_date }}</span>
           {% endif %}
 
-          {% if card_publisher != "" %}
-            <span class="label label--small">Printed by {{ card_publisher }}</span>
-          {% endif %}
 
-          {% if want_credit %}
-            <span class="label label--small">{{ card_credit }}</span>
-          {% endif %}
         </div>
       </div>
     </div>
