@@ -1,17 +1,17 @@
 {
  "country": "Austria",
  "credit": "University of Graz, GrazMuseum Ansichtskarten",
- "date": "1917",
- "day": "2026-09-16",
- "generated": "2026-09-16T04:44:46Z",
- "id": "graz:o:gm.3570",
- "image": "https://gams.uni-graz.at/iiif/o:gm.3570%2FRECTO/full/!1872,1404/0/default.jpg",
+ "date": "1895\u20131905",
+ "day": "2026-09-17",
+ "generated": "2026-09-17T04:27:51Z",
+ "id": "graz:o:gm.1565",
+ "image": "https://gams.uni-graz.at/iiif/o:gm.1565%2FRECTO/full/!1872,1404/0/default.jpg",
  "orientation": "landscape",
- "place": "View of Schlo\u00dfberg from the north, Austria",
+ "place": "Paulustorgasse and Paulustor von Westen, coat of arms of the Grazer akad. Burschenschaft, Austria",
  "pool": 17779,
  "publisher": "",
  "rights": "Resource licensed under CC BY-SA 3.0 AT",
- "source_url": "https://gams.uni-graz.at/o:gm.3570",
- "title": "Graz from the pulpit",
- "year": 1917
+ "source_url": "https://gams.uni-graz.at/o:gm.1565",
+ "title": "German greeting from Graz. St. Paul\u2019s",
+ "year": 1895
 }

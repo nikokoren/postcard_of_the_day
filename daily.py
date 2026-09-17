@@ -286,6 +286,28 @@ def order_for(entries, key, cycle):
     return sorted(entries, key=sort_key)
 
 
+def standin_offsets(total):
+    """
+    Where to look for a stand-in, as offsets from the day's own position
+    in the cycle.
+
+    The obvious answer -- the next card along -- is the one wrong answer.
+    A card whose image is gone is gone every day, so day N would borrow
+    day N+1's card and day N+1 would then show it again: the reader sees
+    the same card two mornings running and reasonably concludes the
+    recipe is stuck. Taking the one before has the same fault pointed
+    backwards.
+
+    So stand-ins are drawn from the far side of the cycle, nearest the
+    halfway mark, where the borrowed card's own day is months away.
+    """
+    reach = min(MAX_SKIPS, total - 1)
+    # Offset i is i days ahead and total-i days behind; the collision
+    # that matters is whichever is nearer.
+    spread = sorted(range(1, total), key=lambda i: (-min(i, total - i), i))
+    return [0] + spread[:reach]
+
+
 def candidates_for(entries, key, day):
     """The day's card, then the ones that stand in if its image is gone."""
     total = len(entries)
@@ -294,7 +316,7 @@ def candidates_for(entries, key, day):
     cycle, position = divmod(day_index(day), total)
     ordered = order_for(entries, key, cycle)
     return [ordered[(position + offset) % total]
-            for offset in range(min(MAX_SKIPS + 1, total))]
+            for offset in standin_offsets(total)]
 
 
 # ============================================================
@@ -727,6 +749,19 @@ def selftest(entries, day):
 
     tomorrow = candidates_for(entries, key, day + timedelta(days=1))[0]["id"]
     check("next day is a different card", first != tomorrow, first)
+
+    # A stand-in is never a neighbouring day's card. The obvious
+    # fallback -- the next card along -- makes a dead image show
+    # tomorrow's card today and the same card again tomorrow, which
+    # reads as a recipe that has stopped moving.
+    standins = {e["id"] for e in candidates_for(entries, key, day)[1:]}
+    yesterday = candidates_for(entries, key, day - timedelta(days=1))[0]["id"]
+    check("a stand-in is not a neighbouring day's card",
+          not standins & {tomorrow, yesterday})
+    gaps = [min(i, total - i) for i in standin_offsets(total)[1:]]
+    check("stand-ins are drawn from the far side of the cycle",
+          bool(gaps) and min(gaps) >= total // 4,
+          f"nearest sits {min(gaps) if gaps else 0} days away")
 
     # One full cycle must visit every card exactly once.
     cycle_start = day - timedelta(days=day_index(day) % total)
