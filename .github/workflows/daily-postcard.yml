@@ -2,9 +2,12 @@ name: Postcard of the Day
 
 on:
   schedule:
-    # 00:05 UTC. The card changes at this moment for every device. The
-    # picks are computed offline from the committed pool, so this job
-    # does not depend on any archive being up.
+    # 00:05 UTC -- though this slot is busy enough that the run usually
+    # starts four hours later, which is survivable because the file
+    # carries three days and each device changes at its own local
+    # midnight rather than when this lands. The picks are computed
+    # offline from the committed pool, so this job does not depend on
+    # any archive being up.
     - cron: "5 0 * * *"
   workflow_dispatch:
 

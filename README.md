@@ -190,18 +190,51 @@ them that 2,999 cards -- every Graz card, 16.9% of the pool -- are
 CC BY-SA and their licence asks for the attribution that credit line
 carried.
 
+### A day that has been published does not move
+
+The three-day feed only works if a day means the same thing tomorrow as
+it did when it went out. It did not.
+
+Every run used to choose all three days from the pool as it stood that
+morning, and the pool moves: `score.py` rewrites `quality.json` daily,
+and `daily.py` filters on it. The schedule turns on `divmod` by the
+pool's size and a hash ordering over its membership, so **six cards
+dropped out of 17,785 moved 23 of 95 cells** to a different card — for
+days that were already on screens. A viewer east of UTC would see the
+card turn over at their own midnight, correctly, and then turn over
+*again* when the next file landed. The image probe did the same on a
+smaller scale: only the middle day is probed, so a skip there disagreed
+with the unprobed copy published the day before.
+
+So `daily.py` now reads the live `today.json` before it writes one, and
+any day that file already carries is copied across rather than chosen
+again. The only thing that unseats a published pick is its image having
+gone, which is worse than the change, and that is looked for on the
+middle day alone. `--recompute` ignores the published feed, for when
+something wrong has been published and needs to be unstuck.
+
+One consequence worth naming: a card dropped from the pool keeps the day
+it already holds and loses every day after it, which is what `score.py`
+means by a card being out of *tomorrow's* picks. Another: a carried pick
+was chosen against a slightly different pool, so the no-repeat guarantee
+below is a guarantee about one schedule, not across a pool that changed
+underneath it — as it always was, only now the seam is where it can be
+seen rather than on somebody's panel.
+
 ### What that costs at each hop
 
 | step | when |
 | --- | --- |
-| Actions cron fires | 00:05 UTC |
+| Actions cron fires | 00:05 UTC — in practice 04:20–05:15 UTC, since that slot is a busy one |
 | `daily.py` picks, warms every image, commits | ~1–4 min |
 | `raw.githubusercontent.com` serves it | `max-age=300`, so up to 5 min |
 | TRMNL polls | `refresh_interval: 60`, so up to 60 min |
 
 The daily job publishes all three days at once, so a device does not
 wait on the cron to see *its* midnight — the card for its tomorrow is
-already in the file it fetched today.
+already in the file it fetched today. That is also why the queue delay
+is survivable rather than urgent: a device at +14 only falls off the end
+of the three days if a run lands later than 10:00 UTC.
 
 ## Determinism
 
@@ -222,6 +255,11 @@ Consequences, which `daily.py --selftest` checks on every pool refresh:
 - no repeat until the pool has been all the way through
 - a different order next time round
 - different cells move independently, so two settings do not lock together
+
+These describe one schedule, against one pool. A day that has already
+been published is pinned to what it published, so a pool that changes
+moves only the days nobody has seen yet — see *A day that has been
+published does not move*.
 
 ---
 
@@ -617,6 +655,7 @@ worth knowing before you edit the Liquid:
 python3 harvest.py --pages 3 --no-measure   # a quick crawl, no Pillow needed
 python3 daily.py --selftest                 # prove the schedule behaves
 python3 daily.py --date 2027-01-01          # any day
+python3 daily.py --recompute                # unpin the days already published
 python3 harvest.py --report                 # what is in the pool
 python3 preview.py --cell landscape__europe__all --days 24
 ```
