@@ -1,17 +1,17 @@
 {
- "country": "United States",
+ "country": "France",
  "credit": "Library of Congress, Prints and Photographs Division",
- "date": "1905",
- "day": "2026-09-17",
- "generated": "2026-09-17T04:50:38Z",
- "id": "loc:2025671035",
- "image": "https://tile.loc.gov/storage-services/service/pnp/pcrd/1a00000/1a09000/1a09200/1a09249v.jpg",
+ "date": "1900",
+ "day": "2026-09-18",
+ "generated": "2026-09-18T04:43:49Z",
+ "id": "loc:2025705637",
+ "image": "https://tile.loc.gov/storage-services/service/pnp/pcrd/1b00000/1b02000/1b02700/1b02739v.jpg",
  "orientation": "portrait",
- "place": "United States",
- "pool": 17771,
+ "place": "France",
+ "pool": 17759,
  "publisher": "",
  "rights": "No known restrictions on publication",
- "source_url": "https://www.loc.gov/item/2025671035/",
- "title": "First Baptist Church, Oneida, NY",
- "year": 1905
+ "source_url": "https://www.loc.gov/item/2025705637/",
+ "title": "Church of Brou, stained glass \"The Disciples of Emmaus\"",
+ "year": 1900
 }
