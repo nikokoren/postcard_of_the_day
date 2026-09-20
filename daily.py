@@ -18,10 +18,16 @@ been all the way through. Both fall out of the same trick: the day
 number picks a position, and a hash of the card id sorts the pool into
 a shuffle that is stable everywhere and reshuffles each time round.
 
+A day that has already been published does not change. The feed carries
+three days, so two of them were on screens before this run started, and
+they are carried across from the live file rather than chosen again --
+see picks_for_day.
+
 Usage:
     python3 daily.py                    # write today's files
     python3 daily.py --date 2026-12-25  # any day, for checking
     python3 daily.py --no-check         # skip the image liveness probe
+    python3 daily.py --recompute        # choose every day afresh
     python3 daily.py --selftest         # prove the schedule behaves
 """
 
@@ -569,6 +575,98 @@ def pick(entries, key, day, check):
 
 
 # ============================================================
+# what is already on the screens
+# ============================================================
+
+def published_days(feed):
+    """
+    The picks a feed is already handing out, as {day: {cell: pick}}.
+
+    Nothing is kept from a file written to a different contract: a
+    changed PICK_FIELDS makes every list in it mean something else, and
+    a pick that means something else is not a pick.
+    """
+    if not isinstance(feed, dict) or feed.get("version") != 1:
+        return {}
+    if list(feed.get("pick_fields") or []) != list(PICK_FIELDS):
+        return {}
+    days = feed.get("days")
+    return days if isinstance(days, dict) else {}
+
+
+def load_published(path=FEED_PATH):
+    """The live feed, or nothing if there isn't one to read."""
+    try:
+        with open(path) as fh:
+            return published_days(json.load(fh))
+    except (OSError, ValueError):
+        return {}
+
+
+def still_stands(standing, probe):
+    """
+    Whether a pick that has already gone out can stay. Shape first --
+    anything the markup could not unpack is not a pick -- and then, on
+    the day it matters, whether the image is still there.
+    """
+    if not isinstance(standing, list) or len(standing) != len(PICK_FIELDS):
+        return False
+    if not all(isinstance(field, str) for field in standing):
+        return False
+    if not standing[0]:
+        return False
+    if not probe or not budget_left():
+        return True
+    return image_ok(standing[0])
+
+
+def picks_for_day(entries, cells, that_day, published, probe):
+    """
+    One day's picks, cell by cell, preferring whatever has already been
+    published for that day. Returns (picks, carried, probed, misses).
+
+    A day the last run published is a day somebody is already looking
+    at. Offsets run to +14, so a viewer can be on tomorrow's card
+    eighteen hours before the next run replaces the file, and a viewer
+    at -12 is still on yesterday's when it lands. Choosing those days
+    again from the current pool is what made the card change twice: once
+    at the viewer's own midnight, which is the point of the whole
+    three-day feed, and again when the new file arrived, which is not.
+
+    It changed because the schedule turns on the pool -- `divmod` by its
+    size, and a hash ordering over its membership -- so anything that
+    moves the pool moves every cell's calendar with it. Six cards
+    dropped on render score out of 17,785 moved 23 of 95 cells to a
+    different card for a day that was already on screens. The image
+    probe does the same on a smaller scale, since only the middle day is
+    probed and a skip there disagrees with the unprobed copy published
+    yesterday.
+
+    So a published pick stands. The one thing that unseats it is its
+    image having gone, which is worse than the change -- and that is
+    only looked for on the middle day, the one about to be everybody's.
+
+    A card dropped from the pool between runs therefore keeps the day it
+    already holds and loses every day after it, which is what score.py
+    means by a card being out of *tomorrow's* picks.
+    """
+    picks, carried, probed, misses = {}, 0, 0, 0
+    for key in cells:
+        standing = published.get(key)
+        if still_stands(standing, probe):
+            picks[key] = standing
+            carried += 1
+            continue
+        entry, checked = pick(cards_for(entries, key), key, that_day, probe)
+        if entry is None:
+            misses += 1
+            continue
+        probed += 1 if checked else 0
+        picks[key] = build_payload(entry)
+    return picks, carried, probed, misses
+
+
+# ============================================================
 # writing
 # ============================================================
 
@@ -807,6 +905,48 @@ def selftest(entries, day):
     check("a device can name any day the feed carries",
           set(DAY_SPAN) == {-1, 0, 1})
 
+    # A day that has been published stays where it is, whatever the pool
+    # has done since. The one thing that can unseat a standing pick is
+    # its image having gone, and that is the network's business rather
+    # than a selftest's, so what is checked here is everything else.
+    #
+    # The fixture is a card no pool will ever hold, so "it came back
+    # unchanged" cannot be a coincidence.
+    gone_out = ["https://example.invalid/already-on-a-screen.jpg",
+                "A card that went out yesterday"]
+    gone_out += [""] * (len(PICK_FIELDS) - len(gone_out))
+
+    fresh, _, _, _ = picks_for_day(entries, [key], day, {}, False)
+    kept, carried, _, _ = picks_for_day(entries, [key], day, {key: gone_out},
+                                        False)
+    check("a published pick is carried forward",
+          kept[key] == gone_out and carried == 1, f"{carried} carried")
+    check("even though the pool would have chosen otherwise",
+          fresh[key] != gone_out)
+
+    for broken, what in ((gone_out[:-1], "too short"),
+                         ([gone_out[0]] + [None] * (len(PICK_FIELDS) - 1),
+                          "not all strings"),
+                         ([""] + gone_out[1:], "no image"),
+                         ("not a list", "not a list")):
+        again, carried, _, _ = picks_for_day(entries, [key], day,
+                                             {key: broken}, False)
+        check(f"a standing pick that is {what} is chosen again",
+              carried == 0 and again[key] == fresh[key])
+
+    check("a feed written to another contract carries nothing",
+          published_days({"version": 1, "pick_fields": ["image"],
+                          "days": {"1": {key: gone_out}}}) == {})
+    check("and neither does one from another version",
+          published_days({"version": 2, "pick_fields": list(PICK_FIELDS),
+                          "days": {"1": {key: gone_out}}}) == {})
+    check("a feed of this contract carries its days",
+          published_days({"version": 1, "pick_fields": list(PICK_FIELDS),
+                          "days": {"1": {key: gone_out}}}) ==
+          {"1": {key: gone_out}})
+    check("a file that is not there carries nothing",
+          load_published(os.path.join(HERE, "no-such-feed.json")) == {})
+
     print()
     if failures:
         print(f"{len(failures)} failed")
@@ -824,6 +964,12 @@ def main():
     ap.add_argument("--date", help="YYYY-MM-DD, defaults to today (UTC)")
     ap.add_argument("--no-check", action="store_true",
                     help="skip the image liveness probe")
+    # The way back out. A published day is otherwise immovable, which is
+    # the point of it -- but a bad pick that got published would sit
+    # there for two more runs, and this is how it is unstuck.
+    ap.add_argument("--recompute", action="store_true",
+                    help="ignore the published feed and choose every day "
+                         "afresh")
     ap.add_argument("--selftest", action="store_true")
     args = ap.parse_args()
 
@@ -851,38 +997,48 @@ def main():
     sys.stderr.write(f"{len(entries)} cards, {len(regions)} regions, "
                      f"{len(cells)} cells\n")
 
+    # What the live feed is already handing out. Two of the three days
+    # it carries have been on screens since it was published, and a day
+    # that has been published does not move -- see picks_for_day.
+    published = {} if args.recompute else load_published()
+
     # Every cell, for every day a device might be on. A card that is
     # tomorrow's here is today's for somebody fourteen hours ahead.
-    days, misses, probed, chosen = {}, 0, 0, {}
+    days, misses, probed, carried = {}, 0, 0, 0
     for shift in DAY_SPAN:
         that_day = day + timedelta(days=shift)
-        picks = {}
-        for key in cells:
-            subset = cards_for(entries, key)
-            # Only probe the images for the middle day. The other two
-            # are the same cards a day either side of their own turn,
-            # and get probed when it comes.
-            entry, checked = pick(subset, key, that_day,
-                                  check and shift == 0)
-            if entry is None:
-                misses += 1
-                continue
-            probed += 1 if checked else 0
-            picks[key] = build_payload(entry)
-            chosen[entry["id"]] = entry
-        days[str(day_index(that_day))] = picks
+        key_day = str(day_index(that_day))
+        # Only probe the images for the middle day. The other two are
+        # the same cards a day either side of their own turn, and get
+        # probed when it comes.
+        picks, kept, checked, missed = picks_for_day(
+            entries, cells, that_day, published.get(key_day) or {},
+            check and shift == 0)
+        days[key_day] = picks
+        carried += kept
+        probed += checked
+        misses += missed
 
     default_key = cell_key("all", "all", "all")
     today = days[str(day_index(day))]
     if default_key not in today:
         raise SystemExit("no pick for the full catalogue; refusing to publish")
 
+    # Every card the pool can still name, by the URL the feed points at.
+    # A carried pick is a list of strings and nothing else, so this is
+    # the way back from one to the card it came from.
+    by_url = {image_url(entry): entry for entry in entries}
+
     # Warm before publishing, so no device is ever the one that triggers
     # a render -- across all three days, because a device fourteen hours
     # ahead is already on tomorrow's. Fixed-derivative sources are
-    # static files and skip this.
+    # static files with nothing to render and are skipped; a URL the
+    # pool no longer carries is warmed anyway, because a HEAD costs less
+    # than being wrong about a card that is on a screen right now.
     if check:
-        warm(image_url(e) for e in chosen.values() if e.get("k") == "iiif")
+        warm(pick_list[0]
+             for picks in days.values() for pick_list in picks.values()
+             if (by_url.get(pick_list[0]) or {}).get("k", "iiif") == "iiif")
 
     generated = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 
@@ -935,12 +1091,21 @@ def main():
     sys.stderr.write(
         f"feed {size} bytes, {len(feed['days'])} days x "
         f"{len(feed['days'][feed['default_day']])} cells"
+        f"{f', {carried} picks carried forward' if carried else ''}"
         f"{f', {probed} images probed' if probed else ''}"
         f"{f', {misses} empty cells' if misses else ''}"
         f"{f', {dropped} cells dropped to fit' if dropped else ''}\n")
 
-    single = full_payload(
-        pick(cards_for(entries, default_key), default_key, day, False)[0], day)
+    # The single-card file is the feed's catch-all cell resolved back to
+    # its card, not a pick of its own: choosing again here would disagree
+    # with the feed on every day the feed is carrying forward. A card
+    # that has since left the pool cannot be written out in full, and
+    # then today's pick is the only thing left to say.
+    standing = by_url.get(today[default_key][0])
+    if standing is None:
+        standing = pick(cards_for(entries, default_key),
+                        default_key, day, False)[0]
+    single = full_payload(standing, day)
     single["generated"] = generated
     single["pool"] = len(entries)
     write_json(DEFAULT_PATH, single)
