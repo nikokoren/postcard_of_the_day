@@ -472,6 +472,28 @@ handle that differently:
   panel outright and upscales acceptably on an X. Cards whose largest
   derivative is smaller than 1000px are dropped.
 
+  Except that they are not really fixed. The Library's search API does
+  not list a IIIF service for Prints and Photographs postcards, so the
+  harvest files them this way and the feed pointed at the raw master —
+  the whole scan, unbounded, up to 670KB, and 22 of every 25 carrying a
+  colour profile averaging 53KB that the panel has to decode before it
+  can dither a pixel. Those were the cards coming up blank; the IIIF
+  ones rendered.
+
+  The service is there, it is just unadvertised: the storage path is the
+  service id with the slashes turned into colons. Asked that way, the
+  same scan comes back fitted to the box and with the profile stripped
+  to nothing. `daily.py` asks once per scan — the request renders the
+  derivative, so asking is also warming it — and remembers the answer in
+  `loc_iiif.json`. A scan the service will not serve keeps its raw
+  master, so nothing can end up without an image. 336 of the first 337
+  asked were served.
+
+Both files are written **compact**, with no indentation. Every byte is
+fetched by every device on every refresh, and `indent=1` was spending
+11.5KB of the 95KB budget on whitespace — enough that the longer IIIF
+URLs pushed the feed over and cost it a cell.
+
 The feed asks for the **colour** scan rather than a greyscale one. A
 colour panel can then show the colour, and a monochrome one loses
 nothing: converting the colour file to luminance lands within 1/255 of

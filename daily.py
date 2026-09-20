@@ -329,15 +329,122 @@ def candidates_for(entries, key, day):
 # images
 # ============================================================
 
+# The Library's Prints and Photographs postcards come back from the
+# search API as a ladder of fixed JPEGs with no IIIF service listed, so
+# the harvest files them as "fixed" and the feed pointed at the raw
+# master. Those masters are the full scan -- unbounded, up to 670KB --
+# and 22 of every 25 carry a colour profile averaging 53KB, which the
+# panel has to decode before image-dither can touch a pixel. The cards
+# that came back blank were all of this kind; the IIIF ones rendered.
+#
+# The service exists anyway, it is just not advertised: the storage path
+# is the service id with the slashes turned into colons. Asked that way
+# the Library returns a derivative fitted to the box we ask for with the
+# profile stripped to nothing, which is what every other source gives us
+# and what the maps recipe has always used.
+LOC_FIXED = re.compile(r"^https://tile\.loc\.gov/storage-services/(.+)\.jpg$")
+LOC_IIIF = "https://tile.loc.gov/image-services/iiif/"
+LOC_IIIF_PATH = os.path.join(HERE, "loc_iiif.json")
+
+# storage path -> 1 if the service serves that scan, 0 if not. Cached on
+# disk because the answer is a property of the scan and never changes,
+# and 11,457 cards is not a thing to re-ask every morning. Keyed by the
+# path alone and valued as a flag, because both URLs are derivable from
+# it and this file is committed: spelling them out cost 189 bytes a scan
+# against 56, which is two megabytes across the pool.
+_loc_iiif = None
+
+
+def loc_path(url):
+    """The storage path inside a Library URL, which is the cache key."""
+    found = LOC_FIXED.match(url or "")
+    return found.group(1) if found else None
+
+
+def loc_iiif_candidate(url):
+    """The IIIF base a Library storage URL implies, if it is one."""
+    path = loc_path(url)
+    return LOC_IIIF + path.replace("/", ":") if path else None
+
+
+def load_loc_iiif():
+    global _loc_iiif
+    if _loc_iiif is None:
+        try:
+            with open(LOC_IIIF_PATH) as fh:
+                _loc_iiif = json.load(fh)
+        except (OSError, ValueError):
+            _loc_iiif = {}
+    return _loc_iiif
+
+
+def save_loc_iiif():
+    if _loc_iiif is None:
+        return
+    with open(LOC_IIIF_PATH, "w") as fh:
+        json.dump(_loc_iiif, fh, indent=0, sort_keys=True)
+        fh.write("\n")
+
+
+def resolve_loc_iiif(entries, box=DEFAULT_BOX):
+    """
+    Ask the Library whether it will serve these scans through IIIF, and
+    remember the answer. One HEAD per card ever: the request renders the
+    derivative, so asking is also warming it.
+
+    A scan the service will not serve keeps its raw master. Nothing here
+    can leave a card without an image.
+    """
+    cache = load_loc_iiif()
+    wanted = []
+    for entry in entries:
+        if entry.get("k") != "fixed":
+            continue
+        raw = entry.get("b") or ""
+        path = loc_path(raw)
+        if not path or path in cache:
+            continue
+        wanted.append(raw)
+    wanted = sorted(set(wanted))
+    if not wanted:
+        return 0
+
+    def ask(raw):
+        url = "{}/full/!{},{}/0/default.jpg".format(
+            loc_iiif_candidate(raw), box[0], box[1])
+        req = urllib.request.Request(url, method="HEAD",
+                                     headers={"User-Agent": UA})
+        try:
+            with urllib.request.urlopen(req, timeout=WARM_TIMEOUT) as resp:
+                if resp.status == 200 and int(
+                        resp.headers.get("Content-Length") or 0) > 0:
+                    return raw, 1
+        except Exception:
+            pass
+        return raw, 0
+
+    with ThreadPoolExecutor(max_workers=WARM_WORKERS) as pool:
+        for raw, served_by_iiif in pool.map(ask, wanted):
+            cache[loc_path(raw)] = served_by_iiif
+    save_loc_iiif()
+    served = sum(1 for raw in wanted if cache.get(loc_path(raw)))
+    sys.stderr.write("  IIIF: asked the Library about {} scans, {} served\n"
+                     .format(len(wanted), served))
+    return served
+
+
 def image_url(entry, box=DEFAULT_BOX, quality="default"):
     """
-    IIIF sources give us any size we ask for. Fixed sources -- the
-    Library of Congress postcard files -- have one derivative and that
-    is what everyone gets.
+    IIIF sources give us any size we ask for. A fixed source is a single
+    raw master -- unless the Library will serve that same scan through
+    IIIF after all, which is asked once and remembered.
     """
+    base = entry.get("b")
     if entry.get("k") == "fixed":
-        return entry["b"]
-    return "{}/full/!{},{}/0/{}.jpg".format(entry["b"], box[0], box[1], quality)
+        if not load_loc_iiif().get(loc_path(base)):
+            return entry["b"]
+        base = loc_iiif_candidate(entry["b"])
+    return "{}/full/!{},{}/0/{}.jpg".format(base, box[0], box[1], quality)
 
 
 def warm(urls):
@@ -692,7 +799,12 @@ def write_json(path, payload):
         sys.stderr.write(f"  {os.path.basename(path)}: unchanged\n")
         return False
     with open(path, "w") as fh:
-        json.dump(payload, fh, indent=1, sort_keys=True)
+        # Compact. Every byte here is a byte fetched by every device on
+        # every refresh, and indent=1 was spending 11.5KB of the budget
+        # on whitespace -- which cost a whole cell the moment the image
+        # URLs got longer. These files are generated; nobody reads the
+        # diff.
+        json.dump(payload, fh, separators=(",", ":"), sort_keys=True)
         fh.write("\n")
     sys.stderr.write(f"  {os.path.basename(path)}: written "
                      f"({os.path.getsize(path)} bytes)\n")
@@ -1002,6 +1114,23 @@ def main():
     # that has been published does not move -- see picks_for_day.
     published = {} if args.recompute else load_published()
 
+    # Ask the Library about the scans that are actually due, before any
+    # of them is turned into a URL. Only the ones due: the pool holds
+    # 11,457 fixed scans and asking about all of them would render
+    # 11,457 derivatives to answer a question about a few hundred.
+    if check:
+        due = []
+        for cell in cells:
+            subset = cards_for(entries, cell)
+            if not subset:
+                continue
+            for shift in DAY_SPAN:
+                # The day's card and the stand-in behind it, since a
+                # dead image promotes the stand-in to a URL as well.
+                due.extend(candidates_for(subset, cell,
+                                          day + timedelta(days=shift))[:2])
+        resolve_loc_iiif(due)
+
     # Every cell, for every day a device might be on. A card that is
     # tomorrow's here is today's for somebody fourteen hours ahead.
     days, misses, probed, carried = {}, 0, 0, 0
@@ -1024,21 +1153,42 @@ def main():
     if default_key not in today:
         raise SystemExit("no pick for the full catalogue; refusing to publish")
 
+    # A carried row was published before the Library was asked about its
+    # scan, so it still points at the raw master. Swapping in the IIIF
+    # derivative is not the day moving -- it is the same card, the same
+    # caption, the same everything a reader could name, at a URL that
+    # renders. A day is not allowed to change its card; it is allowed to
+    # stop being blank.
+    by_raw = {entry["b"]: entry for entry in entries
+              if entry.get("k") == "fixed"}
     # Every card the pool can still name, by the URL the feed points at.
     # A carried pick is a list of strings and nothing else, so this is
     # the way back from one to the card it came from.
     by_url = {image_url(entry): entry for entry in entries}
+    upgraded = 0
+    for picks in days.values():
+        for cell, pick_list in picks.items():
+            held = by_raw.get(pick_list[0])
+            if held is None:
+                continue
+            better = image_url(held)
+            if better != pick_list[0]:
+                pick_list[0] = better
+                upgraded += 1
+    if upgraded:
+        sys.stderr.write(f"  {upgraded} carried rows moved to a IIIF "
+                         f"derivative of the same card\n")
 
     # Warm before publishing, so no device is ever the one that triggers
     # a render -- across all three days, because a device fourteen hours
-    # ahead is already on tomorrow's. Fixed-derivative sources are
-    # static files with nothing to render and are skipped; a URL the
-    # pool no longer carries is warmed anyway, because a HEAD costs less
-    # than being wrong about a card that is on a screen right now.
+    # ahead is already on tomorrow's. Everything the feed points at,
+    # without exception: a raw master still costs a round trip, and
+    # guessing which URLs are free is how two thirds of them went
+    # unwarmed.
     if check:
         warm(pick_list[0]
              for picks in days.values() for pick_list in picks.values()
-             if (by_url.get(pick_list[0]) or {}).get("k", "iiif") == "iiif")
+             if pick_list and pick_list[0])
 
     generated = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 
@@ -1072,8 +1222,10 @@ def main():
     # falls back to a coarser cell, so a reader loses precision, not a
     # postcard.
     def measure(payload):
-        return len(json.dumps(payload, indent=1,
-                              sort_keys=True).encode("utf-8"))
+        # Exactly how write_json will write it, or the guard is guarding
+        # a file that does not exist.
+        return len(json.dumps(payload, separators=(",", ":"),
+                              sort_keys=True).encode("utf-8")) + 1
 
     dropped = 0
     size = measure(feed)
