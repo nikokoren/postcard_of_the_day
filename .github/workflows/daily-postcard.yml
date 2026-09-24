@@ -56,11 +56,16 @@ jobs:
         continue-on-error: true
         run: python3 daily.py --review 7
 
+      # And draw it, into docs/ where Pages serves it.
+      - name: Draw the review page
+        continue-on-error: true
+        run: python3 review_page.py
+
       - name: Commit and push
         run: |
           git config user.name "GitHub Action"
           git config user.email "action@github.com"
-          git add postcard.json today.json quality.json review.json loc_iiif.json
+          git add postcard.json today.json quality.json review.json loc_iiif.json docs
 
           if git diff --staged --quiet; then
             echo "Same postcard as the last run, nothing to commit"
