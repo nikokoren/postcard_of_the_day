@@ -985,8 +985,10 @@ def review_manifest(entries, day, days, path, skip=0):
         for cell in cells:
             subset = cards_for(entries, cell)
             if subset:
-                due.append(candidates_for(subset, cell,
-                                          start + timedelta(days=shift))[0])
+                got = pick(subset, cell, start + timedelta(days=shift),
+                           False)[0]
+                if got is not None:
+                    due.append(got)
     resolve_loc_iiif(due)
 
     found = {}
@@ -996,7 +998,12 @@ def review_manifest(entries, day, days, path, skip=0):
             subset = cards_for(entries, cell)
             if not subset:
                 continue
-            entry = candidates_for(subset, cell, that_day)[0]
+            # What will actually ship, past anything already vetoed --
+            # otherwise a second pass re-asks about every card refused
+            # in the first.
+            entry = pick(subset, cell, that_day, False)[0]
+            if entry is None:
+                continue
             row = found.setdefault(entry["id"], {
                 "id": entry["id"],
                 "title": title_line(entry),
