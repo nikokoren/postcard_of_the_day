@@ -967,7 +967,7 @@ def load_pool():
         if entry_id is not None and entry_id in untranslated():
             return None
         hit = english.get(source)
-        out = hit.get("en") if hit else None
+        out = translate.tidy(source, hit.get("en") if hit else None)
         if out and not translate.usable(source, out):
             refused += 1
             return None
