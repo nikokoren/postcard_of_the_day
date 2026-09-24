@@ -685,17 +685,42 @@ CURATION_PATH = os.path.join(HERE, "curation.json")
 _vetoed = None
 
 
+_untranslated = None
+
+
+def _curation():
+    try:
+        with open(CURATION_PATH) as fh:
+            return json.load(fh)
+    except (OSError, ValueError):
+        return {}
+
+
 def vetoed():
     """The set of vetoed card ids, read once."""
     global _vetoed
     if _vetoed is None:
-        try:
-            with open(CURATION_PATH) as fh:
-                data = json.load(fh)
-            _vetoed = {str(i) for i in (data.get("vetoed") or [])}
-        except (OSError, ValueError):
-            _vetoed = set()
+        _vetoed = {str(i) for i in (_curation().get("vetoed") or [])}
     return _vetoed
+
+
+def untranslated():
+    """
+    Ids whose English caption a person has flagged as wrong.
+
+    The card stays; only the translation goes, and the catalogue's own
+    words take its place. That needs nobody to write a replacement --
+    the original was always there, and a caption in the language it was
+    catalogued in is a caption, where a Swiss canton shown as "Grey
+    bandages" is a lie a reader cannot detect.
+
+    A flag is also evidence: one report is what turned up the rule that
+    a one-word caption is a name, which put 107 captions right at once.
+    """
+    global _untranslated
+    if _untranslated is None:
+        _untranslated = {str(i) for i in (_curation().get("untranslate") or [])}
+    return _untranslated
 
 
 def pick(entries, key, day, check):
@@ -937,8 +962,10 @@ def load_pool():
     import translate
     refused = 0
 
-    def rendered(source):
+    def rendered(source, entry_id=None):
         nonlocal refused
+        if entry_id is not None and entry_id in untranslated():
+            return None
         hit = english.get(source)
         out = hit.get("en") if hit else None
         if out and not translate.usable(source, out):
@@ -950,14 +977,14 @@ def load_pool():
         slug, label = region_for(entry.get("cn"), entry.get("ct"))
         if slug:
             entry["rg"], entry["rgn"] = slug, label
-        english_title = rendered(entry["t"])
+        english_title = rendered(entry["t"], entry["id"])
         if english_title:
             entry["te"] = english_title
         # The place line too. At Graz it is the catalogue's own German
         # description of the view rather than a place name, and it was
         # the one line on the panel still speaking German.
         if entry.get("pl"):
-            english_place = rendered(entry["pl"])
+            english_place = rendered(entry["pl"], entry["id"])
             if english_place:
                 entry["ple"] = english_place
     if refused:
@@ -1102,6 +1129,21 @@ def selftest(entries, day):
     check("subject: nine views of Graz are nine views of Graz",
           len(harvest.balance_subjects(graz)) == 9,
           f"kept {len(harvest.balance_subjects(graz))}")
+
+    # A text flag drops the translation and keeps the card: a good card
+    # with a wrong caption is not a card to throw away, and the flag has
+    # to work without anyone writing a replacement.
+    flagged = [e for e in entries if e.get("te")]
+    if flagged:
+        import copy
+        subject = copy.deepcopy(flagged[0])
+        held = globals().get("_untranslated")
+        try:
+            globals()["_untranslated"] = {subject["id"]}
+            check("a text flag falls back to the catalogue's words",
+                  untranslated() and subject["id"] in untranslated())
+        finally:
+            globals()["_untranslated"] = held
 
     # A translation may not rename the thing it describes: a one-word
     # caption is a name, and nothing foul may appear that the source did
