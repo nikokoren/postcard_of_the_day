@@ -666,9 +666,44 @@ def full_payload(entry, day):
     }
 
 
+# ============================================================
+# curation
+# ============================================================
+
+# Cards a person has looked at and said no to, by id. A veto is the one
+# judgement no measurement makes for us: a scan that is technically fine
+# and still not worth a day of someone's wall.
+#
+# It marks the card dead rather than removing it from the pool, and that
+# distinction is the design. The schedule is divmod(day, len(pool)) over
+# a hash ordering of the pool's *membership*, so dropping one entry
+# changes the length, reshuffles every cycle, and moves every future
+# pick -- including the ones just reviewed. Reviewing would rewrite the
+# thing being reviewed. Marked dead, the pool is untouched and only the
+# vetoed slot falls through to its stand-in half a cycle away.
+CURATION_PATH = os.path.join(HERE, "curation.json")
+_vetoed = None
+
+
+def vetoed():
+    """The set of vetoed card ids, read once."""
+    global _vetoed
+    if _vetoed is None:
+        try:
+            with open(CURATION_PATH) as fh:
+                data = json.load(fh)
+            _vetoed = {str(i) for i in (data.get("vetoed") or [])}
+        except (OSError, ValueError):
+            _vetoed = set()
+    return _vetoed
+
+
 def pick(entries, key, day, check):
-    """The day's card for one cell, skipping any whose image has gone."""
-    candidates = candidates_for(entries, key, day)
+    """The day's card, skipping any vetoed or whose image has gone."""
+    scheduled = candidates_for(entries, key, day)
+    # A veto applies whether or not images are being checked -- it is a
+    # decision about the card, not about its file.
+    candidates = [e for e in scheduled if e["id"] not in vetoed()] or scheduled
     if not candidates:
         return None, False
     if not check:
@@ -710,17 +745,26 @@ def load_published(path=FEED_PATH):
         return {}
 
 
-def still_stands(standing, probe):
+def still_stands(standing, probe, banned=()):
     """
     Whether a pick that has already gone out can stay. Shape first --
-    anything the markup could not unpack is not a pick -- and then, on
-    the day it matters, whether the image is still there.
+    anything the markup could not unpack is not a pick -- then whether
+    it has been vetoed, and then, on the day it matters, whether the
+    image is still there.
+
+    A veto unseats a published pick where a changed threshold would not.
+    Carrying a day forward exists so a card does not move under someone
+    mid-look; it does not exist to keep shipping a card that has been
+    looked at and refused. A row carries no id, so a veto is matched by
+    the image URL, which is the one field that identifies the card.
     """
     if not isinstance(standing, list) or len(standing) != len(PICK_FIELDS):
         return False
     if not all(isinstance(field, str) for field in standing):
         return False
     if not standing[0]:
+        return False
+    if standing[0] in banned:
         return False
     if not probe or not budget_left():
         return True
@@ -757,10 +801,16 @@ def picks_for_day(entries, cells, that_day, published, probe):
     already holds and loses every day after it, which is what score.py
     means by a card being out of *tomorrow's* picks.
     """
+    # The published rows a veto has to unseat, by the URL that names
+    # them. Computed per run, not per cell: only vetoed cards are
+    # resolved, so this costs a handful of lookups rather than a pass
+    # over the pool.
+    banned = {image_url(e) for e in entries if e["id"] in vetoed()}
+
     picks, carried, probed, misses = {}, 0, 0, 0
     for key in cells:
         standing = published.get(key)
-        if still_stands(standing, probe):
+        if still_stands(standing, probe, banned):
             picks[key] = standing
             carried += 1
             continue
