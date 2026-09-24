@@ -47,11 +47,20 @@ jobs:
       - name: Pick today's postcard
         run: python3 daily.py
 
+      # The queue a person reviews, kept a week ahead on its own. A week
+      # rather than a fortnight because 95 cells a day is 624 cards over
+      # seven, and the page that shows them carries every thumbnail
+      # inline. It never fails the run: a stale queue is worth less than
+      # today's card.
+      - name: Write the review queue
+        continue-on-error: true
+        run: python3 daily.py --review 7
+
       - name: Commit and push
         run: |
           git config user.name "GitHub Action"
           git config user.email "action@github.com"
-          git add postcard.json today.json quality.json
+          git add postcard.json today.json quality.json review.json loc_iiif.json
 
           if git diff --staged --quiet; then
             echo "Same postcard as the last run, nothing to commit"
