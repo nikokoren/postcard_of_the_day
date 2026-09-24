@@ -1,3 +1,22 @@
 {
- "vetoed": []
+ "vetoed": [
+  "dc:commonwealth:6d570k37p",
+  "dc:commonwealth:6d570x46q",
+  "dc:commonwealth:x346fm434",
+  "dc:commonwealth:x346fp59f",
+  "dc:commonwealth:x346fs51v",
+  "dc:commonwealth:x346g025n",
+  "graz:o:gm.1754",
+  "loc:2025672564",
+  "loc:2025703301",
+  "loc:2025703341",
+  "loc:2025706848",
+  "loc:2025713189",
+  "loc:2025713715",
+  "rijks:NG-2011-97-17-21",
+  "rijks:RP-F-2009-31-31",
+  "rijks:RP-F-F01148-EQ",
+  "rijks:RP-F-F15719",
+  "rijks:RP-F-F15805"
+ ]
 }
