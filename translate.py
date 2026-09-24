@@ -184,6 +184,61 @@ def save_cache(cache):
     os.replace(tmp, CACHE_PATH)
 
 
+# ============================================================
+# what a translation is not allowed to do
+# ============================================================
+
+# A caption of one word is a name -- a town, a canton, a building -- and
+# a translator handed a name with no sentence around it translates it as
+# vocabulary. Every one of the 107 single-word captions in the cache came
+# back changed, and the changes were not improvements: Asmara, Belmar and
+# Finmarken all became "Home", Graubunden became "Grey bandages", Alt-Graz
+# "Old Great", Antietam "Antimony", Maine "Repute".
+#
+# A few were real gains -- Alpenrose to Alpine rose, Glockenturm to Bell
+# Tower -- and they are not worth the trade. A German noun left in German
+# is a caption a reader half-follows; a town renamed "Home" is a caption
+# that lies, and the reader cannot tell which they are looking at.
+def is_one_word(title):
+    return len(title.split()) == 1
+
+
+# Nothing may appear in a translation that was not in what it translates.
+# Machine translation of a short, contextless string does not merely err,
+# it occasionally invents: "Bereg Baikala" (the shore of Baikal) came back
+# as "Fuck that time", the Turkish town Selcuk as "Fuck", and the Romanian
+# "Tigani ciurari" -- Roma sieve-makers -- as a racial slur. These go on a
+# wall in someone's home.
+#
+# The test is comparison, not a word list applied to the output: a caption
+# about the French town of Bitche must survive, and it does, because the
+# source says it too.
+SLURS = re.compile(
+    r"\b(fuck\w*|shit\w*|cunt\w*|bitch\w*|bastard|wank\w*|arse\w*|asshole|"
+    r"nigg\w+|fag(?:got)?s?|whore|slut|piss\w*|dick(?:head)?|prick|"
+    r"chink|spic|kike|wetback|retard\w*|tranny)\b", re.I)
+
+
+def invents_slur(source, english):
+    """True when the English says something foul the source did not."""
+    if not english:
+        return False
+    found = {m.group(0).lower() for m in SLURS.finditer(english)}
+    if not found:
+        return False
+    already = {m.group(0).lower() for m in SLURS.finditer(source or "")}
+    return bool(found - already)
+
+
+def usable(source, english):
+    """Whether a translation may be published at all."""
+    if not english:
+        return False
+    if is_one_word(source):
+        return False
+    return not invents_slur(source, english)
+
+
 def split_head(title):
     """(place, separator, rest) if the caption opens with a place."""
     m = HEAD_SPLIT.match(title)
@@ -423,3 +478,36 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
+
+# What a translation must never do, at the strings that taught each rule.
+USABLE_CASES = [
+    # a one-word caption is a name, and a name is not vocabulary
+    (False, "Antietam", "Antimony"),
+    (False, "Atlanta", "Home"),
+    (False, "Maine", "Repute"),
+    (False, "Graubunden", "Grey bandages"),
+    (False, "Alt-Graz", "Old Great"),
+    # including the ones it got right, which is the trade being made
+    (False, "Venezia", "Venice"),
+    (False, "Glockenturm", "Bell Tower"),
+    # nothing foul the source did not say
+    (False, "Selcuk", "Fuck."),
+    (False, "Bereg Baikala", "Fuck that time."),
+    (False, "Tigani ciurari", "Tiger niggers"),
+    # but a real place name survives, because the source says it too
+    (True, "Bitche (Lorraine), Le camp", "Bitche (Lorraine), The camp"),
+    (True, "Camp de Bitche (Lorraine", "Bitche Camp (Lorraine)"),
+    # and ordinary captions are untouched
+    (True, "Alt Graz", "Old Graz"),
+    (True, "Beleuchteter Uhrturm", "Illuminated Clock Tower"),
+    (True, "Arnhem, Rijnbrug", "Arnhem, Rhine Bridge"),
+    # nothing to publish is not publishable
+    (False, "Graz", ""),
+]
+
+
+def usable_failures():
+    """Empty when every guard case holds."""
+    return ["usable({!r}, {!r}) = {}, want {}".format(s, e, usable(s, e), w)
+            for w, s, e in USABLE_CASES if usable(s, e) is not w]

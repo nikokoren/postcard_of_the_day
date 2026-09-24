@@ -930,20 +930,38 @@ def load_pool():
         sys.stderr.write(f"{before - len(entries)} cards dropped on subject\n")
 
     english = load_translations()
+    # A translation is checked here as well as where it is written. The
+    # cache is months of work and outlives any one rule, so a caption
+    # refused today must not ship merely because it was stored before
+    # the rule existed -- and the cost of re-checking is a comparison.
+    import translate
+    refused = 0
+
+    def rendered(source):
+        nonlocal refused
+        hit = english.get(source)
+        out = hit.get("en") if hit else None
+        if out and not translate.usable(source, out):
+            refused += 1
+            return None
+        return out
+
     for entry in entries:
         slug, label = region_for(entry.get("cn"), entry.get("ct"))
         if slug:
             entry["rg"], entry["rgn"] = slug, label
-        rendered = english.get(entry["t"])
-        if rendered and rendered.get("en"):
-            entry["te"] = rendered["en"]
+        english_title = rendered(entry["t"])
+        if english_title:
+            entry["te"] = english_title
         # The place line too. At Graz it is the catalogue's own German
         # description of the view rather than a place name, and it was
         # the one line on the panel still speaking German.
         if entry.get("pl"):
-            rendered = english.get(entry["pl"])
-            if rendered and rendered.get("en"):
-                entry["ple"] = rendered["en"]
+            english_place = rendered(entry["pl"])
+            if english_place:
+                entry["ple"] = english_place
+    if refused:
+        sys.stderr.write(f"{refused} translations refused, original kept\n")
     return entries
 
 
@@ -1084,6 +1102,15 @@ def selftest(entries, day):
     check("subject: nine views of Graz are nine views of Graz",
           len(harvest.balance_subjects(graz)) == 9,
           f"kept {len(harvest.balance_subjects(graz))}")
+
+    # A translation may not rename the thing it describes: a one-word
+    # caption is a name, and nothing foul may appear that the source did
+    # not say.
+    import translate
+    for f in translate.usable_failures():
+        check("translation guard", False, f)
+    if not translate.usable_failures():
+        check("translations cannot rename or invent", True)
 
     key = cell_key("all", "all", "all")
     total = len(entries)
