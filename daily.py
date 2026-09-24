@@ -532,6 +532,51 @@ def balance_brackets(text):
     return text
 
 
+# ------------------------------------------------------------
+# catalogue shorthand
+# ------------------------------------------------------------
+# A catalogue title is written for a card index, not a wall. Square
+# brackets mean the words were supplied by a cataloguer rather than
+# printed on the card; a trailing colon or slash is ISBD punctuation
+# joining fields that are not here; "[i.e. 1865]" is a correction to a
+# date printed wrong. All of it is information about the record, and
+# none of it is information about the picture.
+#
+# 231 of 17,737 cards carry brackets. balance_brackets above still has
+# work to do afterwards: a parenthesis is content -- "(Nurnberg)" -- and
+# only needs closing when truncation has split it.
+# "Mississipi [i.e. Mississippi]" -- the bracket holds the correction,
+# so the word before it is the one to drop. Taking the bracket out
+# instead would keep the cataloguer's misspelling and throw away the
+# fix, which is backwards. 166 titles in this pool.
+IE_NOTE = re.compile(r"\S+\s*\[\s*i\.?\s*e\.?\s*([^\]]+)\]", re.I)
+SIC_NOTE = re.compile(r"\s*[\[(]\s*sic\.?\s*[\])]", re.I)
+BRACKETS = re.compile(r"[\[\]]")
+ISBD_TAIL = re.compile(r"[\s:;/,=]+$")
+ISBD_HEAD = re.compile(r"^[\s:;/,=]+")
+
+
+def clean_catalogue(text):
+    """
+    A catalogue title with the cataloguing taken out.
+
+    A correction takes the place of what it corrects: "Mississipi [i.e.
+    Mississippi]" becomes "Mississippi". (sic) goes whole. Then the
+    bracket
+    characters, keeping what is inside them: the words are the title,
+    only the marks around them are the convention. Then the ISBD
+    punctuation that joins a title to fields the panel is not showing.
+    """
+    if not text:
+        return text
+    cleaned = IE_NOTE.sub(r"\1", text)
+    cleaned = SIC_NOTE.sub("", cleaned)
+    cleaned = BRACKETS.sub("", cleaned)
+    cleaned = ISBD_HEAD.sub("", ISBD_TAIL.sub("", cleaned))
+    cleaned = re.sub(r"\s{2,}", " ", cleaned)
+    return cleaned.strip() or text
+
+
 def title_line(entry):
     """
     A title that fits a panel. Cut at a subtitle marker if there is one,
@@ -543,7 +588,7 @@ def title_line(entry):
     caption and a reader who cannot read Greek is not helped by being
     shown the Greek as well. The original stays in the pool.
     """
-    title = entry.get("te") or entry["t"]
+    title = clean_catalogue(entry.get("te") or entry["t"])
     if len(title) <= TITLE_LIMIT:
         return balance_brackets(title)
     for marker in SUBTITLE_MARKERS:
@@ -1155,6 +1200,21 @@ def selftest(entries, day):
                   untranslated() and subject["id"] in untranslated())
         finally:
             globals()["_untranslated"] = held
+
+    # Cataloguing does not reach the wall: brackets mean a supplied
+    # title, a trailing colon joins fields the panel is not showing, and
+    # "[i.e. X]" corrects a word printed wrong -- X being the correction.
+    for want, given in (
+            ("Greetings from Graz", "[Greetings from Graz]"),
+            ("Hotel Marlborough", "Hotel Marlborough :"),
+            ("Partie an der Insel Schutt (Nurnberg)",
+             "Partie an der Insel Schutt (Nurnberg)"),
+            ("Carte du Mississippi", "Carte du Mississipi [i.e. Mississippi]"),
+    ):
+        got = clean_catalogue(given)
+        check(f"catalogue: {given[:34]}", got == want, f"got {got!r}")
+    strays = sum(1 for e in entries if "[" in title_line(e))
+    check("no title still carries a bracket", strays == 0, f"{strays} do")
 
     # A translation may not rename the thing it describes: a one-word
     # caption is a name, and nothing foul may appear that the source did
