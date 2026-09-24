@@ -951,6 +951,84 @@ def load_pool():
 # selftest
 # ============================================================
 
+def review_manifest(entries, day, days, path, skip=0):
+    """
+    What is coming, for someone to look at before it ships.
+
+    Every cell's pick for `days` days starting `skip` days after the
+    window already published -- today and tomorrow are in the feed and
+    frozen for anyone mid-look, so day+3 is the first a veto can still
+    change. `skip` walks a second week without re-reviewing the first.
+
+    Deduplicated by card: one card fills several cells on different days
+    and nobody should be asked twice. Ordered by render detail, lowest
+    first, with cards nobody has measured ahead of those -- 92% of a
+    week's picks carry a score, so the unmeasured are few enough to sit
+    on top without burying the ranking.
+    """
+    scores = {}
+    try:
+        with open(os.path.join(HERE, "quality.json")) as fh:
+            scores = json.load(fh).get("scored") or {}
+    except (OSError, ValueError):
+        pass
+
+    regions = regions_in(entries)
+    cells = build_cells(entries, regions)
+    start = day + timedelta(days=3 + skip)
+
+    # Resolve the Library's scans to IIIF before any URL is written down.
+    # Without this an unresolved card's thumbnail is the raw master --
+    # half a megabyte to fetch for a 290px tile, several hundred times.
+    due = []
+    for shift in range(days):
+        for cell in cells:
+            subset = cards_for(entries, cell)
+            if subset:
+                due.append(candidates_for(subset, cell,
+                                          start + timedelta(days=shift))[0])
+    resolve_loc_iiif(due)
+
+    found = {}
+    for shift in range(days):
+        that_day = start + timedelta(days=shift)
+        for cell in cells:
+            subset = cards_for(entries, cell)
+            if not subset:
+                continue
+            entry = candidates_for(subset, cell, that_day)[0]
+            row = found.setdefault(entry["id"], {
+                "id": entry["id"],
+                "title": title_line(entry),
+                "date": date_line(entry),
+                "place": place_line(entry),
+                "thumb": image_url(entry, (400, 400)),
+                "item": entry.get("u") or "",
+                "holding": entry.get("h") or "",
+                "score": (scores.get(entry["id"]) or [None, None])[1],
+                "when": [],
+            })
+            row["when"].append({"day": that_day.isoformat(), "cell": cell})
+
+    rows = sorted(found.values(),
+                  key=lambda r: (r["score"] is not None, r["score"] or 0))
+    out = {
+        "kind": "postcard-of-the-day",
+        "generated": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "from": start.isoformat(),
+        "to": (start + timedelta(days=days - 1)).isoformat(),
+        "vetoed": sorted(vetoed()),
+        "items": rows,
+    }
+    with open(path, "w") as fh:
+        json.dump(out, fh, separators=(",", ":"), sort_keys=True)
+        fh.write("\n")
+    sys.stderr.write("{} cards to review over {} days from {} -> {}\n"
+                     .format(len(rows), days, start.isoformat(),
+                             os.path.relpath(path, os.getcwd())))
+    return 0
+
+
 def selftest(entries, day):
     failures = []
 
@@ -1129,6 +1207,10 @@ def main():
     # The way back out. A published day is otherwise immovable, which is
     # the point of it -- but a bad pick that got published would sit
     # there for two more runs, and this is how it is unstuck.
+    ap.add_argument("--review", type=int, metavar="DAYS",
+                    help="write review.json: every cell's pick for DAYS days")
+    ap.add_argument("--skip", type=int, default=0, metavar="DAYS",
+                    help="with --review, start this many days later")
     ap.add_argument("--recompute", action="store_true",
                     help="ignore the published feed and choose every day "
                          "afresh")
@@ -1152,6 +1234,10 @@ def main():
 
     if args.selftest:
         return selftest(entries, day)
+
+    if args.review:
+        return review_manifest(entries, day, args.review,
+                               os.path.join(HERE, "review.json"), args.skip)
 
     check = not args.no_check
     regions = regions_in(entries)
