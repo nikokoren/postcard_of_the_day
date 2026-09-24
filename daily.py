@@ -1021,6 +1021,8 @@ def review_manifest(entries, day, days, path, skip=0):
     regions = regions_in(entries)
     cells = build_cells(entries, regions)
     start = day + timedelta(days=3 + skip)
+    english_lang = {k: (v or {}).get("lang")
+                    for k, v in load_translations().items()}
 
     # Resolve the Library's scans to IIIF before any URL is written down.
     # Without this an unresolved card's thumbnail is the raw master --
@@ -1049,9 +1051,18 @@ def review_manifest(entries, day, days, path, skip=0):
             entry = pick(subset, cell, that_day, False)[0]
             if entry is None:
                 continue
+            # The caption as shown, what it was made from, and the
+            # language it was read as. A flag is no use to whoever has
+            # to diagnose it without all three: together they say
+            # whether the fault is the rule, the glossary, or the
+            # detector that picked the language.
+            translated = bool(entry.get("te")
+                              and entry["id"] not in untranslated())
             row = found.setdefault(entry["id"], {
                 "id": entry["id"],
                 "title": title_line(entry),
+                "source": entry["t"] if translated else "",
+                "lang": (english_lang.get(entry["t"]) or "") if translated else "",
                 "date": date_line(entry),
                 "place": place_line(entry),
                 "thumb": image_url(entry, (400, 400)),
