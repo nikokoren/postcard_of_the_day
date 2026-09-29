@@ -221,6 +221,33 @@ below is a guarantee about one schedule, not across a pool that changed
 underneath it — as it always was, only now the seam is where it can be
 seen rather than on somebody's panel.
 
+### And nothing is published unprobed
+
+Standing still is only worth having if what stands was worth publishing.
+Probing the middle day alone made sense while every day was chosen again
+each morning — tomorrow's card was probed when tomorrow came. It does not
+now: a row stands once it is published, so a card whose scan has gone is
+pinned rather than corrected.
+
+The map recipe, which is this one's twin, measured what that costs: **8 to
+12 of its 55 topics moved every morning** before days were carried, and
+every one of them was a day published without its image ever being asked
+about. Here the share is smaller — publishing 2026-10-01 for the first
+time, the probe rejected the scheduled card for 3 of 95 cells — but those
+three are cells that would otherwise have shown a dead image for a day,
+with no run left to fix it.
+
+So a fresh choice is probed on whichever of the three days it is for. A
+carried row is still probed on the middle day alone, as before: it was
+checked when it was chosen. Yesterday and today are normally carried
+rather than chosen, so this costs about one extra day's worth of checks —
+190 of the 400 in `CHECK_BUDGET`, which `--selftest` now asserts is enough
+for a fresh day plus the middle day's rows.
+
+The budget goes to today first, then tomorrow, then yesterday, so when the
+checks run out they run out on the day that matters least. A pick that did
+go out unprobed is still probed when its day arrives, exactly as before.
+
 ### What that costs at each hop
 
 | step | when |

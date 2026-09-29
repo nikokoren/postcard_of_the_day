@@ -155,6 +155,13 @@ MAX_CELLS = 140
 # hour, so there is nothing to tune. Hence yesterday, today, tomorrow.
 DAY_SPAN = (-1, 0, 1)
 
+# Which of those days gets the image budget first. Today is what most
+# devices are on; tomorrow is what the ones ahead of UTC are about to be
+# on; yesterday is nearly over everywhere. So when the checks run out,
+# they run out on the day that matters least. All three are published
+# whatever order they were chosen in.
+BUDGET_ORDER = (0, 1, -1)
+
 # One pick as a list, not an object: at 282 of them, field names alone
 # would cost around 17KB of the 95KB budget. Order is part of the
 # contract with the markup -- see PICK_FIELDS in the README.
@@ -841,7 +848,8 @@ def still_stands(standing, probe, banned=()):
     return image_ok(standing[0])
 
 
-def picks_for_day(entries, cells, that_day, published, probe):
+def picks_for_day(entries, cells, that_day, published, probe,
+                  probe_fresh=None):
     """
     One day's picks, cell by cell, preferring whatever has already been
     published for that day. Returns (picks, carried, probed, misses).
@@ -870,7 +878,20 @@ def picks_for_day(entries, cells, that_day, published, probe):
     A card dropped from the pool between runs therefore keeps the day it
     already holds and loses every day after it, which is what score.py
     means by a card being out of *tomorrow's* picks.
+
+    And a fresh choice is probed whichever day it is for, which is the
+    other half of the same idea. Probing the middle day alone made sense
+    while every day was chosen again each morning -- tomorrow's card got
+    probed when tomorrow came. It does not now: a row stands once it is
+    published, so a card whose scan has gone is pinned rather than
+    corrected. The map recipe, which is this one's twin, showed what that
+    is worth -- 8 to 12 of its 55 topics moved every morning before days
+    were carried, every one of them a day published without its image
+    ever being asked about. `probe_fresh` defaults to `probe`, so a caller
+    that only knows about one kind of checking gets the old behaviour.
     """
+    if probe_fresh is None:
+        probe_fresh = probe
     # The published rows a veto has to unseat, by the URL that names
     # them. Computed per run, not per cell: only vetoed cards are
     # resolved, so this costs a handful of lookups rather than a pass
@@ -884,7 +905,8 @@ def picks_for_day(entries, cells, that_day, published, probe):
             picks[key] = standing
             carried += 1
             continue
-        entry, checked = pick(cards_for(entries, key), key, that_day, probe)
+        entry, checked = pick(cards_for(entries, key), key, that_day,
+                              probe_fresh)
         if entry is None:
             misses += 1
             continue
@@ -1291,6 +1313,16 @@ def selftest(entries, day):
               isinstance(v, str) for v in payload))
     check("a device can name any day the feed carries",
           set(DAY_SPAN) == {-1, 0, 1})
+    # A row stands once it is published, so every day the file carries is
+    # probed as it is written -- a day published unprobed never gets a
+    # second chance. The budget order decides which day goes short when
+    # the checks run out, so it has to name them all.
+    check("the budget order covers every day published",
+          set(BUDGET_ORDER) == set(DAY_SPAN))
+    check("and spends on today before the days either side",
+          BUDGET_ORDER[0] == 0 and BUDGET_ORDER[-1] == -1)
+    check("there is budget for a fresh day plus the middle day's rows",
+          CHECK_BUDGET >= 2 * MAX_CELLS, f"{CHECK_BUDGET} checks")
 
     # A day that has been published stays where it is, whatever the pool
     # has done since. The one thing that can unseat a standing pick is
@@ -1417,15 +1449,17 @@ def main():
     # Every cell, for every day a device might be on. A card that is
     # tomorrow's here is today's for somebody fourteen hours ahead.
     days, misses, probed, carried = {}, 0, 0, 0
-    for shift in DAY_SPAN:
+    for shift in BUDGET_ORDER:
         that_day = day + timedelta(days=shift)
         key_day = str(day_index(that_day))
-        # Only probe the images for the middle day. The other two are
-        # the same cards a day either side of their own turn, and get
-        # probed when it comes.
+        # A carried row is probed on the middle day only: it was checked
+        # when it was chosen, and the middle day is the one about to be
+        # everybody's. A fresh choice is probed whichever day it is for,
+        # because a row stands once it is published and never gets a
+        # second chance to be checked -- see picks_for_day.
         picks, kept, checked, missed = picks_for_day(
             entries, cells, that_day, published.get(key_day) or {},
-            check and shift == 0)
+            check and shift == 0, check)
         days[key_day] = picks
         carried += kept
         probed += checked
