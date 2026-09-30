@@ -1,0 +1,12 @@
+{
+ "loc:2025708744": {
+  "was": "Paris (17e), la rue Demours, Le Restaurant du Grand Veneur",
+  "title": "Paris (17th arrondissement), rue Demours, the Restaurant du Grand Veneur",
+  "note": "The translator turned 17e into 17th, dropped an article, and left the rest in French -- a caption that looks translated and is not. 17e is the arrondissement, not a date or an ordinal on its own, so it needs the word. Rue Demours is a street and Le Grand Veneur -- the royal Master of the Hunt -- is the restaurant's name; neither is vocabulary."
+ },
+ "loc:2025713908": {
+  "was": "Rabat - Musee des Arts indigenes des Oudaias",
+  "title": "Rabat - Museum of Indigenous Arts of the Oudaias",
+  "note": "The caption is French but was detected as German, so a German model was run over French text and indigenes came back as Indigenouss, a word in no language. This is the museum in the Kasbah of the Oudaias at Rabat; indigenes is the colonial-era French for indigenous, which the museum's own name used."
+ }
+}

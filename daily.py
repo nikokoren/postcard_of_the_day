@@ -732,6 +732,57 @@ _vetoed = None
 
 _untranslated = None
 
+CORRECTIONS_PATH = os.path.join(HERE, "corrections.json")
+_corrections = None
+_stale = set()
+
+
+def corrections():
+    """
+    Captions written by hand, read once.
+
+    The flag list is the blunt repair: it drops a bad translation and
+    puts the catalogue's own words back, which needs nobody to write
+    anything but leaves a reader looking at French. This is the other
+    half -- somebody reads the caption, works out what the translator
+    got wrong, and writes the line that should have been there. It beats
+    both the machine and the fallback, because a person who has looked
+    at the source is a better authority than either.
+
+    Kept in its own file rather than in curation.json, which
+    apply_decisions.py rewrites from a pasted block and would drop
+    anything it does not recognise.
+    """
+    global _corrections
+    if _corrections is None:
+        try:
+            with open(CORRECTIONS_PATH) as fh:
+                _corrections = json.load(fh)
+        except (OSError, ValueError):
+            _corrections = {}
+    return _corrections
+
+
+def corrected(entry):
+    """The hand-written caption for this entry, if it still applies."""
+    fix = corrections().get(str(entry["id"]))
+    if not fix:
+        return None
+    # A correction answers one particular caption. Archives do re-catalogue,
+    # and a correction left pointing at text that has since changed would
+    # put the answer to one question against another. Dropped, and the
+    # selftest says so rather than letting it pass unnoticed.
+    if fix.get("was") is not None and fix["was"] != entry["t"]:
+        _stale.add(str(entry["id"]))
+        return None
+    return fix.get("title") or None
+
+
+def stale_corrections():
+    """Corrections whose caption has moved since they were written."""
+    return set(_stale)
+
+
 
 def _curation():
     try:
@@ -1022,7 +1073,9 @@ def load_pool():
         slug, label = region_for(entry.get("cn"), entry.get("ct"))
         if slug:
             entry["rg"], entry["rgn"] = slug, label
-        english_title = rendered(entry["t"], entry["id"])
+        # A caption somebody wrote by hand outranks both the machine's
+        # attempt and the catalogue's own words a flag falls back to.
+        english_title = corrected(entry) or rendered(entry["t"], entry["id"])
         if english_title:
             entry["te"] = english_title
         # The place line too. At Graz it is the catalogue's own German
@@ -1034,6 +1087,11 @@ def load_pool():
                 entry["ple"] = english_place
     if refused:
         sys.stderr.write(f"{refused} translations refused, original kept\n")
+    applied = sum(1 for e in entries
+                  if str(e["id"]) in corrections()
+                  and e.get("te") == corrections()[str(e["id"])].get("title"))
+    if applied:
+        sys.stderr.write(f"{applied} captions written by hand\n")
     return entries
 
 
@@ -1224,6 +1282,28 @@ def selftest(entries, day):
         check("translation guard", False, f)
     if not translate.usable_failures():
         check("translations cannot rename or invent", True)
+
+    # A caption written by hand has to actually reach the panel, and has
+    # to still be answering the caption it was written for. A correction
+    # that quietly stopped applying is worse than none: somebody looked
+    # at it, fixed it, and would have no way to know it had lapsed.
+    by_id = {str(e["id"]): e for e in entries}
+    for item, fix in corrections().items():
+        entry = by_id.get(item)
+        if entry is None:
+            check(f"correction {item} still has an entry", False, "gone from the pool")
+            continue
+        check(f"correction {item} matches the caption it corrects",
+              fix.get("was") == entry["t"], f"pool now says {entry['t']!r}")
+        check(f"correction {item} is what gets served",
+              entry.get("te") == fix.get("title"), f"served {entry.get('te')!r}")
+    if corrections():
+        check("a correction outranks a flag",
+              all(str(e["id"]) not in untranslated()
+                  or e.get("te") == corrections()[str(e["id"])].get("title")
+                  for e in entries if str(e["id"]) in corrections()))
+    check("no correction has gone stale", not stale_corrections(),
+          f"{sorted(stale_corrections())}")
 
     key = cell_key("all", "all", "all")
     total = len(entries)
