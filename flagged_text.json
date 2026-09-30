@@ -16,5 +16,47 @@
   "lang": "ca",
   "shown": "Eritrea - A fontana",
   "source": "Eritrea - Una fontana"
+ },
+ {
+  "id": "dc:commonwealth:x346fm32m",
+  "lang": "es",
+  "shown": "Municipal Aqueduct purification plant, Cali, Colombia",
+  "source": "Acueducto municipal planta de purificacion, Cali, Colombia"
+ },
+ {
+  "id": "dc:commonwealth:x346fv13v",
+  "lang": "es",
+  "shown": "La aduana fronteriza, Ciudad Juarez. North of the Republic",
+  "source": "La aduana fronteriza, Ciudad Juarez. Al Norte de la Republica"
+ },
+ {
+  "id": "graz:o:gm.4093",
+  "lang": "de",
+  "shown": "Old Graz Von Schlossberg geg. West 1865 by Reichert",
+  "source": "Alt-Graz Von Schlossberg geg. Westen 1865 v. Reichert"
+ },
+ {
+  "id": "loc:2025704207",
+  "lang": "es",
+  "shown": "Retirement to Jucuapa (El Salvador)",
+  "source": "Entrada a Jucuapa (El Salvador"
+ },
+ {
+  "id": "loc:2025707304",
+  "lang": "fr",
+  "shown": "Cathedrale de Chartres. Around the Choir (XVIe century). \"The Annunciation\"",
+  "source": "Cathedrale de Chartres. Pourtour du Choeur (XVIe siecle). \"L'Annonciation\", \"Visite de la Sainte Vierge a Sainte Elisabeth\""
+ },
+ {
+  "id": "loc:2025713878",
+  "lang": "nl",
+  "shown": "Rabat, Arrivee de M. Steeg and 1925",
+  "source": "Rabat, Arrivee de M. Steeg en 1925"
+ },
+ {
+  "id": "loc:2025716276",
+  "lang": "fr",
+  "shown": "Constantinople. Galata Bridge. Die neue bruke",
+  "source": "Constantinople. Le Pont de Galata. Die neue brucke"
  }
 ]

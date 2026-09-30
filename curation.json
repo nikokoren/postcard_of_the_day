@@ -1,7 +1,9 @@
 {
  "vetoed": [
+  "dc:commonwealth:6108vc74r",
   "dc:commonwealth:6d570k37p",
   "dc:commonwealth:6d570x46q",
+  "dc:commonwealth:h989vv68b",
   "dc:commonwealth:x346fm434",
   "dc:commonwealth:x346fp59f",
   "dc:commonwealth:x346fs51v",
@@ -68,9 +70,16 @@
   "rijks:RP-F-F15805"
  ],
  "untranslate": [
+  "dc:commonwealth:x346fm32m",
+  "dc:commonwealth:x346fv13v",
+  "graz:o:gm.4093",
   "loc:2020760634",
+  "loc:2025704207",
+  "loc:2025707304",
   "loc:2025708744",
-  "loc:2025713908"
+  "loc:2025713878",
+  "loc:2025713908",
+  "loc:2025716276"
  ],
  "reviewed_to": "2026-10-10"
 }
