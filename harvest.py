@@ -1603,11 +1603,37 @@ CRAWLERS["rijksmuseum"] = rijks_crawl
 # ============================================================
 
 def load_cache(path):
+    """
+    The cache's rows, whichever key they were stored under.
+
+    Two writers disagreed about quality.json. harvest keeps the rows
+    under "entries" and the count under a name; score.py had it the
+    other way round, rows under "scored" and the count under "count".
+    Whichever ran last decided the shape, and both readers were strict,
+    so each job broke on the other's file: the refresh wrote a file the
+    daily build read the count of and died on, while harvest read
+    score.py's file as empty and re-measured cards it had already
+    scored -- 17,862 of them, which is why pool.json recorded scored=0.
+
+    One shape is written now. Both are still read, so a file left by
+    either version loads instead of being thrown away, and so that this
+    fix does not itself need the caches rebuilt to take effect.
+    """
     try:
         with open(path) as fh:
-            return json.load(fh).get("entries") or {}
+            data = json.load(fh)
     except (OSError, ValueError):
         return {}
+    if not isinstance(data, dict):
+        return {}
+    if isinstance(data.get("entries"), dict):
+        return data["entries"]
+    # An older file: the rows are under whatever it called them, and the
+    # count is a number, so the rows are the one value that is a mapping.
+    for key in sorted(data):
+        if key != "entries" and isinstance(data[key], dict):
+            return data[key]
+    return {}
 
 
 def save_cache(path, entries, name):

@@ -73,22 +73,18 @@ def load_pool_raw():
         return json.load(fh).get("entries") or []
 
 
+# quality.json is shared with harvest.py, which also measures and reads
+# it, so it is read and written through harvest's helpers rather than a
+# second pair that has to be kept in step. It was not, and the two
+# shapes broke both jobs.
 def load_cache():
-    try:
-        with open(CACHE_PATH) as fh:
-            return json.load(fh).get("scored") or {}
-    except (OSError, ValueError):
-        return {}
+    import harvest
+    return harvest.load_cache(CACHE_PATH)
 
 
 def save_cache(cache):
-    tmp = CACHE_PATH + ".tmp"
-    with open(tmp, "w") as fh:
-        json.dump({"version": 1, "count": len(cache), "scored": cache},
-                  fh, ensure_ascii=False, separators=(",", ":"),
-                  sort_keys=True)
-        fh.write("\n")
-    os.replace(tmp, CACHE_PATH)
+    import harvest
+    harvest.save_cache(CACHE_PATH, cache, "scored")
 
 
 def upcoming_ids(entries, days):

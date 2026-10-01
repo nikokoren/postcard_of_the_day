@@ -987,11 +987,9 @@ QUALITY_PATH = os.path.join(HERE, "quality.json")
 
 
 def load_quality():
-    try:
-        with open(QUALITY_PATH) as fh:
-            return json.load(fh).get("scored") or {}
-    except (OSError, ValueError):
-        return {}
+    """The render scores, through the one reader that understands them."""
+    import harvest
+    return harvest.load_cache(QUALITY_PATH)
 
 
 def load_translations():
@@ -1304,6 +1302,24 @@ def selftest(entries, day):
                   for e in entries if str(e["id"]) in corrections()))
     check("no correction has gone stale", not stale_corrections(),
           f"{sorted(stale_corrections())}")
+
+    # The render scores are shared with harvest.py and score.py, and the
+    # three disagreed about which key held them for long enough to break
+    # both jobs. One failure was loud -- a count read as the rows, and an
+    # AttributeError on the next line. The other was silent: a full cache
+    # read as empty, 17,862 scores re-measured, and nothing filtered. So
+    # what the file holds is compared with what gets read.
+    try:
+        with open(QUALITY_PATH) as fh:
+            raw = json.load(fh)
+        on_disk = max((len(v) for v in raw.values() if isinstance(v, dict)),
+                      default=0)
+    except (OSError, ValueError):
+        on_disk = 0
+    read = load_quality()
+    check("the render scores load, whichever job wrote them",
+          isinstance(read, dict) and len(read) == on_disk,
+          f"{on_disk} rows in quality.json, {len(read)} read")
 
     key = cell_key("all", "all", "all")
     total = len(entries)

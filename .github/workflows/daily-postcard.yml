@@ -33,6 +33,13 @@ jobs:
       - name: Install the image libraries
         run: pip install --quiet pillow numpy
 
+      - name: Check every job still reads the score cache the same way
+        # harvest.py, score.py and daily.py all touch quality.json. When
+        # they disagreed about which key held the rows, this job wrote a
+        # file the next step died on, and harvest re-measured a cache it
+        # had already filled.
+        run: python3 test_quality_cache.py
+
       - name: Check the picture filter still agrees with our eyes
         run: python3 score.py --selftest
 
