@@ -130,6 +130,14 @@ REGION_MIN = 25
 # countries and two eras is choosing among four of these, and the
 # markup rotates over whichever ones exist.
 CELL_MIN = 20
+
+# How many starred cards a cell needs before it serves only those. Ninety
+# is a quarter of a year before it comes round again, which is well past
+# the three days a device can see at once. Below this a cell keeps its
+# whole pool, which is what stops curation from quietly costing a reader
+# their selection: the thinnest cells here hold 20 cards and could never
+# sustain a starred rotation, so they are never asked to.
+STAR_MIN = 90
 CELL_SEP = "__"
 
 # TRMNL rejects a polling payload over 100KB. This is the line the build
@@ -316,6 +324,7 @@ def standin_offsets(total):
 
 def candidates_for(entries, key, day):
     """The day's card, then the ones that stand in if its image is gone."""
+    entries = preferred(entries)
     total = len(entries)
     if not total:
         return []
@@ -734,6 +743,7 @@ _untranslated = None
 
 CORRECTIONS_PATH = os.path.join(HERE, "corrections.json")
 _corrections = None
+_starred = None
 _stale = set()
 
 
@@ -798,6 +808,60 @@ def vetoed():
     if _vetoed is None:
         _vetoed = {str(i) for i in (_curation().get("vetoed") or [])}
     return _vetoed
+
+
+def starred():
+    """Ids somebody marked as worth showing, read once."""
+    global _starred
+    if _starred is None:
+        _starred = {str(i) for i in (_curation().get("starred") or [])}
+    return _starred
+
+
+def preferred(pool):
+    """
+    What a cell actually draws from.
+
+    A veto is a judgement about one card. A star is a judgement that
+    takes effect only in company: a cell with enough of them serves
+    those and nothing else, and a cell without enough keeps everything,
+    exactly as before.
+
+    Deciding it per cell is the whole design. Keeping only approved
+    cards everywhere would be a different feed: the breadth of this one
+    is paid for by its tail, and at the measured depths dropping to the
+    best half would take ten of the ninety-five cells below CELL_MIN and
+    stop them being offered at all. A reader who picked Asia, pre-1900,
+    landscape would simply lose it. So the thin cells are never asked to
+    carry a starred rotation, and the deep ones switch over the moment
+    they can -- the catch-all first, which is what a reader sees before
+    choosing anything.
+
+    This does reshuffle the cell it switches, and that is sound where
+    the usual rule is not: everything in the new order was approved by
+    hand, so there is nothing unreviewed to be surprised by. The pool
+    itself is untouched, so no other cell moves.
+    """
+    chosen = starred()
+    if not chosen:
+        return pool
+    kept = [e for e in pool if str(e["id"]) in chosen]
+    return kept if len(kept) >= STAR_MIN else pool
+
+
+def star_progress(entries, cells):
+    """Per cell: how many of its cards are starred, and whether it switched."""
+    out = {}
+    for key in cells:
+        pool = cards_for(entries, key)
+        have = sum(1 for e in pool if str(e["id"]) in starred())
+        out[key] = {"starred": have, "depth": len(pool),
+                    "needs": max(0, STAR_MIN - have),
+                    "on": have >= STAR_MIN,
+                    # A cell shallower than the threshold can never switch,
+                    # and saying so stops it reading as work outstanding.
+                    "capped": len(pool) < STAR_MIN}
+    return out
 
 
 def untranslated():
@@ -1112,12 +1176,13 @@ def review_manifest(entries, day, days, path, skip=0):
     week's picks carry a score, so the unmeasured are few enough to sit
     on top without burying the ranking.
     """
-    scores = {}
-    try:
-        with open(os.path.join(HERE, "quality.json")) as fh:
-            scores = json.load(fh).get("scored") or {}
-    except (OSError, ValueError):
-        pass
+    # Through the one reader, not a second copy of it. This was a second
+    # copy, and it broke the moment the cache was written in the agreed
+    # shape: it read the row count as the rows and died on the next line.
+    # The daily job runs this step with continue-on-error, so nothing
+    # failed and nothing said so -- review.json simply stopped being
+    # rebuilt, and the queue silently aged a week.
+    scores = load_quality()
 
     regions = regions_in(entries)
     cells = build_cells(entries, regions)
@@ -1182,6 +1247,13 @@ def review_manifest(entries, day, days, path, skip=0):
         "from": start.isoformat(),
         "to": (start + timedelta(days=days - 1)).isoformat(),
         "vetoed": sorted(vetoed()),
+        "starred": sorted(starred()),
+        # Per cell, so the page can say which selections are curated and
+        # which still need stars. Without it there is no way to tell a
+        # finished cell from an untouched one, and the work has no end.
+        "progress": star_progress(entries, build_cells(entries,
+                                                       regions_in(entries))),
+        "star_min": STAR_MIN,
         "items": rows,
     }
     with open(path, "w") as fh:
@@ -1302,6 +1374,59 @@ def selftest(entries, day):
                   for e in entries if str(e["id"]) in corrections()))
     check("no correction has gone stale", not stale_corrections(),
           f"{sorted(stale_corrections())}")
+
+    # A star only takes effect in company. A cell with enough of them
+    # serves those and nothing else; one without enough is untouched,
+    # which is what stops curation from costing a reader a selection
+    # they chose -- the thinnest cells here could never sustain a
+    # starred rotation and are never asked to.
+    global _starred
+    held_stars = _starred
+    try:
+        star_cells = build_cells(entries, regions_in(entries))
+        deep = max(star_cells, key=lambda k: len(cards_for(entries, k)))
+        thin = min(star_cells, key=lambda k: len(cards_for(entries, k)))
+        deep_pool = cards_for(entries, deep)
+        thin_pool = cards_for(entries, thin)
+        check("the thinnest cell is below the threshold, so it is a real test",
+              len(thin_pool) < STAR_MIN, f"{len(thin_pool)} cards")
+
+        _starred = {str(e["id"]) for e in deep_pool[:STAR_MIN]}
+        served = [pick(cards_for(entries, deep), deep,
+                       day + timedelta(days=n), False)[0] for n in range(3, 43)]
+        check("a cell at the threshold serves only starred cards",
+              all(str(e["id"]) in _starred for e in served),
+              f"{sum(1 for e in served if str(e['id']) not in _starred)} were not")
+        check("  and still has a card for every day", all(served))
+
+        one_short = sorted(_starred)[:-1]
+        _starred = set(one_short)
+        served = [pick(cards_for(entries, deep), deep,
+                       day + timedelta(days=n), False)[0] for n in range(3, 23)]
+        check("one star short and the cell keeps its whole pool",
+              any(str(e["id"]) not in _starred for e in served))
+
+        _starred = {str(e["id"]) for e in thin_pool}
+        served = [pick(cards_for(entries, thin), thin,
+                       day + timedelta(days=n), False)[0] for n in range(3, 23)]
+        check("a cell shallower than the threshold never switches",
+              all(served), "it lost its cards")
+
+        # The pool is the thing that must not move. Starring narrows what
+        # one cell draws from; it must not change what any cell contains.
+        _starred = {str(e["id"]) for e in deep_pool[:STAR_MIN]}
+        check("starring does not filter the pool",
+              len(cards_for(entries, deep)) == len(deep_pool)
+              and len(cards_for(entries, thin)) == len(thin_pool))
+        progress = star_progress(entries, [deep, thin])
+        check("progress reports the cell that switched",
+              progress[deep]["on"] and progress[deep]["needs"] == 0,
+              str(progress[deep]))
+        check("  and marks one that never can",
+              progress[thin]["capped"] and not progress[thin]["on"],
+              str(progress[thin]))
+    finally:
+        _starred = held_stars
 
     # The render scores are shared with harvest.py and score.py, and the
     # three disagreed about which key held them for long enough to break
