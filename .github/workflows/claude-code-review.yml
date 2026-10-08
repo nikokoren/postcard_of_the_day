@@ -12,12 +12,13 @@ on:
 
 jobs:
   claude-review:
-    # Optional: Filter by PR author
-    # if: |
-    #   github.event.pull_request.user.login == 'external-contributor' ||
-    #   github.event.pull_request.user.login == 'new-developer' ||
-    #   github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR'
-
+    # Skip the pull requests Claude opened itself. rewrite-captions.yml
+    # branches are named rewrite-captions-<run id> and carry a few lines
+    # of corrections.json, written by a Claude run minutes earlier --
+    # reviewing them means paying a second time for a second opinion on
+    # the same work, from the same source, about a file whose only real
+    # check is whether a person agrees with the caption.
+    if: ${{ !startsWith(github.event.pull_request.head.ref, 'rewrite-captions-') }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
