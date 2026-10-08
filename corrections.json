@@ -1,12 +1,52 @@
 {
+ "dc:commonwealth:x346fm32m": {
+  "note": "The Spanish runs two noun phrases together with no punctuation between them. The translator read them as one compound and capitalised mid-phrase, giving Municipal Aqueduct purification plant; they are two things, the aqueduct and its purification plant.",
+  "title": "Municipal aqueduct, purification plant, Cali, Colombia",
+  "was": "Acueducto municipal planta de purificacion, Cali, Colombia"
+ },
+ "dc:commonwealth:x346fv13v": {
+  "note": "Half-translated: the first clause was left in Spanish and only the second rendered, and rendered wrongly. Al Norte de la Republica places the subject in the north of Mexico; it does not mean north of it.",
+  "title": "The border customs house, Ciudad Juarez. In the north of the Republic",
+  "was": "La aduana fronteriza, Ciudad Juarez. Al Norte de la Republica"
+ },
+ "graz:o:gm.4093": {
+  "note": "Two German words survived into the English. Von was left capitalised as though it were part of a name, and geg. is an abbreviation of gegen, towards -- so geg. Westen is looking west, not the bare word West.",
+  "title": "Old Graz, from the Schlossberg looking west, 1865, by Reichert",
+  "was": "Alt-Graz Von Schlossberg geg. Westen 1865 v. Reichert"
+ },
+ "loc:2020760634": {
+  "note": "Italian, but detected as Catalan, so a Catalan model ran over it and translated only the article: una became A and fontana was left alone. Fontana is Italian for fountain.",
+  "title": "Eritrea - A fountain",
+  "was": "Eritrea - Una fontana"
+ },
+ "loc:2025704207": {
+  "note": "Entrada is the entrance or approach to the town. It came back as Retirement, which is not a sense the word carries and not a thing the caption describes. The source leaves its bracket unclosed.",
+  "title": "Entrance to Jucuapa (El Salvador)",
+  "was": "Entrada a Jucuapa (El Salvador"
+ },
+ "loc:2025707304": {
+  "note": "Three faults at once. The cathedral's name and the century were left in French; pourtour du choeur is the sculpted screen enclosing the choir, not Around the Choir; and the second panel was dropped altogether -- Visite de la Sainte Vierge a Sainte Elisabeth is the Visitation.",
+  "title": "Chartres Cathedral. The choir screen (16th century). \"The Annunciation\", \"The Visitation\"",
+  "was": "Cathedrale de Chartres. Pourtour du Choeur (XVIe siecle). \"L'Annonciation\", \"Visite de la Sainte Vierge a Sainte Elisabeth\""
+ },
  "loc:2025708744": {
-  "was": "Paris (17e), la rue Demours, Le Restaurant du Grand Veneur",
+  "note": "The translator turned 17e into 17th, dropped an article, and left the rest in French -- a caption that looks translated and is not. 17e is the arrondissement, not a date or an ordinal on its own, so it needs the word. Rue Demours is a street and Le Grand Veneur -- the royal Master of the Hunt -- is the restaurant's name; neither is vocabulary.",
   "title": "Paris (17th arrondissement), rue Demours, the Restaurant du Grand Veneur",
-  "note": "The translator turned 17e into 17th, dropped an article, and left the rest in French -- a caption that looks translated and is not. 17e is the arrondissement, not a date or an ordinal on its own, so it needs the word. Rue Demours is a street and Le Grand Veneur -- the royal Master of the Hunt -- is the restaurant's name; neither is vocabulary."
+  "was": "Paris (17e), la rue Demours, Le Restaurant du Grand Veneur"
+ },
+ "loc:2025713878": {
+  "note": "French detected as Dutch, which turns one word inside out: en is in in French and and in Dutch, so a date became a conjunction. Theodore Steeg arrived as Resident-General of Morocco in 1925.",
+  "title": "Rabat, the arrival of Monsieur Steeg in 1925",
+  "was": "Rabat, Arrivee de M. Steeg en 1925"
  },
  "loc:2025713908": {
-  "was": "Rabat - Musee des Arts indigenes des Oudaias",
+  "note": "The caption is French but was detected as German, so a German model was run over French text and indigenes came back as Indigenouss, a word in no language. This is the museum in the Kasbah of the Oudaias at Rabat; indigenes is the colonial-era French for indigenous, which the museum's own name used.",
   "title": "Rabat - Museum of Indigenous Arts of the Oudaias",
-  "note": "The caption is French but was detected as German, so a German model was run over French text and indigenes came back as Indigenouss, a word in no language. This is the museum in the Kasbah of the Oudaias at Rabat; indigenes is the colonial-era French for indigenous, which the museum's own name used."
+  "was": "Rabat - Musee des Arts indigenes des Oudaias"
+ },
+ "loc:2025716276": {
+  "note": "A bilingual caption saying the same thing in French and German. The French half was translated, the German half left in German, and a letter lost from Brucke on the way.",
+  "title": "Constantinople. The Galata Bridge -- the new bridge",
+  "was": "Constantinople. Le Pont de Galata. Die neue brucke"
  }
 }
