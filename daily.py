@@ -1447,7 +1447,16 @@ def selftest(entries, day):
           f"{on_disk} rows in quality.json, {len(read)} read")
 
     key = cell_key("all", "all", "all")
-    total = len(entries)
+    # What the cell actually draws from, which is not the whole pool once
+    # it has enough stars to switch. Everything below divides by this --
+    # where the cycle starts, how far a stand-in reaches, how many days
+    # before a card comes round again -- so measuring the whole pool
+    # measures a cycle that no longer exists. It failed exactly that way:
+    # a review carrying 268 stars switched the catch-all over, the check
+    # sampled 400 days of a 301-day rotation, found 99 repeats and called
+    # it a fault. The rotation was right; the ruler was wrong.
+    drawn = preferred(entries)
+    total = len(drawn)
 
     first = candidates_for(entries, key, day)[0]["id"]
     again = candidates_for(entries, key, day)[0]["id"]
