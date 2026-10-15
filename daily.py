@@ -788,6 +788,22 @@ def corrected(entry):
     return fix.get("title") or None
 
 
+def fix_in_force(entry):
+    """Whether a hand-written caption is the one this entry now carries.
+
+    A flag and a rewrite are two halves of one job, and the review page
+    could not tell them apart: a card already rewritten looked exactly
+    like one still waiting, so the same card got flagged again every
+    round and a flag that had worked read as a flag that had not.
+
+    Asked of the correction rather than inferred from the caption on the
+    page, which title_line has already cut to panel width -- a shortened
+    title is not an unfixed one, and comparing the two strings would
+    call every long caption outstanding.
+    """
+    return corrected(entry) is not None
+
+
 def stale_corrections():
     """Corrections whose caption has moved since they were written."""
     return set(_stale)
@@ -1229,6 +1245,13 @@ def review_manifest(entries, day, days, path, skip=0):
                 "title": title_line(entry),
                 "source": entry["t"] if translated else "",
                 "lang": (english_lang.get(entry["t"]) or "") if translated else "",
+                # Whether a hand-written caption is in force, and whether
+                # one was written against text the archive has since
+                # re-catalogued. Together they let the page say which
+                # flags are answered, which are still waiting, and which
+                # have an answer that no longer applies.
+                "fixed": fix_in_force(entry),
+                "stale": str(entry["id"]) in stale_corrections(),
                 "date": date_line(entry),
                 "place": place_line(entry),
                 "thumb": image_url(entry, (400, 400)),
