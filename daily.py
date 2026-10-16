@@ -131,6 +131,53 @@ REGION_MIN = 25
 # markup rotates over whichever ones exist.
 CELL_MIN = 20
 
+# ============================================================
+# a thumb on the scale
+# ============================================================
+#
+# The Library of Congress is 12,449 of the 18,206 cards and collects
+# where it sits, so 5,976 cards -- a third of the pool -- are American,
+# against 3,089 Austrian and 1,582 French. In the cells where a reader
+# has chosen no region that came out at 23% of the feed.
+#
+# A third of the pool getting a quarter of the feed is not in itself
+# unfair. What is wrong is *which* American cards they are. Sorted by
+# caption against everything else in the pool:
+#
+#   main street / business block     2.8% of US cards   0.0% elsewhere
+#   courthouse, city hall, capitol   2.8%               0.1%
+#   school, academy, college         6.3%               0.9%
+#   street scene, avenue             6.1%               1.1%
+#   bridge                           3.8%               0.7%
+#   lake, river, falls, creek       15.6%               0.7%
+#   -------------------------------------------------------------
+#   any of the above                42.2%               9.7%
+#
+# Four in ten American cards are the civic-survey genre -- the high
+# school, the courthouse, the bridge over the creek, Main Street looking
+# north -- and they are nearly absent everywhere else. That is what
+# makes a quarter of the feed feel like most of it: the American cards
+# are disproportionately the forgettable ones, so a reader who sees four
+# a fortnight remembers them as the same card.
+#
+# So the thumb goes on the genre rather than the country. The civic
+# survey is held back hard and the rest of the American cards barely at
+# all, which leaves Yosemite and the Chicago World's Fair where they
+# were and thins the county courthouses.
+PLAIN_AMERICANA = re.compile(
+    r"main st|business (district|section)|business block|court ?house|city hall"
+    r"|post office|state capitol|\bschool\b|\bacademy\b|\bcollege\b"
+    r"|residence|home of|hospital|asylum|sanitarium|\bbridge\b|\blake\b"
+    r"|\briver\b|\bfalls\b|\bcreek\b|\bhotel\b|\binn\b|\bstreet\b"
+    r"|avenue|\bave\b|\bblvd\b", re.I)
+
+# Measured over 1,080 cell-days with no region chosen: 23.1% American
+# and 6.1% civic-survey untouched; 16.1% and 1.0% at these shares. The
+# genre block is what moves, which is the point -- the country's share
+# falls as a consequence rather than as the aim.
+US_PLAIN_KEEP = 0.20
+US_KEEP = 0.80
+
 # How many starred cards a cell needs before it serves only those. Ninety
 # is a quarter of a year before it comes round again, which is well past
 # the three days a device can see at once. Below this a cell keeps its
@@ -899,12 +946,69 @@ def untranslated():
     return _untranslated
 
 
+def is_american(entry):
+    """Whether a card is of somewhere in the United States."""
+    return entry.get("cn") == "United States"
+
+
+def crowded_share(entry):
+    """How much of this card's group a region-less cell keeps."""
+    if not is_american(entry):
+        return 1.0
+    return US_PLAIN_KEEP if PLAIN_AMERICANA.search(
+        entry.get("t") or "") else US_KEEP
+
+
+def crowded_out(entry):
+    """
+    Whether this card is one of the crowded ones a broad cell skips.
+
+    Salted apart from the schedule's own hash, so which cards are held
+    back has nothing to do with the order they come round in, and by id
+    rather than by date, so it is the same cards every run -- thinning
+    that moved would move the schedule under a reader each morning.
+
+    Asked at pick time and never used to build a pool. Filtering the
+    pool instead changes its length and its membership, and the schedule
+    is divmod by that length over a hash of that membership, so a filter
+    that looks like a tidy-up reshuffles every cell it touches and
+    throws away the reviews already done against it. The maps recipe
+    learned that the expensive way: thinning its general pool moved 80
+    slots and put 72 unreviewed maps in front of a reader whose review
+    had finished four hours earlier.
+    """
+    share = crowded_share(entry)
+    if share >= 1.0:
+        return False
+    digest = hashlib.sha256(
+        "{}|thin|{}".format(SALT, entry["id"]).encode()).hexdigest()
+    return int(digest[:8], 16) / 0xFFFFFFFF >= share
+
+
+def held_back(entry, key):
+    """
+    Whether a card is kept out of a cell it was not chosen for.
+
+    Only where the reader asked for no region. Pick North America and
+    you get it whole, courthouses and all -- that is what the axis is
+    for, and a reader who chose it has said what they want. The 18 cells
+    with no region are the ones that answer for the whole world, and
+    they are where a third of the pool should not be most of the view.
+    """
+    region = key.split(CELL_SEP)[1]
+    return region == "all" and crowded_out(entry)
+
+
 def pick(entries, key, day, check):
     """The day's card, skipping any vetoed or whose image has gone."""
     scheduled = candidates_for(entries, key, day)
     # A veto applies whether or not images are being checked -- it is a
-    # decision about the card, not about its file.
-    candidates = [e for e in scheduled if e["id"] not in vetoed()] or scheduled
+    # decision about the card, not about its file. So does being held
+    # back: it is a decision about the card's share of a view nobody
+    # asked for.
+    candidates = [e for e in scheduled
+                  if e["id"] not in vetoed()
+                  and not held_back(e, key)] or scheduled
     if not candidates:
         return None, False
     if not check:
@@ -1584,6 +1688,85 @@ def selftest(entries, day):
           published_days({"version": 1, "pick_fields": list(PICK_FIELDS),
                           "days": {"1": {key: gone_out}}}) ==
           {"1": {key: gone_out}})
+    # The thumb on the scale, and the thing it must never touch.
+    all_cells = build_cells(entries, regions_in(entries))
+    broad_cells = [k for k in all_cells if k.split(CELL_SEP)[1] == "all"]
+    region_cells = [k for k in all_cells if k.split(CELL_SEP)[1] != "all"]
+    if broad_cells and region_cells:
+        key = broad_cells[0]
+        # The pool a cell draws from must be every card matching that
+        # cell's own criteria and nothing less. Built here from the
+        # entries directly, so this compares cards_for against the
+        # definition rather than against itself: the schedule is divmod
+        # by this length over a hash of this membership, so a cards_for
+        # that quietly dropped the thinned cards would reshuffle every
+        # cell and throw away the reviews already done against it.
+        orientation, region, era = key.split(CELL_SEP)
+        want = [e for e in entries
+                if (orientation == "all" or e.get("o") == orientation)
+                and (region == "all" or e.get("rg") == region)
+                and (era == "all" or in_era(e, era))]
+        pool = cards_for(entries, key)
+        check("thinning leaves the pool a cell draws from alone",
+              len(pool) == len(want),
+              "cards_for returns {} of {} -- it is filtering, and the "
+              "schedule is divmod by its length".format(len(pool), len(want)))
+
+        plain = [e for e in entries
+                 if is_american(e) and PLAIN_AMERICANA.search(e.get("t") or "")
+                 and crowded_out(e)]
+        check("the civic survey is held back somewhere", bool(plain),
+              "nothing is being thinned at all")
+        if plain:
+            check("and held back where no region was chosen",
+                  all(held_back(plain[0], k) for k in broad_cells),
+                  "a thinned card is still at full strength in a "
+                  "region-less cell")
+            check("and served whole where one was",
+                  not any(held_back(plain[0], k) for k in region_cells),
+                  "held back from a cell the reader asked for by name")
+            # Thinning is a pure function of the id. Recomputed here
+            # from scratch rather than by calling crowded_out twice,
+            # which would pass whatever it did: thinning by date or at
+            # random would move the schedule under a reader every run.
+            # Across the American cards rather than one of them: a
+            # single card agrees with a date-salted hash about half the
+            # time, so one sample is a coin toss dressed as a test.
+            american = [e for e in entries if is_american(e)]
+            disagree = 0
+            for entry in american:
+                digest = hashlib.sha256(
+                    "{}|thin|{}".format(SALT, entry["id"]).encode()).hexdigest()
+                want = int(digest[:8], 16) / 0xFFFFFFFF >= crowded_share(entry)
+                if want != crowded_out(entry):
+                    disagree += 1
+            check("and decided by the card's id, not the day",
+                  disagree == 0,
+                  "{} of {} American cards are not reproducible from the "
+                  "id alone, so the thinning moves under the schedule"
+                  .format(disagree, len(american)))
+        check("nothing outside the United States is thinned",
+              not any(crowded_out(e) for e in entries if not is_american(e)),
+              "the thumb reached past what it was aimed at")
+
+        # And the order is untouched. Checked by moving the shares and
+        # asserting the schedule does not move with them -- comparing
+        # candidates_for against itself would pass no matter what.
+        global US_KEEP, US_PLAIN_KEEP
+        before = [e["id"] for e in candidates_for(cards_for(entries, key),
+                                                  key, day)]
+        keep, plain_keep = US_KEEP, US_PLAIN_KEEP
+        try:
+            US_KEEP, US_PLAIN_KEEP = 0.01, 0.01
+            after = [e["id"] for e in candidates_for(cards_for(entries, key),
+                                                     key, day)]
+        finally:
+            US_KEEP, US_PLAIN_KEEP = keep, plain_keep
+        check("and the schedule does not move when the shares do",
+              before == after,
+              "retuning the thumb reshuffled the cell, which is what "
+              "destroys a finished review")
+
     check("a file that is not there carries nothing",
           load_published(os.path.join(HERE, "no-such-feed.json")) == {})
 
