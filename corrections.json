@@ -39,6 +39,11 @@
   "title": "Ephesus. Ancient theatre",
   "was": "Ephèse. Ancien théâtre"
  },
+ "dc:commonwealth:7940bj565": {
+  "note": "Greek: Ενθύμιον = souvenir/keepsake, and εκκαησια is a misspelling of εκκλησία, church. The translator read it as an excavation. Εφέσου is Ephesus.",
+  "title": "Souvenir of Ephesus. Ancient church",
+  "was": "Ενθυμιον Εφεσου. Αρχαια εκκαησια"
+ },
  "dc:commonwealth:cr56qn119": {
   "note": "Never translated; the French was shown as is. Mosquée d'Ahmed is the mosque of Sultan Ahmed; Stamboul and Constantinople are place names and stay.",
   "title": "The interior of the Ahmed Mosque, Stamboul, Constantinople",
@@ -179,10 +184,25 @@
   "title": "Graz. Schloßberg. Kriegssteig",
   "was": "Graz. Schloßberg. Kriegssteig"
  },
+ "graz:o:gm.337": {
+  "note": "Glockenspielplatz is the name of a square in Graz and was translated as 'Bell Playground'. Hof here is a courtyard.",
+  "title": "Graz - Glockenspielplatz - Courtyard",
+  "was": "Graz - Glockenspielplatz - Hof"
+ },
  "graz:o:gm.4093": {
   "note": "Two German words survived into the English. Von was left capitalised as though it were part of a name, and geg. is an abbreviation of gegen, towards -- so geg. Westen is looking west, not the bare word West.",
   "title": "Old Graz, from the Schlossberg looking west, 1865, by Reichert",
   "was": "Alt-Graz Von Schlossberg geg. Westen 1865 v. Reichert"
+ },
+ "loc:2018690031": {
+  "note": "Transliterated Russian, never translated. V skvere na beregu Omi = in the small public garden on the bank of the Om; Om is the river at Omsk.",
+  "title": "Omsk. In the public garden on the bank of the Om",
+  "was": "Omsk. V skvere na beregu Omi"
+ },
+ "loc:2018690089": {
+  "note": "Transliterated Russian cut off at 'Selʹskokhozi' by a diacritic-driven split (language was mis-detected as Slovenian). Selʹskokhozi︠a︡ĭstvennyĭ institut is the Agricultural Institute.",
+  "title": "Omsk. Agricultural Institute",
+  "was": "Omsk. Selʹskokhozi︠a︡ĭstvennyĭ institut"
  },
  "loc:2018690204": {
   "note": "Never translated; the Russian was shown in Latin transliteration. Novye doma is new houses, and Dzerzhinskiy raion is the Dzerzhinsky district of Novosibirsk.",
@@ -198,6 +218,11 @@
   "note": "Transliterated Russian: zdanie = building, Oblastnoi Komitet VKP(b) = Regional Committee of the All-Union Communist Party (Bolsheviks), Oblispolkom = regional executive committee.",
   "title": "Vladivostok. Building of the Regional Committee of the VKP(b) and the Oblispolkom",
   "was": "Vladivostok. Zdanie Oblastnogo Komiteta VKP(b) i Oblispolkoma"
+ },
+ "loc:2018690867": {
+  "note": "Transliterated Russian, never translated. Gorod = city; Filial = branch; DVGU is Dalʹnevostochnyĭ gosudarstvennyĭ universitet, the Far Eastern State University.",
+  "title": "City of Vladivostok. Branch of DVGU (Far Eastern State University)",
+  "was": "Gorod Vladivostok. Filial DVGU"
  },
  "loc:2018691239": {
   "note": "Transliterated Russian: derevʹi︠a︡ = trees, na khodulʹnykh korni︠a︡kh = on stilt roots. Baikal is the lake.",
@@ -244,10 +269,20 @@
   "title": "Eritrean Costume",
   "was": "Costume Eritreo"
  },
+ "loc:2020760409": {
+  "note": "Italian. 'Abissina' is the adjective Abyssinian and was left as if a name; A.O.I. (Africa Orientale Italiana) is kept as the archive's abbreviation. L'ora del pranzo = lunchtime.",
+  "title": "A.O.I. - Ethiopia - Abyssinian Family - Lunchtime",
+  "was": "A.O.I. - Etiopia - Famiglia - Abissina - L'ora del Pranzo"
+ },
  "loc:2020760411": {
   "note": "Italian. A.O.I. is Africa Orientale Italiana. 'Abissino' is 'Abyssinian' (a person from Abyssinia), which the translator cut to 'Abyss'. UN/IN/DI are the archive's all-caps 'un/in/di'.",
   "title": "A.O.I. - Ethiopia - An Abyssinian Chief in Gala Dress",
   "was": "A.o.i. - Etiopia - UN Capo Abissino IN Abito DI Gala"
+ },
+ "loc:2020760454": {
+  "note": "German 'bedeutender Marktplatz' is a major/significant marketplace; 'important marketplace' was stilted, with a missing article. Aliu-Amba and Shoa are place names and stay.",
+  "title": "Aliu-Amba, a major marketplace in Shoa",
+  "was": "Aliu-Amba, bedeutender Marktplatz in Schoa"
  },
  "loc:2020760495": {
   "note": "French, never translated. Harar is a city in Ethiopia and Abyssinie is the period name for Ethiopia; both are places.",
@@ -278,6 +313,11 @@
   "note": "Italian. DI is the archive's all-caps 'di' (of); Abordat is a place name and stays as written.",
   "title": "Panorama of Abordat",
   "was": "Panorama DI Abordat"
+ },
+ "loc:2020760560": {
+  "note": "Viale Crispi is a street name (Asmara's avenue named for Crispi); the translator rendered the article and kept it as 'The Viale Crispi'. The Italian article is dropped, the name kept.",
+  "title": "Asmara - Viale Crispi",
+  "was": "Asmara - Il Viale Crispi"
  },
  "loc:2020760600": {
   "note": "Never translated. Italian 'Massaua' is Massawa (Eritrean port, a place name); 'Moschea' is mosque.",
@@ -374,6 +414,11 @@
   "title": "139 - Madagascar - Types of Malagasy hairstyles",
   "was": "139 - Madagascar - Types DE Coiffures Malgaches"
  },
+ "loc:2020761023": {
+  "note": "Never translated; English but with 'THE' shouted from the archive's casing. The Marina is a Lagos waterfront road, a name.",
+  "title": "986. West Africa - Nigeria - Lagos. The Marina",
+  "was": "986. West Africa-nigeria-lagos. THE Marina"
+ },
  "loc:2020761048": {
   "note": "English with mangled capitals; Fulaney is a name and stays.",
   "title": "Selling chop to carriers on arrival to Fulaney",
@@ -454,6 +499,11 @@
   "title": "Algiers. Rue Kleber",
   "was": "Alger. Rue Kleber"
  },
+ "loc:2025702808": {
+  "note": "French; Constantine is the Algerian city. La Place du Palais is a named square and the article 'La' had been dropped.",
+  "title": "Constantine. The Place du Palais",
+  "was": "Constantine. La Place du Palais"
+ },
  "loc:2025702836": {
   "note": "Never translated. Spanish 'Portal Colonial en Buenos Aires'; Buenos Aires is a place name.",
   "title": "Colonial Portal in Buenos Aires",
@@ -464,10 +514,25 @@
   "title": "House of the Arias family, in Salta",
   "was": "Casa de la familia Arias, en Salta"
  },
+ "loc:2025702842": {
+  "note": "Spanish 'en' is 'in'; 'at' misread it. San Isidro and Jesús María are names and stay.",
+  "title": "\"San Isidro\" in Jesus Maria",
+  "was": "\"San Isidro\" en Jesus Maria"
+ },
  "loc:2025702848": {
   "note": "Spanish; zaguán is an entrance hall or vestibule, Casa del Virrey the Viceroy's House. Córdoba is the Argentine city. Never translated.",
   "title": "Entrance hall of the Viceroy's House, in Córdoba",
   "was": "Zaguan de la Casa del Virrey, en Cordoba"
+ },
+ "loc:2025702855": {
+  "note": "'Intendencia' is the administration (superintendent's office), not 'Intent'. Puerto Aguirre is a place name.",
+  "title": "Iguazu National Park: Park Administration Office at Puerto Aguirre",
+  "was": "Parque Nacional del Iguazu: Intendencia del Parque en Puerto Aguirre"
+ },
+ "loc:2025702862": {
+  "note": "Never translated; 'Parque Nacional De Nahuel - Huapi' is Nahuel Huapi National Park, a name split by a stray hyphen. Lago Traful is Lake Traful.",
+  "title": "Nahuel Huapi National Park: Lake Traful",
+  "was": "Parque Nacional De Nahuel - Huapi: Lago Traful"
  },
  "loc:2025702863": {
   "note": "Spanish, never translated. Nahuel Huapi is the national park and lake in Argentina; the archive's stray spaces and 'De' casing split the name. Cerro Bonete is a mountain name.",
@@ -498,6 +563,11 @@
   "note": "Portuguese. Adro is a churchyard or forecourt, which the translator left as 'Adro'. Bom Jesus de Matosinhos is the church's name and Congonhas do Campo a town in Minas Gerais.",
   "title": "Churchyard of the Church of Bom Jesus de Matosinhos. Congonhas do Campo - Minas Gerais - Brazil",
   "was": "Adro da Igreja de Bom Jesus de Matosinhos. Congonhas do Campo - Minas Gerais - Brasil"
+ },
+ "loc:2025703294": {
+  "note": "Portuguese. 'Bom Jesus de Matosinhos' is the name of the sanctuary, and 'de' was translated to 'of' inside it. Congonhas do Campo and M. (Minas) Gerais are places.",
+  "title": "Facade of the Church of Bom Jesus de Matosinhos. Congonhas do Campo - M. Gerais - Brazil",
+  "was": "Fachada da Igreja de Bom Jesus de Matosinhos. Congonhas do Campo - M. Gerais - Brasil"
  },
  "loc:2025703305": {
   "note": "Portuguese. 'Matriz' is the mother (parish) church, not 'Matrix'; the translator also turned the name Nossa Senhora do Pilar into 'Ouro Senhora do Pilar', swapping in the city name Ouro (Preto). The church name is kept in Portuguese.",
@@ -548,6 +618,11 @@
   "note": "Eventail was left in French; it means fan, so \"en eventail\" is fan-shaped. Taichan (Mount Tai) and Chantong (Shandong) are names, kept as the archive spells them.",
   "title": "The \"Fan-shaped Escarpment\" at Mount Taichan, Chantong (China)",
   "was": "L' \"Escarpement en eventail\" au mont Taichan, Chantong (Chine"
+ },
+ "loc:2025703637": {
+  "note": "German 'Schönen Gruss' is a warm/kind greeting; 'Beautiful greeting' translated schön literally. Kiao-Tschau (Jiaozhou Bay, the German leased territory) is a place name.",
+  "title": "Warm greetings from Kiao-Tschau",
+  "was": "Schonen Gruss aus Kiao-Tschau"
  },
  "loc:2025703641": {
   "note": "A place name (Dong-hsi, Dongxi); nothing to translate. Kept as is.",
@@ -629,6 +704,11 @@
   "title": "Netley Abbey. East aisle of south transept",
   "was": "Netley Abbey. E. Aisle of S. transept"
  },
+ "loc:2025704404": {
+  "note": "English, never translated; the archive's inverted word order ('500 ft. above the sea rises the Tor') read as a fragment. Reordered with no detail added; the archive re-catalogued the longer text.",
+  "title": "Glastonbury Tor, Somerset. The Tor, the Island Mount of St. Michael, rises 500 ft. above the sea. It has a ruined tower, built probably in the 14th century and restored 500 years later",
+  "was": "Glastonbury Tor, Somerset. 500 ft. above the sea rises the Tor, the Island Mount of St. Michael. It has a ruined tower, built probably in the 14th century and restored 500 years later"
+ },
  "loc:2025705265": {
   "note": "German 'Domruine' is the ruin of the cathedral (Dom), not 'Rule'. Dorpat is the German name of Tartu.",
   "title": "Dorpat - Cathedral ruins",
@@ -639,10 +719,20 @@
   "title": "A Family from Plougastel-Daoulas",
   "was": "Une Famille de Plougastel-Daoulas"
  },
+ "loc:2025705399": {
+  "note": "Laboureur is the sculptor's surname and was translated as the common noun 'Labourer'. The archive's parenthesis was also left unclosed.",
+  "title": "Ajaccio. Fountain of the 4 Lions and Statue of the First Consul (Laboureur, sculptor; Maglioni, architect)",
+  "was": "Ajaccio. Fontaine des 4 Lions et Statue du Premier Consul (Laboureur, Sculpteur. Maglioni, architecte"
+ },
  "loc:2025705442": {
   "note": "Never translated. French 'La Pagode de Chanteloup' is the Chanteloup Pagoda, a named building near Amboise; both are proper names.",
   "title": "Amboise, the Chanteloup Pagoda",
   "was": "Amboise, La Pagode de Chanteloup"
+ },
+ "loc:2025705490": {
+  "note": "L'Horloge is the name of the Auxerre clock monument; translating it away left a caption with no name. Kept as a name with a gloss.",
+  "title": "Auxerre, L'Horloge (the Clock)",
+  "was": "Auxerre, L'Horloge"
  },
  "loc:2025705611": {
   "note": "French, never translated. Bretagne is Brittany, Tregunc a commune in Finistère. The archive's caption is missing its closing parenthesis; left as it stands.",
@@ -683,6 +773,11 @@
   "note": "French, never translated. Orléans is the city and Diane de Poitiers a person (the royal mistress).",
   "title": "Orléans, House of Diane de Poitiers",
   "was": "Orleans, Maison de Diane de Poitiers"
+ },
+ "loc:2025706366": {
+  "note": "Ussé is a commune and château, accents stripped in the archive text; I.-et-L. is Indre-et-Loire. Name and diacritics restored.",
+  "title": "Ussé (I.-et-L.), The Château, General view",
+  "was": "Usse (I.-et-L.), Le Chateau, Vue generale"
  },
  "loc:2025706511": {
   "note": "'Notre-Dame' is a church's name and stays; 'Our Lady' loses it. Donjon = keep.",
@@ -829,6 +924,11 @@
   "title": "Regensburg with the Stone Bridge",
   "was": "Regensburg mit stein. Brucke"
  },
+ "loc:2025709848": {
+  "note": "German left half-translated: 'Das Konigl. Schauspielhaus' stayed German in the middle of English. Konigl. = Königliches, Royal.",
+  "title": "Berlin, the Royal Playhouse (Königliches Schauspielhaus), after a drawing by Hintze, c. 1830",
+  "was": "Berlin, Das Konigl. Schauspielhaus nach einer Zeichnung von Hintze um 1830"
+ },
  "loc:2025709850": {
   "note": "German, never translated. Föhn is the alpine wind; Fohnstimmung is the atmosphere of a foehn day. G. Graubner is the artist's name.",
   "title": "Foehn mood. G. Graubner",
@@ -844,6 +944,11 @@
   "title": "Munich. Schwabing is more than a district of Munich. In the foreground the Ludwig-Maximilians-University, behind it the Academy of Fine Arts and the Siegestor (\"Dedicated to victory, destroyed by war, a reminder of peace\"). Am Hor",
   "was": "Munchen. Schwabing ist mehr als ein Stadtteil von Munchen. Im Vordergrund die Ludwig-Maximilians-Universitat, dahinter die Akademie der bildenden Kunste und das Siegestro (\"Dem Sieg geweiht, vom Krieg zerstort, zum Frieden mahnend\"). Am Hor"
  },
+ "loc:2025710182": {
+  "note": "Nürnberg left unlocalised in a published caption, and 'Schoner' lost its umlaut. Schöner Brunnen is a named fountain and is kept; 'Markt' is the market square.",
+  "title": "Nuremberg - Market with the Schöner Brunnen",
+  "was": "Nurnberg - Markt mit Schoner Brunnen"
+ },
  "loc:2025710204": {
   "note": "German. Funfeckig means five-cornered, so 'Funfeck Tower' is not English. Nürnberg is Nuremberg, and the Fünfeckiger Turm is a named tower.",
   "title": "Pentagonal Tower in Nuremberg",
@@ -853,6 +958,11 @@
   "note": "Campo de Pelota is the Maya ball court; the translator left Pelota in Spanish. C.A. is Central America.",
   "title": "Honduras, C.A. Detail of the Ball Court. Copan Ruinas, Honduras. Mayan Architecture",
   "was": "Honduras, C.A. Detalle del Campo de Pelota. Copan Ruinas, Honduras. Mayan Architecture"
+ },
+ "loc:2025710694": {
+  "note": "English, never translated; the archive's spelling Tirruvanamali is a variant of the town Tiruvannamalai. Both are given; gopuram is the temple gateway tower.",
+  "title": "Temple gopuram at Tirruvanamali (Tiruvannamalai), India",
+  "was": "Temple Gopuram at Tirruvanamali, India"
  },
  "loc:2025710724": {
   "note": "Au bord du Tigre was rendered at the edge of the Tiger. Le Tigre is the river Tigris in French. Mossoul is Mosul.",
@@ -909,6 +1019,11 @@
   "title": "Lake Como - Cadenabbia",
   "was": "Lago di Como - Cadenabbia"
  },
+ "loc:2025711867": {
+  "note": "'Galleria Umberto I' is the name of the Naples shopping arcade, translated as 'Gallery Umberto I'. Name restored; Napoli rendered as the English city name.",
+  "title": "Naples. Galleria Umberto I",
+  "was": "Napoli. Galleria Umberto I"
+ },
  "loc:2025711958": {
   "note": "Never translated. Catacombe Cappuccini are the Capuchin Catacombs of Palermo, a place and a monastic order, not a drink.",
   "title": "Palermo. Capuchin Catacombs",
@@ -923,6 +1038,21 @@
   "note": "Italian 'ora siderale' is 'sidereal hour' (starry hour), not 'side time'. Pincio is the Rome hill.",
   "title": "Rome from the Pincio. Sidereal hour",
   "was": "Roma dal Pincio. Ora siderale"
+ },
+ "loc:2025712470": {
+  "note": "English, never translated; Roma left as the Italian form.",
+  "title": "Rome. Garibaldi Monument",
+  "was": "Roma. Garibaldi Monument"
+ },
+ "loc:2025712495": {
+  "note": "English, never translated; Roma left as the Italian form. Caecilia Metella is a person's name.",
+  "title": "Rome. Tomb of Caecilia Metella",
+  "was": "Roma. Tomb of Caecilia Metella"
+ },
+ "loc:2025712675": {
+  "note": "The church name was half-translated as 'St. Mary Major'. Santa Maria Maggiore is the name of the basilica and stays.",
+  "title": "Rome. Basilica of Santa Maria Maggiore",
+  "was": "Roma. Basilica di S. Maria Maggiore"
  },
  "loc:2025712720": {
   "note": "Roma was left in Italian; the city is Rome. The rest was correct.",
@@ -1059,15 +1189,30 @@
   "title": "Rabat, the arrival of Monsieur Steeg in 1925",
   "was": "Rabat, Arrivee de M. Steeg en 1925"
  },
+ "loc:2025713892": {
+  "note": "French 'Remparts' was copied through as the misspelling 'Remparts'; it is ramparts.",
+  "title": "The Storks on the Old Ramparts",
+  "was": "Les Cigognes sur les vieux Remparts"
+ },
  "loc:2025713893": {
   "note": "French. 'Ouvrier d'Art' is an art worker or craftsman, left untranslated. The Oudaias (Kasbah of the Udayas) is a place in Rabat, and 'Atelier' is studio, not workshop in the industrial sense.",
   "title": "Rabat, Moroccan Craftsman. Painting studio at the Oudaias",
   "was": "Rabat, Ouvrier d'Art Marocain. Atelier de Peinture aux Oudaias"
  },
+ "loc:2025713894": {
+  "note": "French left untranslated. Jardin des Oudaias = Gardens of the Oudaias (the Kasbah, a name); Medersa is the madrasa.",
+  "title": "Rabat, Gardens of the Oudaias and the Medersa",
+  "was": "Rabat, Jardin des Oudaias et la Medersa"
+ },
  "loc:2025713897": {
   "note": "Never translated. La Casbah des Oudaias is the kasbah of the Oudaias, a place name, and Le Jardin is the garden.",
   "title": "Rabat, The Casbah of the Oudaias. The Garden",
   "was": "Rabat, La Casbah des Oudaias. Le Jardin"
+ },
+ "loc:2025713899": {
+  "note": "French left untranslated. Vue d'ensemble = general view; Kasbah des Oudaias is a named place.",
+  "title": "Rabat, Kasbah of the Oudaias. General view",
+  "was": "Rabat, Kasbah des Oudaias. Vue d'ensemble"
  },
  "loc:2025713900": {
   "note": "Correct in sense; flagged for consistency. Sultan Moulay Youssef is a person's name.",
@@ -1104,6 +1249,11 @@
   "title": "The Sunhwa School (Mangyongdae). The school where Mr. Kim Hyong Jik, father of Comrade Kim Il Sung, educated children and youth in the anti-Japanese patriotic ideas",
   "was": "The Sunhwa School (Mangyongdae)The school where Mr. Kim Hyong Jik, father of Comrade Kim Il Sung, educated children and youth in the anti-Japanese patriotic ideas"
  },
+ "loc:2025714302": {
+  "note": "English, but Norwegian place names had lost their å, ø and ø in the archive's ASCII text. Holtålen and Sør-Trøndelag restored.",
+  "title": "Ancient costumes from Holtålen, Sør-Trøndelag, Norway",
+  "was": "Ancient costumes from Holtaalen, Sor-Trondelag, Norway"
+ },
  "loc:2025714435": {
   "note": "Norwegian; Hotel Stalheim is a named hotel, Nærødal is the valley, 'Norge' is Norway.",
   "title": "Stalheim Hotel and Nærødal. Norway",
@@ -1128,6 +1278,11 @@
   "note": "Polish 'Strój rawski' is the Rawa regional costume; English half uses a typo 'Coustumes [i.e. Costumes]' from catalogue, corrected.",
   "title": "Stroj Rawski. Polish Folk Costumes",
   "was": "Stroj Rawski. Polish Folk Coustumes [i.e. Costumes"
+ },
+ "loc:2025714959": {
+  "note": "Portuguese; Praça da Estrela is a square's name (Estrela, in Lisbon) and was translated to 'Star Praca'.",
+  "title": "Praça da Estrela",
+  "was": "Praca da Estrela"
  },
  "loc:2025714987": {
   "note": "Portuguese; 'Monte' is the Madeira place name (Monte), not 'Mount'.",
@@ -1159,15 +1314,30 @@
   "title": "Leningrad. Palace Square",
   "was": "Leningrad. Palace Square"
  },
+ "loc:2025715195": {
+  "note": "French left untranslated: Palais impérial is the Imperial Palace. Tzarskoe-Selo (Tsarskoye Selo) is a place name and keeps the archive spelling.",
+  "title": "Tzarskoe-Selo. Imperial Palace",
+  "was": "Tzarskoe-Selo. Palais imperial"
+ },
  "loc:2025715207": {
   "note": "French 'Palais Impérial à Peterhof'; Peterhof is a place name. Never translated.",
   "title": "Imperial Palace at Peterhof",
   "was": "Palais Imperial a Peterhof"
  },
+ "loc:2025715230": {
+  "note": "English, never translated; article added before the quoted name, which stays as the archive gave it.",
+  "title": "Mecca and the \"Kaaba El-Shareefat\"",
+  "was": "Mecca and \"Kaaba El-Shareefat\""
+ },
  "loc:2025715711": {
   "note": "Swedish; Göteborg is Gothenburg, Norra and Södra Hamngatorna are the North and South Harbour Streets, named streets.",
   "title": "Gothenburg. Norra and Södra Hamngatan",
   "was": "Goteborg. Norra och Sodra Hamngatorna"
+ },
+ "loc:2025715742": {
+  "note": "Swedish left untranslated. Gotlands Fornsal is the museum's name and stays; S. Göranskapellet is St. Göran's Chapel.",
+  "title": "Gotlands Fornsal. St. Göran's Chapel",
+  "was": "Gotlands Fornsal. S. Goranskapellet"
  },
  "loc:2025715896": {
   "note": "German. Oltenertracht is the costume of Olten, a Swiss town (Tracht = traditional dress). Soleure is the French name of Solothurn.",
@@ -1178,6 +1348,11 @@
   "note": "A trilingual archive title (German Schweizertrachten, French Costumes-Suisse). Never translated; all three say Swiss costumes.",
   "title": "Swiss Costumes",
   "was": "Schweizertrachten-Costumes-Suisse"
+ },
+ "loc:2025715963": {
+  "note": "German left untranslated: Schweiz = Switzerland, Freilichtmuseum = open-air museum, Korbflechten = basket weaving. Ballenberg and Brienz are places.",
+  "title": "Switzerland. Ballenberg Open-Air Museum above Brienz, basket weaving",
+  "was": "Schweiz. Freilichtmuseum Ballenberg ob Brienz Korbflechten"
  },
  "loc:2025715966": {
   "note": "'u. M.' is 'über Meer' (above sea level), which was rendered 'and m'. Piz Corvatsch and Engadin are place names.",
@@ -1209,15 +1384,30 @@
   "title": "Damascus. House of Ananias",
   "was": "Damas. Maison d'Ananais"
  },
+ "loc:2025716228": {
+  "note": "French/English mix: 'pont à Pergame' is a bridge at Pergamon, not 'in Pergame'. Pergame is the French form of Pergamon, a place name left unlocalised.",
+  "title": "Smyrna. Ancient bridge at Pergamon",
+  "was": "Smyrne. Ancient pont a Pergame"
+ },
  "loc:2025716229": {
   "note": "The language was misdetected as Catalan; French 'mosquée' left half-translated as 'mosquee'. The Selimiye Mosque in Adrianople (Edirne).",
   "title": "Adrianople. The Sultan Selim Mosque",
   "was": "Adrianople. La mosquee Sultan Selim"
  },
+ "loc:2025716237": {
+  "note": "Ephèse is Ephesus, a place, and Fontaine was left French in the middle of English.",
+  "title": "Ephesus. Fountain in front of the theater",
+  "was": "Ephese. Fontaine devant le theatre"
+ },
  "loc:2025716253": {
   "note": "Roumeli Hissar is Rumeli Hisarı, the fortress on the Bosphorus; a named building.",
   "title": "Constantinople. Rumeli Hisar",
   "was": "Constantinople. Roumeli Hissar"
+ },
+ "loc:2025716257": {
+  "note": "English, never translated; Stamboul is the old name for the historic peninsula of Istanbul, glossed for a modern reader.",
+  "title": "Stamboul (Istanbul) Harbour",
+  "was": "Stamboul Harbour"
  },
  "loc:2025716258": {
   "note": "French. Beylerbey is the French spelling of Beylerbeyi, the Ottoman palace on the Bosphorus. The translator treated it as a plain name; it is a named building and the usual English form is Beylerbeyi Palace.",
@@ -1289,6 +1479,11 @@
   "title": "Gold Prospectors at a Placer",
   "was": "Goudzoekers bij een placer"
  },
+ "rijks:NG-2016-50-14": {
+  "note": "Dutch 'Plantage' is a plantation; 'Plantage Mariënburg' is the plantation's name, and the English now says so.",
+  "title": "Sugar mill on the Mariënburg plantation",
+  "was": "Suikermolen op Plantage Mariënburg"
+ },
  "rijks:NG-2016-50-18": {
   "note": "Dutch, but Gravenstraat is a street name in Paramaribo and stays as the name; the rest is already the place.",
   "title": "Gravenstraat in Paramaribo",
@@ -1329,6 +1524,11 @@
   "title": "Memories of King Ludwig II of Bavaria and his castles",
   "was": "Erinnerungen an König Ludwig II. von Bayern und seine Schlösser"
  },
+ "rijks:RP-F-00-24371": {
+  "note": "Dutch; Groete is an old spelling of Groeten, greetings. The earlier rendering was already right; restated so the flag clears.",
+  "title": "Greetings from Wormer",
+  "was": "Groete uit Wormer"
+ },
  "rijks:RP-F-00-24416": {
   "note": "The published English is correct; VOC is the Dutch East India Company's initialism and Hoorn a town. Kept as is.",
   "title": "View of two VOC warehouses in Hoorn",
@@ -1348,6 +1548,11 @@
   "note": "'Allerheiligst Hart van Jezus' is the Sacred Heart of Jesus; 'Most Holy' was too literal.",
   "title": "Ruins of the Sacred Heart of Jesus Church and the Van Oldebarneveltstraat in Rotterdam",
   "was": "Ruïnes van de Allerheiligst Hart van Jezuskerk en de Van Oldebarneveltstraat te Rotterdam"
+ },
+ "rijks:RP-F-F01132-K": {
+  "note": "Dutch, never translated. Gruis = rubble, bombardement = bombing; Diergaardelaan is a Rotterdam street and Rotterdam a place.",
+  "title": "Rubble from the bombing in the Diergaardelaan, Rotterdam",
+  "was": "Gruis van het bombardement in de Diergaardelaan te Rotterdam"
  },
  "rijks:RP-F-F01141-BU": {
   "note": "Never translated. Tombe van Polycarpus is the tomb of Saint Polycarp of Smyrna.",
