@@ -185,6 +185,36 @@ US_KEEP = 0.80
 # their selection: the thinnest cells here hold 20 cards and could never
 # sustain a starred rotation, so they are never asked to.
 STAR_MIN = 90
+
+# ============================================================
+# the curation queue
+# ============================================================
+#
+# review.json is a schedule: the next seven days of every cell's picks.
+# That is the right shape for catching a bad card before it ships and
+# the wrong shape for building a starred set, because a person starring
+# from it stars whatever the week happened to serve.
+#
+# Measured after 591 stars: 10 of 95 cells switched over, 61 that could
+# but are short, and about 59 stars spent per cell switched. Aimed at
+# the cells nearest their threshold it costs at most 25 each, and three
+# stars switch the next one. The work is cheap and the queue was
+# pointing it in the wrong direction.
+#
+# So a second manifest, built by its own step, ordered by cell rather
+# than by day. Kept apart from review.json rather than widening it: the
+# two have different shapes and different lifetimes, and a cell fifteen
+# stars short does not have fifteen undecided cards inside a seven-day
+# window -- all/asia/all contributes about seven rows a week.
+#
+# A working set, not the whole job. Offering every short cell its full
+# shortfall at once is 3,329 rows and 679KB, which is a file nobody
+# finishes and a page nobody opens; the twelve nearest are 603 rows and
+# 172KB, cover 201 stars of work, and the file rebuilds as cells switch
+# over. Three times the shortfall because not every card offered is
+# worth a star -- at parity a single pass could not finish a cell.
+CURATE_CELLS = 12
+CURATE_OFFER = 3
 CELL_SEP = "__"
 
 # TRMNL rejects a polling payload over 100KB. This is the line the build
@@ -1392,6 +1422,116 @@ def review_manifest(entries, day, days, path, skip=0):
     return 0
 
 
+def cell_label_for(key, regions=None):
+    """
+    A cell key as a person would say it: "Landscape, Asia, Before 1900".
+
+    The slugs are fine in a file and useless on a page -- a reader
+    deciding which cell to spend forty stars on should not have to parse
+    "landscape__asia__era-pre-1900" to find out what it is.
+    """
+    orientation, region, era = key.split(CELL_SEP)
+    labels = dict(ORIENTATIONS)
+    eras = {slug: label for slug, label, _, _ in ERAS}
+    parts = []
+    if orientation != "all":
+        parts.append(labels.get(orientation, orientation))
+    if region != "all":
+        named = dict((slug, name) for slug, name, _ in (regions or []))
+        parts.append(named.get(region, region.replace("-", " ").title()))
+    if era != "all":
+        parts.append(eras.get(era, era))
+    return ", ".join(parts) if parts else "Everything"
+
+
+def curate_manifest(entries, day, path):
+    """
+    The cells nearest their starring threshold, and enough undecided
+    cards in each to clear it.
+
+    Ordered by the cell's own rotation rather than by render score, so
+    the cards offered are the ones that cell will actually serve, in the
+    order it will serve them. Sorting by score instead would put the
+    prettiest cards first and leave the cell's real next fortnight
+    unexamined.
+
+    Undecided means neither starred nor vetoed. Asking again about a
+    card already judged is the thing that makes a queue feel endless,
+    and the page cannot know what an earlier pass decided unless this
+    file leaves it out.
+    """
+    regions = regions_in(entries)
+    cells = build_cells(entries, regions)
+    progress = star_progress(entries, cells)
+
+    # Short of the threshold, and able to reach it. A cell already
+    # serving starred-only is finished; a cell shallower than the
+    # threshold never switches and is not work.
+    short = sorted(
+        (STAR_MIN - progress[key]["starred"], key)
+        for key in cells
+        if not progress[key].get("on") and not progress[key].get("capped"))
+
+    chosen, rows, offered = [], {}, 0
+    for need, key in short[:CURATE_CELLS]:
+        pool = cards_for(entries, key)
+        total = len(pool)
+        if not total:
+            continue
+        # The cell's own order, from its current cycle -- the same
+        # ordering the schedule uses, so what is offered is what is
+        # coming.
+        cycle = day_index(day) // total
+        free = [e for e in order_for(pool, key, cycle)
+                if str(e["id"]) not in starred() and e["id"] not in vetoed()]
+        take = free[:need * CURATE_OFFER]
+        if not take:
+            continue
+        chosen.append({"cell": key,
+                       "label": cell_label_for(key, regions),
+                       "starred": progress[key]["starred"],
+                       "need": need,
+                       "depth": progress[key]["depth"],
+                       "undecided": len(free),
+                       "ids": [e["id"] for e in take]})
+        offered += len(take)
+        for entry in take:
+            rows.setdefault(entry["id"], entry)
+
+    resolve_loc_iiif(list(rows.values()))
+    scores = load_quality()
+    items = [{
+        "id": entry["id"],
+        "title": title_line(entry),
+        "date": date_line(entry),
+        "place": place_line(entry),
+        "thumb": image_url(entry, (400, 400)),
+        "item": entry.get("u") or "",
+        "holding": entry.get("h") or "",
+        "score": (scores.get(entry["id"]) or [None, None])[1],
+    } for entry in rows.values()]
+
+    out = {
+        "kind": "postcard-of-the-day",
+        "generated": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "star_min": STAR_MIN,
+        "cells": chosen,
+        "items": items,
+        # For the page to say how much of the whole job this is.
+        "short_cells": len(short),
+        "short_stars": sum(need for need, _ in short),
+        "switched": sum(1 for key in cells if progress[key].get("on")),
+        "capped": sum(1 for key in cells if progress[key].get("capped")),
+    }
+    write_json(path, out)
+    sys.stderr.write(
+        "{} cards across {} cells to curate, {} stars clears them "
+        "({} of {} short cells, {} stars outstanding overall)\n"
+        .format(offered, len(chosen), sum(c["need"] for c in chosen),
+                len(chosen), len(short), out["short_stars"]))
+    return 0
+
+
 def selftest(entries, day):
     failures = []
 
@@ -1767,6 +1907,70 @@ def selftest(entries, day):
               "retuning the thumb reshuffled the cell, which is what "
               "destroys a finished review")
 
+    # The curation queue. Built here rather than read from disk, so this
+    # tests the builder and not whatever the last run happened to leave.
+    import tempfile
+    with tempfile.NamedTemporaryFile("w+", suffix=".json",
+                                     delete=False) as tmp:
+        curate_path = tmp.name
+    curate_manifest(entries, day, curate_path)
+    with open(curate_path) as fh:
+        curated = json.load(fh)
+    os.unlink(curate_path)
+    cells_now = build_cells(entries, regions_in(entries))
+    prog_now = star_progress(entries, cells_now)
+    offered_cells = curated.get("cells") or []
+    rows_by_id = {i["id"]: i for i in (curated.get("items") or [])}
+
+    check("the curation queue offers some cells", bool(offered_cells),
+          "nothing to curate, so the rest of these prove nothing")
+    if offered_cells:
+        check("and no more than it was asked for",
+              len(offered_cells) <= CURATE_CELLS,
+              "{} cells against a limit of {}".format(len(offered_cells),
+                                                      CURATE_CELLS))
+        # The whole point of the file: a card already judged must not be
+        # asked about again, or the queue never ends.
+        decided = starred() | {str(i) for i in vetoed()}
+        asked = [i for c in offered_cells for i in c["ids"]]
+        check("and never a card already starred or vetoed",
+              not [i for i in asked if str(i) in decided],
+              "{} of {} offered cards were already decided"
+              .format(len([i for i in asked if str(i) in decided]),
+                      len(asked)))
+        check("and every offered card carries a row",
+              all(i in rows_by_id for i in asked),
+              "{} ids have no item to draw"
+              .format(len([i for i in asked if i not in rows_by_id])))
+        # Only cells that are short of the threshold and able to reach
+        # it. A switched cell is finished; a capped one never switches,
+        # and offering either reads as work that cannot be finished.
+        wrong = [c["cell"] for c in offered_cells
+                 if prog_now.get(c["cell"], {}).get("on")
+                 or prog_now.get(c["cell"], {}).get("capped")]
+        check("and only cells that are short and can still switch",
+              not wrong, "offered " + ", ".join(wrong[:3]))
+        # Nearest first, because that is where a star is worth most.
+        needs = [c["need"] for c in offered_cells]
+        check("and the nearest cells first", needs == sorted(needs),
+              "ordered {}".format(needs[:6]))
+        check("and enough of each to clear it",
+              all(len(c["ids"]) <= c["need"] * CURATE_OFFER
+                  for c in offered_cells),
+              "a cell was offered more than CURATE_OFFER times its "
+              "shortfall")
+        # And the pool is untouched by any of it.
+        key = offered_cells[0]["cell"]
+        orientation, region, era = key.split(CELL_SEP)
+        want = [e for e in entries
+                if (orientation == "all" or e.get("o") == orientation)
+                and (region == "all" or e.get("rg") == region)
+                and (era == "all" or in_era(e, era))]
+        check("and building it leaves the pool alone",
+              len(cards_for(entries, key)) == len(want),
+              "cards_for returns {} of {}".format(
+                  len(cards_for(entries, key)), len(want)))
+
     check("a file that is not there carries nothing",
           load_published(os.path.join(HERE, "no-such-feed.json")) == {})
 
@@ -1797,6 +2001,10 @@ def main():
     ap.add_argument("--recompute", action="store_true",
                     help="ignore the published feed and choose every day "
                          "afresh")
+    ap.add_argument("--curate", action="store_true",
+                    help="write curate.json: the cells nearest their "
+                         "starring threshold, and enough undecided cards "
+                         "in each to clear it")
     ap.add_argument("--selftest", action="store_true")
     args = ap.parse_args()
 
@@ -1821,6 +2029,10 @@ def main():
     if args.review:
         return review_manifest(entries, day, args.review,
                                os.path.join(HERE, "review.json"), args.skip)
+
+    if args.curate:
+        return curate_manifest(entries, day,
+                               os.path.join(HERE, "curate.json"))
 
     check = not args.no_check
     regions = regions_in(entries)

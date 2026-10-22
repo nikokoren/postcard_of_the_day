@@ -63,7 +63,21 @@ jobs:
         continue-on-error: true
         run: python3 daily.py --review 7
 
-      # And draw it, into docs/ where Pages serves it.
+      # The other queue: the cells nearest their starring threshold,
+      # with enough undecided cards in each to clear it. A working set
+      # rather than the whole backlog -- the twelve nearest are 200
+      # stars of work and 190KB, where every short cell at once is 3,300
+      # stars and 680KB, which is a file nobody finishes.
+      #
+      # After --review, because both read the same pool and this one is
+      # the cheaper of the two to lose: a stale curation queue costs a
+      # pass aimed at cells that have since moved, where a stale review
+      # queue ships a bad card.
+      - name: Write the curation queue
+        continue-on-error: true
+        run: python3 daily.py --curate
+
+      # And draw them both, into docs/ where Pages serves them.
       - name: Draw the review page
         continue-on-error: true
         run: python3 review_page.py
@@ -72,7 +86,8 @@ jobs:
         run: |
           git config user.name "GitHub Action"
           git config user.email "action@github.com"
-          git add postcard.json today.json quality.json review.json loc_iiif.json docs
+          git add postcard.json today.json quality.json review.json \
+                  curate.json loc_iiif.json docs
 
           if git diff --staged --quiet; then
             echo "Same postcard as the last run, nothing to commit"

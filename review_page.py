@@ -40,6 +40,7 @@ import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REVIEW = os.path.join(HERE, "review.json")
+CURATE = os.path.join(HERE, "curate.json")
 CURATION = os.path.join(HERE, "curation.json")
 OUT_DIR = os.path.join(HERE, "docs")
 
@@ -63,6 +64,43 @@ def seen_before():
             return set(json.load(fh))
     except (OSError, ValueError):
         return set()
+
+
+def draw_curate(curation):
+    """
+    The by-cell page, beside the dated one.
+
+    Its own page rather than a mode on the review page because the two
+    answer different questions and are built by different steps: the
+    review queue is a week of the schedule and goes stale daily, this is
+    a working set of cells and only moves when a cell switches over.
+    Written only if curate.json exists, so a repository that has not
+    run the step yet is not a failure.
+    """
+    try:
+        with open(CURATE) as fh:
+            data = json.load(fh)
+    except (OSError, ValueError):
+        return
+    data = dict(data)
+    # The decisions already handed over, so the page can leave out what
+    # was judged in an earlier pass instead of asking again.
+    data["starred"] = sorted(curation.get("starred") or [])
+    data["vetoed"] = sorted(curation.get("vetoed") or [])
+    try:
+        with open(os.path.join(HERE, "curate_page.html")) as fh:
+            shell = fh.read()
+    except OSError:
+        sys.stderr.write("no curate_page.html, skipping the by-cell page\n")
+        return
+    payload = json.dumps(data, separators=(",", ":"))
+    out = os.path.join(OUT_DIR, "curate.html")
+    with open(out, "w") as fh:
+        fh.write(shell.replace("__DATA__", payload))
+    sys.stderr.write("{} cards across {} cells -> {}, {}KB\n".format(
+        len(data.get("items") or []), len(data.get("cells") or []),
+        os.path.relpath(out, os.getcwd()),
+        os.path.getsize(out) // 1024))
 
 
 def main():
@@ -136,6 +174,8 @@ def main():
         json.dump(sorted(i["id"] for i in items), fh)
     with open(os.path.join(OUT_DIR, ".nojekyll"), "w") as fh:
         fh.write("")
+
+    draw_curate(curation)
 
     size = os.path.getsize(os.path.join(OUT_DIR, "index.html"))
     sys.stderr.write(
