@@ -79,7 +79,12 @@ jobs:
             "" \
             "The queue page is at ${QUEUE_PAGE}" \
             "" \
-            "The daily job rebuilds that page, and the page says so itself if" \
+            "To star rather than veto -- picking the cards worth showing," \
+            "one cell at a time, nearest its threshold first -- the other" \
+            "page is at ${QUEUE_PAGE}curate.html. Stars given on either" \
+            "page hand over in the same block." \
+            "" \
+            "The daily job rebuilds both pages, and each says so itself if" \
             "it is ever drawing a queue more than two days old." \
             "" \
             "This issue closes itself once the runway recovers.")"
