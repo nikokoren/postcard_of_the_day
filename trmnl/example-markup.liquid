@@ -274,14 +274,26 @@
   {% endcomment %}
   {% if want_caption %}
     <div class="absolute bottom--2 left--2 z--2 p--2 w--max-[80cqw] lg:w--max-[75cqw] bg--canvas outline outline--strong">
+      {% comment %}
+        One size up on the X, which is what lg: targets. The caption was
+        written against the 800x480 panel, where title--small reads
+        fine; on the 1872x1404 one the same 16px sits in a box four
+        times the area and is too small to read across a room, worst in
+        full screen and half vertical where the picture is largest and
+        the caption has the most space around it.
+
+        title--base is 26px against title--small's 16px, and label--base
+        16px against 13px at that density. Both left alone on the OG,
+        where there is no room to spare.
+      {% endcomment %}
       <div class="flex flex--col gap--xsmall">
         <div class="content">
-          <span class="title title--small">{{ card_title }}</span>
+          <span class="title title--small lg:title--base">{{ card_title }}</span>
 
           {% if want_place and card_place != "" %}
-            <span class="label label--small">{{ card_place }} &middot; {{ card_date }}</span>
+            <span class="label label--small lg:label--base">{{ card_place }} &middot; {{ card_date }}</span>
           {% else %}
-            <span class="label label--small">{{ card_date }}</span>
+            <span class="label label--small lg:label--base">{{ card_date }}</span>
           {% endif %}
 
 
