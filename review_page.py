@@ -48,11 +48,17 @@ KIND = {
     "map-of-the-day": dict(
         title="Map Queue", noun="map", nouns="maps",
         measure="B/kpx", repo="map_of_the_day",
-        sort_label="Thinnest ink", near_label="Only near the bar"),
+        sort_label="Thinnest ink", near_label="Only near the bar",
+        # What a selection is called here. The two recipes divide their
+        # pools differently -- maps by theme and era, postcards also by
+        # orientation and region -- and one page draws both, so the word
+        # comes from the kind rather than being written into the shell.
+        unit="topic", units="topics", curate_title="Curate by Topic"),
     "postcard-of-the-day": dict(
         title="Postcard Queue", noun="card", nouns="cards",
         measure="detail", repo="postcard_of_the_day",
-        sort_label="Least detail", near_label="Only the mushiest"),
+        sort_label="Least detail", near_label="Only the mushiest",
+        unit="cell", units="cells", curate_title="Curate by Cell"),
 }
 
 
@@ -66,7 +72,7 @@ def seen_before():
         return set()
 
 
-def draw_curate(curation):
+def draw_curate(curation, kind):
     """
     The by-cell page, beside the dated one.
 
@@ -87,6 +93,7 @@ def draw_curate(curation):
     # was judged in an earlier pass instead of asking again.
     data["starred"] = sorted(curation.get("starred") or [])
     data["vetoed"] = sorted(curation.get("vetoed") or [])
+    data["labels"] = kind
     try:
         with open(os.path.join(HERE, "curate_page.html")) as fh:
             shell = fh.read()
@@ -97,8 +104,9 @@ def draw_curate(curation):
     out = os.path.join(OUT_DIR, "curate.html")
     with open(out, "w") as fh:
         fh.write(shell.replace("__DATA__", payload))
-    sys.stderr.write("{} cards across {} cells -> {}, {}KB\n".format(
-        len(data.get("items") or []), len(data.get("cells") or []),
+    sys.stderr.write("{} {} across {} {} -> {}, {}KB\n".format(
+        len(data.get("items") or []), kind.get("nouns", "items"),
+        len(data.get("cells") or []), kind.get("units", "cells"),
         os.path.relpath(out, os.getcwd()),
         os.path.getsize(out) // 1024))
 
@@ -175,7 +183,7 @@ def main():
     with open(os.path.join(OUT_DIR, ".nojekyll"), "w") as fh:
         fh.write("")
 
-    draw_curate(curation)
+    draw_curate(curation, kind)
 
     size = os.path.getsize(os.path.join(OUT_DIR, "index.html"))
     sys.stderr.write(
