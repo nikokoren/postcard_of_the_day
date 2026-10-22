@@ -213,8 +213,22 @@ STAR_MIN = 90
 # 172KB, cover 201 stars of work, and the file rebuilds as cells switch
 # over. Three times the shortfall because not every card offered is
 # worth a star -- at parity a single pass could not finish a cell.
-CURATE_CELLS = 12
+# Budgeted in rows rather than in cells, because the byte cost of a
+# cell depends on how far from the threshold it is and that moves every
+# time somebody does a pass. Twelve cells was 603 rows and 190KB when
+# the nearest were three and four stars short; one pass later the
+# nearest were seven and fourteen short and the same twelve cells came
+# to 1,093 rows and 382KB. A file that doubles because the work went
+# well is a file that will one day be too big to serve.
+#
+# So: the nearest cells, in order, until the budget is spent. 600 rows
+# is about 190KB of postcards and lands where the first build did.
+CURATE_ROWS = 600
 CURATE_OFFER = 3
+
+# An upper bound as well, so a run that finds every cell one star short
+# offers a readable number of them rather than sixty sections of three.
+CURATE_CELLS = 16
 CELL_SEP = "__"
 
 # TRMNL rejects a polling payload over 100KB. This is the line the build
@@ -1473,7 +1487,9 @@ def curate_manifest(entries, day, path):
         if not progress[key].get("on") and not progress[key].get("capped"))
 
     chosen, rows, offered = [], {}, 0
-    for need, key in short[:CURATE_CELLS]:
+    for need, key in short:
+        if offered >= CURATE_ROWS or len(chosen) >= CURATE_CELLS:
+            break
         pool = cards_for(entries, key)
         total = len(pool)
         if not total:
@@ -1484,7 +1500,11 @@ def curate_manifest(entries, day, path):
         cycle = day_index(day) // total
         free = [e for e in order_for(pool, key, cycle)
                 if str(e["id"]) not in starred() and e["id"] not in vetoed()]
-        take = free[:need * CURATE_OFFER]
+        # Never past the budget, so the last cell in is trimmed rather
+        # than the file overrunning. A cell that would only fit in part
+        # is still worth offering: its header says how many more it
+        # needs, and the next build carries the rest.
+        take = free[:min(need * CURATE_OFFER, CURATE_ROWS - offered)]
         if not take:
             continue
         chosen.append({"cell": key,
@@ -1959,6 +1979,11 @@ def selftest(entries, day):
                   for c in offered_cells),
               "a cell was offered more than CURATE_OFFER times its "
               "shortfall")
+        asked_total = sum(len(c["ids"]) for c in offered_cells)
+        check("and the file stays inside its budget",
+              asked_total <= CURATE_ROWS,
+              "{} rows against a budget of {}".format(asked_total,
+                                                      CURATE_ROWS))
         # And the pool is untouched by any of it.
         key = offered_cells[0]["cell"]
         orientation, region, era = key.split(CELL_SEP)
