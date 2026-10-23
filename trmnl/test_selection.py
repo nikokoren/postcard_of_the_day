@@ -186,6 +186,63 @@ for name, settings in CASES:
     bad += 0 if ok else 1
     print(f"  {'ok  ' if ok else 'FAIL'} {name:32s} {tail}")
 # ---------------------------------------------------------------
+# The Graz feed, read by the same markup from a second install.
+#
+# graz.json carries one cell and no options at all: keys_by_label is
+# empty, so every axis a reader touches resolves to "all", the
+# "all__all__all" cell does not exist in this feed, each loosening step
+# in turn finds nothing, and the last fallback lands on `default`.
+# Which means the panel cannot strand that install on a blank screen,
+# whatever is set on it -- and that is the whole reason the Graz feed
+# can reuse this markup unchanged instead of needing its own.
+#
+# The cases below are the ones that would break it: a region the feed
+# has never heard of, an orientation that happens to match the cell's
+# own first segment, and all three axes at once.
+# ---------------------------------------------------------------
+
+GRAZ_CELL = "landscape__graz__all"
+graz_picks = {
+    str(DAY - 1): {GRAZ_CELL: ["IMG-gy", "YESTERDAY Graz", "1900", "Graz"]},
+    str(DAY):     {GRAZ_CELL: ["IMG-g", "Graz", "1907", "Graz"]},
+    str(DAY + 1): {GRAZ_CELL: ["IMG-gt", "TOMORROW Graz", "1900", "Graz"]},
+}
+graz_feed = {
+    "default": GRAZ_CELL,
+    "day_index": DAY,
+    "cell_keys": GRAZ_CELL,
+    "keys_by_label": {},
+    "days": graz_picks,
+    "default_day": str(DAY),
+    "pick_fields": ["image", "title", "date", "place"],
+}
+
+GRAZ_CASES = [
+    ("graz: nothing selected", {}),
+    ("graz: region europe", {"region": ["europe"]}),
+    ("graz: orientation landscape", {"orientation": ["landscape"]}),
+    ("graz: orientation portrait", {"orientation": ["portrait"]}),
+    ("graz: all three axes", {"orientation": ["portrait"],
+                              "region": ["africa"],
+                              "era": ["before_1900"]}),
+    ("graz: unknown value", {"region": ["atlantis"]}),
+    ("graz: two regions", {"region": ["europe", "africa"]}),
+]
+for name, settings in GRAZ_CASES:
+    ctx = dict(graz_feed)
+    ctx["trmnl"] = {"plugin_settings": {"custom_fields_values": settings},
+                    "device": {"width": 800, "height": 480},
+                    "system": {"timestamp_utc": EVENING},
+                    "user": {"utc_offset": 2 * 3600}}
+    out = t2.render(**ctx)
+    tail = out[out.rfind("<<") + 2:out.rfind(">>")]
+    parts = tail.split("|")
+    ok = (len(parts) > 2 and parts[0] == GRAZ_CELL
+          and parts[1] == "Graz" and parts[2] == "IMG-g")
+    bad += 0 if ok else 1
+    print(f"  {'ok  ' if ok else 'FAIL'} {name:32s} {tail}")
+
+# ---------------------------------------------------------------
 # The plugin runs example-markup.liquid, not this file. They hold the
 # same selection logic because a private plugin has no {% include %},
 # and for three days in September they did not: the local-midnight

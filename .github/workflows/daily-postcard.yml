@@ -54,6 +54,14 @@ jobs:
       - name: Pick today's postcard
         run: python3 daily.py
 
+      # The Graz feed: a second file for a second install, one
+      # landscape card of Graz or Styria a day. Same pool, same
+      # corrections, same vetoes -- only the cell differs. It never
+      # fails the run: the public card does not depend on it.
+      - name: Pick today's Graz card
+        continue-on-error: true
+        run: python3 daily.py --graz
+
       # The queue a person reviews, kept a week ahead on its own. A week
       # rather than a fortnight because 95 cells a day is 624 cards over
       # seven, and the page that shows them carries every thumbnail
@@ -87,7 +95,7 @@ jobs:
           git config user.name "GitHub Action"
           git config user.email "action@github.com"
           git add postcard.json today.json quality.json review.json \
-                  curate.json loc_iiif.json docs
+                  curate.json graz.json loc_iiif.json docs
 
           if git diff --staged --quiet; then
             echo "Same postcard as the last run, nothing to commit"

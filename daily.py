@@ -274,10 +274,41 @@ def in_era(entry, era):
     return False
 
 
+# Graz, as a region a cell can ask for. Not in the public option lists
+# and not in build_cells: nothing but the Graz feed names this key, so
+# no installed recipe can reach it and the public cells are untouched.
+GRAZ_REGION = "graz"
+GRAZ_CELL = CELL_SEP.join(("landscape", GRAZ_REGION, "all"))
+GRAZ_PATH = os.path.join(HERE, "graz.json")
+GRAZ_TEXT = re.compile(r"\bgraz\b|\bgrazer\b|steiermark|styria", re.I)
+
+
+def is_graz(entry):
+    """
+    Whether a card is of Graz or Styria.
+
+    The holding first, since the University of Graz collection is
+    nothing else, then the catalogue, which picks up the handful the
+    Library of Congress and the Rijksmuseum hold. Word-bounded on
+    `graz` because Grazalema is in Andalusia.
+    """
+    if entry.get("src") == "graz":
+        return True
+    return bool(GRAZ_TEXT.search(" ".join(
+        str(entry.get(field) or "") for field in ("t", "pl", "cn"))))
+
+
 def cards_for(entries, key):
     """The subset of the pool one cell selects."""
     orientation, region, era = key.split(CELL_SEP)
     out = entries
+    if region == GRAZ_REGION:
+        # Resolved here rather than by a region slug on the card,
+        # because `rg` is the continent a card is placed in and every
+        # one of these is already "europe". Giving them a second region
+        # would take them out of Europe in the public feed.
+        out = [e for e in out if is_graz(e)]
+        region = "all"
     if orientation != "all":
         out = [e for e in out if e.get("o") == orientation]
     if region != "all":
@@ -1556,6 +1587,94 @@ def curate_manifest(entries, day, path):
     return 0
 
 
+def graz_feed(entries, day, check, path=GRAZ_PATH):
+    """
+    The Graz feed: one landscape card of Graz or Styria a day, in the
+    same shape as the public file so a second plugin install can run
+    the same markup against a different URL.
+
+    A separate file rather than a category in the public feed, for two
+    reasons that have not changed. The 95KB cap is per file, and a new
+    axis multiplies cells by every orientation and era crossed with it.
+    And the option lists are a contract the Liquid reads by name, so
+    adding one changes what every installed recipe sees.
+
+    A separate file rather than a forked repository, for a third: the
+    translation guards, corrections.json and curation.json are shared,
+    so a veto or a hand-written caption applies here without being
+    reviewed twice, and a fix here is a fix there.
+
+    Everything the three-day contract rests on is the public builder's,
+    reused rather than copied -- the same picks_for_day, the same
+    carry-forward, the same DAY_SPAN, the same warm step. The only
+    difference is one cell key.
+    """
+    pool = cards_for(entries, GRAZ_CELL)
+    if not pool:
+        sys.stderr.write("no Graz cards in the pool, nothing to write\n")
+        return 1
+
+    published = load_published(path)
+    if check:
+        due = []
+        for shift in DAY_SPAN:
+            due.extend(candidates_for(pool, GRAZ_CELL,
+                                      day + timedelta(days=shift))[:2])
+        resolve_loc_iiif(due)
+
+    days, carried, misses = {}, 0, 0
+    for shift in DAY_SPAN:
+        that_day = day + timedelta(days=shift)
+        key_day = str(day_index(that_day))
+        picks, kept, _, missed = picks_for_day(
+            entries, [GRAZ_CELL], that_day, published.get(key_day) or {},
+            check and shift == 0)
+        days[key_day] = picks
+        carried += kept
+        misses += missed
+
+    if check:
+        warm(pick_list[0] for picks in days.values()
+             for pick_list in picks.values() if pick_list and pick_list[0])
+
+    feed = {
+        "version": 1,
+        "generated": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "day": day.isoformat(),
+        "day_index": day_index(day),
+        "pool": len(pool),
+        "default": GRAZ_CELL,
+        "default_day": str(day_index(day)),
+        "cell_separator": CELL_SEP,
+        "cell_keys": GRAZ_CELL,
+        "pick_fields": list(PICK_FIELDS),
+        # No options, deliberately. There is one selection, so the
+        # settings panel on this install has nothing to offer: with
+        # keys_by_label empty every axis a reader touches resolves to
+        # "all", no "all__all__all" cell exists here, each loosening
+        # step finds nothing, and the markup's last fallback lands on
+        # `default`. Whatever is set, the Graz card is served.
+        "keys_by_label": {},
+        "orientation_options": [],
+        "region_options": [],
+        "era_options": [],
+        "days": days,
+    }
+
+    size = len(json.dumps(feed, separators=(",", ":"),
+                          sort_keys=True).encode("utf-8")) + 1
+    if size > MAX_FEED_BYTES:
+        sys.stderr.write("graz feed is {}B, over the {}B cap\n"
+                         .format(size, MAX_FEED_BYTES))
+        return 1
+    write_json(path, feed)
+    sys.stderr.write(
+        "graz.json {:.1f}KB, {} of {} cards, {} carried forward{}\n"
+        .format(size / 1024, len(days[str(day_index(day))]), len(pool),
+                carried, ", {} missed".format(misses) if misses else ""))
+    return 0
+
+
 def selftest(entries, day):
     failures = []
 
@@ -2000,6 +2119,110 @@ def selftest(entries, day):
               "cards_for returns {} of {}".format(
                   len(cards_for(entries, key)), len(want)))
 
+    # ------------------------------------------------------------
+    # The Graz feed: the selector, the cells it must not disturb, and
+    # the builder.
+    # ------------------------------------------------------------
+    graz = cards_for(entries, GRAZ_CELL)
+    check("the Graz cell has cards", len(graz) > 365,
+          "{} is under a year of them".format(len(graz)))
+    check("and they are all landscape",
+          all(e.get("o") == "landscape" for e in graz),
+          "{} are not".format(sum(1 for e in graz
+                                  if e.get("o") != "landscape")))
+
+    # Not `all(is_graz(e) for e in graz)`: is_graz built that list, so
+    # asking it again proves nothing. A fixture instead, with the near
+    # misses that matter -- the other Austrian cities, and a Graz that
+    # is part of a longer word.
+    graz_cases = [
+        (True,  {"t": "Gruss aus Graz"}),
+        (True,  {"t": "Grazer Hauptplatz"}),
+        (True,  {"t": "Schlossberg", "pl": "Graz, Steiermark"}),
+        (True,  {"t": "Landscape", "cn": "Styria"}),
+        (True,  {"src": "graz", "t": "Hauptplatz"}),
+        (False, {"t": "Gruss aus Wien"}),
+        (False, {"t": "Salzburg, Getreidegasse"}),
+        (False, {"t": "Innsbruck"}),
+        (False, {"t": "Klagenfurt, Kaernten"}),
+        (False, {"t": "Grazalema", "cn": "Spain"}),
+        (False, {"t": "Graznoye"}),
+        (False, {"t": "Vienna", "cn": "Austria"}),
+        (False, {"t": "Hauptplatz", "cn": "Austria"}),
+    ]
+    wrong = [e["t"] for want, e in graz_cases if is_graz(e) != want]
+    check("and the selector reads Graz and Styria and nothing else",
+          not wrong, "wrong on " + ", ".join(wrong))
+
+    # Built from the entries directly rather than from another
+    # cards_for call, so this is the definition and not the code under
+    # test restated.
+    want_graz = [e for e in entries
+                 if e.get("o") == "landscape" and is_graz(e)]
+    check("and it is every such card, not a sample",
+          len(graz) == len(want_graz),
+          "{} of {}".format(len(graz), len(want_graz)))
+
+    # The branch sits inside cards_for, which every public cell also
+    # runs through, and the schedule is divmod by the pool length: a
+    # branch catching one card too many reshuffles the public feed and
+    # throws away the reviews already done against it.
+    for key in (CELL_SEP.join(("all", "all", "all")),
+                CELL_SEP.join(("landscape", "all", "all"))):
+        orientation, region, era = key.split(CELL_SEP)
+        want = [e for e in entries
+                if (orientation == "all" or e.get("o") == orientation)
+                and (region == "all" or e.get("rg") == region)
+                and (era == "all" or in_era(e, era))]
+        check("the Graz branch leaves " + key + " alone",
+              len(cards_for(entries, key)) == len(want),
+              "{} of {}".format(len(cards_for(entries, key)), len(want)))
+
+    # A card of Graz in a cell that asked for Europe is still a card of
+    # Graz: is_graz reads the catalogue, and only the Graz feed acts on
+    # what it says.
+    if graz:
+        check("a Graz card is still in the public pool",
+              graz[0] in cards_for(entries, CELL_SEP.join(
+                  ("landscape", "all", "all"))),
+              "the Graz feed has taken a card out of the public one")
+
+    # And the builder, to a scratch path. The checks above are on the
+    # selector; this one is on graz_feed, which carries its own copy of
+    # the cell key.
+    import tempfile
+    scratch = os.path.join(tempfile.mkdtemp(), "graz.json")
+    rc = graz_feed(entries, day, False, scratch)
+    check("the Graz feed builds", rc == 0)
+    if rc == 0:
+        with open(scratch) as fh:
+            built = json.load(fh)
+        check("and draws on every landscape card of Graz",
+              built["pool"] == len(want_graz),
+              "{} of {} -- the builder is not selecting the cell it "
+              "declares".format(built["pool"], len(want_graz)))
+        landscape_graz = {e["id"] for e in want_graz}
+        by_image = {image_url(e): e["id"] for e in entries}
+        served, outside = 0, []
+        for picks in built["days"].values():
+            for pick_list in picks.values():
+                if pick_list:
+                    served += 1
+                    if by_image.get(pick_list[0]) not in landscape_graz:
+                        outside.append(pick_list[1])
+        check("and serves a card for every day in the span",
+              served == len(DAY_SPAN),
+              "{} of {}".format(served, len(DAY_SPAN)))
+        check("and every one of them a landscape card of Graz",
+              not outside, "served " + "; ".join(outside[:3]))
+        check("and declares the cell it actually served",
+              built["cell_keys"] == GRAZ_CELL == built["default"],
+              "{} / {}".format(built["cell_keys"], built["default"]))
+        check("and offers no options, so the panel cannot strand it",
+              not built["keys_by_label"] and not built["region_options"],
+              "an axis the one-cell feed cannot satisfy")
+        os.remove(scratch)
+
     check("a file that is not there carries nothing",
           load_published(os.path.join(HERE, "no-such-feed.json")) == {})
 
@@ -2030,6 +2253,9 @@ def main():
     ap.add_argument("--recompute", action="store_true",
                     help="ignore the published feed and choose every day "
                          "afresh")
+    ap.add_argument("--graz", action="store_true",
+                    help="write graz.json: one landscape card of Graz or "
+                         "Styria a day, for a second plugin install")
     ap.add_argument("--curate", action="store_true",
                     help="write curate.json: the cells nearest their "
                          "starring threshold, and enough undecided cards "
@@ -2062,6 +2288,9 @@ def main():
     if args.curate:
         return curate_manifest(entries, day,
                                os.path.join(HERE, "curate.json"))
+
+    if args.graz:
+        return graz_feed(entries, day, not args.no_check)
 
     check = not args.no_check
     regions = regions_in(entries)

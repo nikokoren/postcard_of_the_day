@@ -613,6 +613,7 @@ next person to touch the expression can see what each clause is for.
 | `dimensions.json` | pixel sizes from IIIF `info.json`, accumulated |
 | `today.json` | **the polling URL** — one pick per cell |
 | `postcard.json` | today's card for the full catalogue, on its own |
+| `graz.json` | **a second polling URL** — landscape cards of Graz and Styria |
 
 ---
 
@@ -641,6 +642,38 @@ file nobody runs.
 
 The markup gets `pick` (the day's card) and `card_image` (its URL, ready
 to use at any panel size). The rest is layout.
+
+### The Graz feed
+
+A second file from this repo, `graz.json`, for a second install: one
+landscape card of Graz or Styria a day, 2,456 of them, about six and a
+half years before one repeats.
+
+```
+https://raw.githubusercontent.com/nikokoren/postcard_of_the_day/main/graz.json
+```
+
+Paste `trmnl/graz-settings.yml` into that plugin's settings and the same
+`trmnl/example-markup.liquid` into its markup. The markup needs no
+change: `graz.json` carries one cell and no option lists, so whatever a
+reader sets resolves to nothing the feed has, and the markup's last
+fallback serves `default`, which is the Graz cell.
+
+It is a second file rather than a region in the public feed because the
+95KB cap is per file and a fourth axis multiplies every cell by it, and
+because the option lists are a contract — the Liquid looks labels up by
+name, so adding one changes what every installed recipe sees.
+
+It is a second file rather than a fork because `corrections.json`,
+`curation.json` and the translation guards are shared. A veto or a
+hand-written caption applies to both feeds without being reviewed
+twice, and the review and curation pages still cover these cards.
+
+`daily.py --graz` writes it, from the same pool, the same
+`picks_for_day`, the same three-day span and the same carry-forward as
+the public feed. The only difference is the cell key.
+
+---
 
 ### What the settings do
 

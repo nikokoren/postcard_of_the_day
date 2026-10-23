@@ -1,0 +1,41 @@
+---
+# Postcard of the Day, Graz -- TRMNL plugin settings for a private
+# second install.
+#
+# Hand-written, not generated: make_settings.py writes the public
+# settings.yml from the pool, and the counts and country lists it fills
+# in have nothing to say here.
+#
+# This install points at graz.json instead of today.json. That file
+# carries one cell -- landscape cards of Graz and Styria -- so there is
+# nothing to choose and the three selection axes are gone. The markup
+# is the public example-markup.liquid unchanged: with no
+# orientation/region/era options in the feed, keys_by_label is empty,
+# every axis resolves to "all", no "all__all__all" cell exists, and the
+# fallback at the end of the cell block lands on `default`, which is
+# the Graz cell. Whatever a reader sets, they get the Graz card.
+#
+# The booleans below do still work -- they only switch parts of the
+# caption on and off, which is local to the markup.
+
+name: Postcard of the Day - Graz
+refresh_interval: 60
+strategy: polling
+polling_verb: get
+polling_url: https://raw.githubusercontent.com/nikokoren/postcard_of_the_day/main/graz.json
+dark_mode: "no"
+no_screen_padding: "no"
+
+custom_fields:
+  - keyname: show_caption
+    field_type: boolean
+    name: Show the caption
+    description: The card's own title, and its date.
+    optional: true
+    default: true
+  - keyname: show_place
+    field_type: boolean
+    name: Show the place
+    description: Adds where the card is from to the line under the title.
+    optional: true
+    default: true
