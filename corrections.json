@@ -144,6 +144,11 @@
   "title": "Havana: Presidential Palace, Avenida de las Misiones",
   "was": "Habana: Palacio Presidencial, Avenida de la Misiones"
  },
+ "dc:commonwealth:x346ft84m": {
+  "note": "Not a translation fault: the caption is already English (Tichnor Brothers card, Ciudad Juárez), and the language detector returned 'unknown' on its place names. Text kept verbatim as the correct caption; nothing to translate. Unflag rather than rewrite if the tooling allows.",
+  "title": "Juarez Avenue, Juarez, Mexico. Cafes, curio shops, quaint customs and starting point for trips to the interior",
+  "was": "Juarez Avenue, Juarez, Mexico. Cafes, curio shops, quaint customs and starting point for trips to the interior"
+ },
  "dc:commonwealth:x346fv13v": {
   "note": "Half-translated: the first clause was left in Spanish and only the second rendered, and rendered wrongly. Al Norte de la Republica places the subject in the north of Mexico; it does not mean north of it.",
   "title": "The border customs house, Ciudad Juarez. In the north of the Republic",
@@ -513,6 +518,11 @@
   "note": "Italian; Boschi di Cocchi a Genale = woods of Cocchi at Genale (Genale being a place in Italian Somaliland/East Africa). Never translated; names kept.",
   "title": "Woods of Cocchi at Genale",
   "was": "Boschi DI Cocchi A Genale"
+ },
+ "loc:2024690645": {
+  "note": "Not a translation fault: the caption is already English; the detector returned 'unknown' on a short string with a place name. Only change is punctuation: the ' - N.M' is the state abbreviation New Mexico, so it reads 'Gallup, N.M.'. Gallup kept as a name.",
+  "title": "A glimpse of yesterday near Gallup, N.M.",
+  "was": "A glimpse of yesterday near Gallup - N.M"
  },
  "loc:2024691935": {
   "note": "Place name plus a date (June 15, 1934, US format); nothing to translate.",
