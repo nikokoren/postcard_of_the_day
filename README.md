@@ -664,6 +664,28 @@ It is a second file rather than a region in the public feed because the
 because the option lists are a contract — the Liquid looks labels up by
 name, so adding one changes what every installed recipe sees.
 
+**It is served in German**, or whatever the catalogue happens to speak
+— the card's own title and the archive's own description of the view,
+not `translate.py`'s English. A card of Graz read in Graz wants the
+words that are on it, and at Graz the place line is the archive's
+description of the view, which is usually the better of the two lines:
+*Blick in die Bergmanngasse stadtauswärts* against *View into the
+Bergmanngasse city away*.
+
+Both texts are already on every card — `t` and `pl` are the source and
+were never overwritten — so the feed drops the translation rather than
+undoing it. The country goes with it: `cn` is `Austria` on all 2,456 of
+these, which says nothing here and was the last English on the panel.
+A hand-written caption from `corrections.json` goes too, since those
+are English rewrites; both of the ones standing against these cards
+correct a mistranslation, and the German they correct is what is served
+instead. Vetoes and stars still apply — those are about the picture.
+
+The stripping happens on copies, after the pool is chosen and then
+checked, because `is_graz` reads `cn` as one of its fields: a card that
+had matched on country alone would drop out, and the schedule is
+`divmod` by the pool's length over a hash of its membership.
+
 It is a second file rather than a fork because `corrections.json`,
 `curation.json` and the translation guards are shared. A veto or a
 hand-written caption applies to both feeds without being reviewed

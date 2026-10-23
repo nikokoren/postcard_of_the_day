@@ -298,6 +298,34 @@ def is_graz(entry):
         str(entry.get(field) or "") for field in ("t", "pl", "cn"))))
 
 
+# What a card loses to be served in its own language. `te` and `ple`
+# are translate.py's English, `cn` the country as harvest.py normalised
+# it -- "Austria" on all 2,456 of these, which is a word that says
+# nothing on a feed where every card is Austrian and the only English
+# left on the panel.
+GRAZ_DROP = ("te", "ple", "cn")
+
+
+def in_source_language(entries, pool_ids):
+    """
+    The pool again, with the cards in `pool_ids` carrying the
+    catalogue's own words instead of the English.
+
+    Both are already on the card -- `t` and `pl` are the source text
+    and were never overwritten -- so this drops the translation rather
+    than undoing it. Copies, because the public feed is built from the
+    same list in the same run and must not see any of this.
+
+    A hand-written caption from corrections.json goes too, since those
+    are English rewrites: both the ones standing against these cards
+    correct a mistranslation, and the German they were correcting is
+    what gets served here.
+    """
+    return [{k: v for k, v in entry.items() if k not in GRAZ_DROP}
+            if entry["id"] in pool_ids else entry
+            for entry in entries]
+
+
 def cards_for(entries, key):
     """The subset of the pool one cell selects."""
     orientation, region, era = key.split(CELL_SEP)
@@ -1606,12 +1634,33 @@ def graz_feed(entries, day, check, path=GRAZ_PATH):
 
     Everything the three-day contract rests on is the public builder's,
     reused rather than copied -- the same picks_for_day, the same
-    carry-forward, the same DAY_SPAN, the same warm step. The only
-    difference is one cell key.
+    carry-forward, the same DAY_SPAN, the same warm step.
+
+    Two things differ: the cell key, and the language. These cards are
+    served in the catalogue's own German rather than translate.py's
+    English -- a card of Graz read in Graz wants the words that are on
+    it, and at Graz the place line is the archive's own description of
+    the view, which is the better line of the two. Vetoes and stars
+    still apply: those are about the picture, not the words.
     """
     pool = cards_for(entries, GRAZ_CELL)
     if not pool:
         sys.stderr.write("no Graz cards in the pool, nothing to write\n")
+        return 1
+
+    # In German, which is what the cards say. Done after the pool is
+    # chosen and then checked, because is_graz reads the catalogue and
+    # `cn` is one of the fields it reads: a card that had matched on
+    # country alone would drop out here, and the schedule is divmod by
+    # this length over a hash of this membership.
+    ids = {e["id"] for e in pool}
+    entries = in_source_language(entries, ids)
+    pool = cards_for(entries, GRAZ_CELL)
+    if {e["id"] for e in pool} != ids:
+        sys.stderr.write(
+            "serving the source text moved the Graz pool, {} cards to {}"
+            " -- it would reshuffle the schedule\n"
+            .format(len(ids), len(pool)))
         return 1
 
     published = load_published(path)
@@ -2187,6 +2236,69 @@ def selftest(entries, day):
                   ("landscape", "all", "all"))),
               "the Graz feed has taken a card out of the public one")
 
+    # The language. These cards are served in the catalogue's own words,
+    # and the English they are served instead of has to stay where the
+    # public feed can still find it -- both feeds are built from this
+    # one list in one run.
+    translated = [e for e in graz if e.get("te") and e.get("ple")]
+    check("some Graz cards have an English caption to set aside",
+          len(translated) > 100,
+          "only {} -- the check below would prove nothing".format(
+              len(translated)))
+    if translated:
+        before = translated[0]
+        # Read off the card before anything touches it, so the check
+        # further down that the public feed still has its English is
+        # against what that feed would have served, not against the
+        # card as it stands afterwards.
+        was = (title_line(before), place_line(before))
+        source = {e["id"]: e for e in
+                  in_source_language(entries, {e["id"] for e in graz})}
+        after = source[before["id"]]
+        check("the Graz feed serves the catalogue's title",
+              title_line(after) == clean_catalogue(before["t"]),
+              "served {!r}, the card says {!r}".format(
+                  title_line(after), before["t"]))
+        check("and the catalogue's place line, without the country",
+              place_line(after) == before["pl"],
+              "served {!r}, the card says {!r}".format(
+                  place_line(after), before["pl"]))
+        check("and not the English either line had",
+              title_line(after) != title_line(before)
+              and place_line(after) != place_line(before))
+        check("while the public feed still has the English",
+              (title_line(before), place_line(before)) == was,
+              "serving the source text has reached the public feed: "
+              "{!r} was {!r}".format(
+                  (title_line(before), place_line(before)), was))
+
+        # A card outside the Graz pool is handed back untouched, not
+        # copied and not stripped: the public feed is 17,000 cards and
+        # this runs over all of them.
+        handed_back = in_source_language(entries, {before["id"]})
+        rewritten = [out["id"] for out, original in zip(handed_back, entries)
+                     if out is not original and out["id"] != before["id"]]
+        check("and a card outside the Graz pool is handed straight back",
+              not rewritten and len(handed_back) == len(entries),
+              "{} cards nothing asked about were copied".format(
+                  len(rewritten)))
+        check("and the one inside it is a copy, not the pool's own card",
+              handed_back[entries.index(before)] is not before
+              and before.get("te"),
+              "the English has been taken off the card the public "
+              "feed is about to read")
+
+    # A hand-written caption is an English rewrite, so it goes too. Both
+    # of the ones standing against these cards correct a mistranslation,
+    # and the German they correct is what is served here.
+    by_hand = [e for e in graz if str(e["id"]) in corrections()]
+    if by_hand:
+        fixed = in_source_language(entries, {e["id"] for e in graz})
+        fixed = {e["id"]: e for e in fixed}[by_hand[0]["id"]]
+        check("and a hand-written English caption gives way to the source",
+              title_line(fixed) == clean_catalogue(by_hand[0]["t"]),
+              "served {!r}".format(title_line(fixed)))
+
     # And the builder, to a scratch path. The checks above are on the
     # selector; this one is on graz_feed, which carries its own copy of
     # the cell key.
@@ -2215,6 +2327,24 @@ def selftest(entries, day):
               "{} of {}".format(served, len(DAY_SPAN)))
         check("and every one of them a landscape card of Graz",
               not outside, "served " + "; ".join(outside[:3]))
+
+        # In German, which the builder has its own line for and so can
+        # forget. Checked against what the card says rather than
+        # against a language test: the comparison is the point.
+        by_id = {e["id"]: e for e in entries}
+        englished = []
+        for picks in built["days"].values():
+            for pick_list in picks.values():
+                if not pick_list:
+                    continue
+                card = by_id.get(by_image.get(pick_list[0]))
+                if card is None:
+                    continue
+                if pick_list[1] != clean_catalogue(card["t"]) or (
+                        card.get("pl") and pick_list[3] != card["pl"]):
+                    englished.append(pick_list[1])
+        check("and in the words the catalogue uses, not the English",
+              not englished, "served " + "; ".join(englished[:2]))
         check("and declares the cell it actually served",
               built["cell_keys"] == GRAZ_CELL == built["default"],
               "{} / {}".format(built["cell_keys"], built["default"]))

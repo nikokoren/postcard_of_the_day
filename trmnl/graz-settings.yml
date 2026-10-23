@@ -15,6 +15,10 @@
 # fallback at the end of the cell block lands on `default`, which is
 # the Graz cell. Whatever a reader sets, they get the Graz card.
 #
+# The captions are the catalogue's own German, not the English the
+# public feed serves: see "The Graz feed" in the README for why, and
+# for what that costs.
+#
 # The booleans below do still work -- they only switch parts of the
 # caption on and off, which is local to the markup.
 
@@ -36,6 +40,8 @@ custom_fields:
   - keyname: show_place
     field_type: boolean
     name: Show the place
-    description: Adds where the card is from to the line under the title.
+    description: >-
+      Adds the archive's description of the view to the line under the
+      title.
     optional: true
     default: true
