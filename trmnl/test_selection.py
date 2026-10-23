@@ -59,7 +59,7 @@ feed = {
   },
   "days": picks,
   "default_day": str(DAY),
-  "pick_fields": ["image","title","date","place","publisher","credit"],
+  "pick_fields": ["image","title","date","place"],
 }
 
 # Local time decides the day, so these are the cases that matter, and

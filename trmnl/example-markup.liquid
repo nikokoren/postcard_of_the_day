@@ -240,8 +240,6 @@
 {% assign card_title = pick[1] %}
 {% assign card_date = pick[2] %}
 {% assign card_place = pick[3] %}
-{% assign card_publisher = pick[4] %}
-{% assign card_credit = pick[5] %}
 
 {% comment %}
   From here on:
@@ -255,9 +253,6 @@
     card_title      the card's own caption, trimmed to fit
     card_date       "1907" or "1900-1906"
     card_place      "Athens, Region of Attica, Greece"
-    card_publisher  who printed it, when the archive knows
-    card_credit     the holding institution and collection
-                    -- both still in the payload, neither drawn
     want_caption    whether to draw the caption block at all
     want_place      whether that block includes the place line
 {% endcomment %}

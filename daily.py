@@ -773,7 +773,13 @@ def credit_line(entry):
 # payload
 # ============================================================
 
-PICK_FIELDS = ("image", "title", "date", "place", "publisher", "credit")
+# The publisher and the credit are gone from here. Neither ever
+# reached a screen -- the markup assigned them and drew the title, the
+# date and the place -- and the credit alone was 13.8KB of an 80.5KB
+# feed, which is 17% of a payload with a hard 95KB ceiling spent on a
+# line nobody saw. Both are still on the card in postcard.json, which
+# is the readable single-card file and has no size problem.
+PICK_FIELDS = ("image", "title", "date", "place")
 
 
 def build_payload(entry):
@@ -787,8 +793,6 @@ def build_payload(entry):
         title_line(entry),
         date_line(entry),
         place_line(entry),
-        publisher_line(entry),
-        credit_line(entry),
     ]
 
 
