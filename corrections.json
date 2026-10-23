@@ -14,6 +14,11 @@
   "title": "Constantinople. Obelisk of Theodosius",
   "was": "Constantinople. Obelisque de Theodose"
  },
+ "dc:commonwealth:37723207f": {
+  "note": "French. Dolma-Baghtché is the French transliteration of Dolmabahçe, the Ottoman palace on the Bosphorus; the translator split it as if it were words and left it a half-French name. Le Palais is 'the Palace'.",
+  "title": "Constantinople. The Dolmabahçe Palace",
+  "was": "Constantinople. Le Palais de Dolma-Baghtché"
+ },
  "dc:commonwealth:4m90f153s": {
   "note": "English with a catalogue number; 'Lunch time' tidied to 'Lunchtime'.",
   "title": "62 -- Lunchtime",
@@ -184,10 +189,20 @@
   "title": "Graz. Schloßberg. Kriegssteig",
   "was": "Graz. Schloßberg. Kriegssteig"
  },
+ "graz:o:gm.3249": {
+  "note": "German, never translated properly. Künstlerkarte is an artist-designed postcard, not an 'artist card'. Mur is the river through Graz and Schlossberg the castle hill: both place names, left as names.",
+  "title": "Artist postcard. Graz, the Mur, Schlossberg",
+  "was": "Künstlerkarte Graz Mur Schlossberg"
+ },
  "graz:o:gm.337": {
   "note": "Glockenspielplatz is the name of a square in Graz and was translated as 'Bell Playground'. Hof here is a courtyard.",
   "title": "Graz - Glockenspielplatz - Courtyard",
   "was": "Graz - Glockenspielplatz - Hof"
+ },
+ "graz:o:gm.363": {
+  "note": "German. Pensionat is a boarding school, not a 'pensioner'; the translator read it as Pensionär. Franz Scholz is the proprietor's name and belongs to the school, not to a pensioner.",
+  "title": "Graz. Franz Scholz Private Gymnasium and Boarding School",
+  "was": "Graz. Privat-Gymnasium und Pensionat Franz Scholz"
  },
  "graz:o:gm.4093": {
   "note": "Two German words survived into the English. Von was left capitalised as though it were part of a name, and geg. is an abbreviation of gegen, towards -- so geg. Westen is looking west, not the bare word West.",
@@ -209,6 +224,11 @@
   "title": "Novosibirsk. New houses in the Dzerzhinsky district",
   "was": "Novosibirsk. Novye doma v Dzerzhinskom raĭone"
  },
+ "loc:2018690310": {
+  "note": "Russian transliteration, misdetected as Slovenian and mangled ('Great. Vostochnai'). Krasnoyarsk is the city; Stolby ('the pillars') is the nature reserve (goszapovednik = state reserve); Vtoroi stolb is the second pillar; Pered pryzhkom is 'before the jump'.",
+  "title": "Krasnoyarsk. Eastern Siberia. Stolby Nature Reserve. Second pillar. Before the jump",
+  "was": "Krasnoi︠a︡rsk. Vostochnai︠a︡ Sibirʹ. Goszapovednik \"Stolby\". Vtoroĭ stolb. Pered pryzhkom"
+ },
  "loc:2018690572": {
   "note": "Transliterated Russian: pereprava = crossing, cherez reku Angaru = across the Angara River, plashkout = a pontoon ferry. Angara is the river.",
   "title": "Irkutsk. Ferry crossing the Angara River on a pontoon",
@@ -228,6 +248,11 @@
   "note": "Transliterated Russian: derevʹi︠a︡ = trees, na khodulʹnykh korni︠a︡kh = on stilt roots. Baikal is the lake.",
   "title": "Baikal. Trees on stilt roots",
   "was": "Baĭkal. Derevʹi︠a︡ na khodulʹnykh korni︠a︡kh"
+ },
+ "loc:2020753034": {
+  "note": "French, never translated. Vers = towards, Traversée = crossing. Biaramulo (a place) and Ruwuwu (a river) kept as names; the archive's capitalised DE LA is just casing.",
+  "title": "36 - Towards Biaramulo. Crossing the Ruwuwu",
+  "was": "36 - Vers Biaramulo. Traversee DE LA Ruwuwu"
  },
  "loc:2020753039": {
   "note": "French. 'Entrée des troupes belges à Tabora' is the entry of the troops into the town; the published text dropped 'Entrée' (entry). Tabora is a place name.",
@@ -379,6 +404,11 @@
   "title": "Children in Front of Fishing Boat on the Beach",
   "was": "Children IN Front OF Fishing Boat ON THE Beach"
  },
+ "loc:2020760887": {
+  "note": "English, never cleaned: the capitalised IN THE / AT are catalogue casing, and Wembly is a misspelling of Wembley (the British Empire Exhibition site).",
+  "title": "Gold Coast Africans in the Native Village at Wembley",
+  "was": "Gold Coast Africans IN THE Native Village AT Wembly"
+ },
  "loc:2020760911": {
   "note": "English with mangled capitals.",
   "title": "98. Gold Coast - Repairing a fishing net",
@@ -389,10 +419,20 @@
   "title": "No. 146. Children and fishing boats",
   "was": "NO. 146. [children AND Fishing Boats"
  },
+ "loc:2020760948": {
+  "note": "English, never cleaned: THE / From were mis-cased and the ampersand and 'D.c' (D.C., the District Commissioner's) were left as typed. Sekondi is a place on the Gold Coast.",
+  "title": "Sekondi. The Point and D.C.'s Bungalow from the Sea",
+  "was": "Sekondi. THE Point & D.c's Bungalow From THE SEA"
+ },
  "loc:2020760980": {
   "note": "English; the pool's catalogue text had a stray '[' and the archive's mangled capitals (AND, IN, OF). Normalised to sentence case.",
   "title": "Monrovia. Women and children sitting in front of a cemetery",
   "was": "Monrovia. [women AND Children Sitting IN Front OF A Cemetery"
+ },
+ "loc:2020760984": {
+  "note": "French, never translated. Ecole de Tisseuses is a school of (women) weavers; the capitalised DE is catalogue casing.",
+  "title": "Madagascar 1 Weavers' School",
+  "was": "Madagascar 1 Ecole DE Tisseuses"
  },
  "loc:2020760986": {
   "note": "English and French ('Huttes dans la Jungle') duplicating each other; the English half is sufficient.",
@@ -499,6 +539,11 @@
   "title": "Algiers. Rue Kleber",
   "was": "Alger. Rue Kleber"
  },
+ "loc:2025702799": {
+  "note": "French, never translated. Alger is Algiers, a place; L'Archevêché is the archbishop's residence; Intérieur is interior. Accents had been stripped by the catalogue.",
+  "title": "Algiers. The Archbishop's Palace, Interior",
+  "was": "Alger. L'Archeveche, Interieur"
+ },
  "loc:2025702808": {
   "note": "French; Constantine is the Algerian city. La Place du Palais is a named square and the article 'La' had been dropped.",
   "title": "Constantine. The Place du Palais",
@@ -528,6 +573,11 @@
   "note": "'Intendencia' is the administration (superintendent's office), not 'Intent'. Puerto Aguirre is a place name.",
   "title": "Iguazu National Park: Park Administration Office at Puerto Aguirre",
   "was": "Parque Nacional del Iguazu: Intendencia del Parque en Puerto Aguirre"
+ },
+ "loc:2025702860": {
+  "note": "Spanish, never translated. Parque Nacional de Nahuel Huapi is the national park in Argentina; Puerto Anchorena is a place on its lake. Names kept, the stray hyphen in Nahuel - Huapi removed.",
+  "title": "Nahuel Huapi National Park: Puerto Anchorena",
+  "was": "Parque Nacional De Nahuel - Huapi: Puerto Anchorena"
  },
  "loc:2025702862": {
   "note": "Never translated; 'Parque Nacional De Nahuel - Huapi' is Nahuel Huapi National Park, a name split by a stray hyphen. Lago Traful is Lake Traful.",
@@ -739,6 +789,11 @@
   "title": "In Brittany. Woman of Tregunc (Finistere",
   "was": "En Bretagne. Femme de Tregunc (Finistere"
  },
+ "loc:2025705626": {
+  "note": "French, never translated, and the archive's text has lost its closing parenthesis ('(Finistere'), which this correction restores. Bretagne is Brittany; Roscoff is a town and Finistère the département, both names.",
+  "title": "In Brittany. Woman of Roscoff (Finistère)",
+  "was": "En Bretagne. Femme de Roscoff (Finistere"
+ },
  "loc:2025705980": {
   "note": "Correct; only flagged for the stray comma and regional consistency. Saint-Léonard is a church name.",
   "title": "Honfleur, The Church of Saint Leonard",
@@ -809,6 +864,11 @@
   "title": "Brest, the Harbour and the Goulet. The Roadstead and narrow entrance",
   "was": "Brest, La Rade et le Goulet. The Roadstead and narrow entrance"
  },
+ "loc:2025707178": {
+  "note": "French, never translated. Cité de Carcassonne is the walled medieval city, a name, so it is kept; Descente = descent, Barbacane = the barbican (outer fortification).",
+  "title": "Cité de Carcassonne, Descent from the Barbican",
+  "was": "Cite de Carcassonne, Descente de la Barbacane"
+ },
  "loc:2025707304": {
   "note": "Three faults at once. The cathedral's name and the century were left in French; pourtour du choeur is the sculpted screen enclosing the choir, not Around the Choir; and the second panel was dropped altogether -- Visite de la Sainte Vierge a Sainte Elisabeth is the Visitation.",
   "title": "Chartres Cathedral. The choir screen (16th century). \"The Annunciation\", \"The Visitation\"",
@@ -843,6 +903,11 @@
   "note": "French. Coiffe is a traditional headdress or cap, not 'hair'; Honfleur is a town.",
   "title": "Normandy. Headdress of Honfleur",
   "was": "La Normandie. Coiffe D'Honfleur"
+ },
+ "loc:2025708188": {
+  "note": "French, never translated. Musée de Cluny is a museum name; coffre-fort is a strongbox, ciselé means chased/chiselled; fin du XVIIe siècle is the end of the 17th century.",
+  "title": "Cluny Museum. Chased steel strongbox. French art, late 17th century",
+  "was": "Musee de Cluny. Coffre-fort en acier cisele. Art Francais, fin du XVIIe siecle"
  },
  "loc:2025708240": {
   "note": "French; margelle de puits = the stone curb of a well. Pool text lacked the closing parenthesis.",
@@ -1329,6 +1394,11 @@
   "title": "Mecca and the \"Kaaba El-Shareefat\"",
   "was": "Mecca and \"Kaaba El-Shareefat\""
  },
+ "loc:2025715408": {
+  "note": "Spanish, never translated. Pueblo Español is the name of the model village built for the 1929 exposition, so it is kept with a gloss; Gradas = steps, and Santiago is part of the place's name.",
+  "title": "International Exposition of Barcelona. Pueblo Español (Spanish Village) - Steps of Santiago",
+  "was": "Exposicion Internacional de Barcelona. Pueblo Espanol - Gradas de Santiago"
+ },
  "loc:2025715711": {
   "note": "Swedish; Göteborg is Gothenburg, Norra and Södra Hamngatorna are the North and South Harbour Streets, named streets.",
   "title": "Gothenburg. Norra and Södra Hamngatan",
@@ -1384,6 +1454,11 @@
   "title": "Damascus. House of Ananias",
   "was": "Damas. Maison d'Ananais"
  },
+ "loc:2025716208": {
+  "note": "French Damas is Damascus, a place; misdetected as Indonesian, which only left a stray space in 'El- Arwam'. Souk El-Arwam is a market name, kept.",
+  "title": "Damascus. Souk El-Arwam",
+  "was": "Damas. Souk El-Arwam"
+ },
  "loc:2025716228": {
   "note": "French/English mix: 'pont à Pergame' is a bridge at Pergamon, not 'in Pergame'. Pergame is the French form of Pergamon, a place name left unlocalised.",
   "title": "Smyrna. Ancient bridge at Pergamon",
@@ -1398,6 +1473,11 @@
   "note": "Ephèse is Ephesus, a place, and Fontaine was left French in the middle of English.",
   "title": "Ephesus. Fountain in front of the theater",
   "was": "Ephese. Fontaine devant le theatre"
+ },
+ "loc:2025716242": {
+  "note": "French, never translated. Charrette de paysan is a peasant's cart; Anatolie is Anatolia.",
+  "title": "Constantinople - Peasant's Cart in Anatolia",
+  "was": "Constantinople - Charrette de Paysan en Anatolie"
  },
  "loc:2025716253": {
   "note": "Roumeli Hissar is Rumeli Hisarı, the fortress on the Bosphorus; a named building.",
@@ -1523,6 +1603,11 @@
   "note": "German; Erinnerungen an = memories of. Ludwig II. von Bayern is King Ludwig II of Bavaria.",
   "title": "Memories of King Ludwig II of Bavaria and his castles",
   "was": "Erinnerungen an König Ludwig II. von Bayern und seine Schlösser"
+ },
+ "rijks:RP-F-00-24128": {
+  "note": "Dutch. Eierlandse is the adjective of Eierland (the northern tip of Texel), so it is the Eierland Lighthouse, a named building, not an 'Eierlandse lighthouse'; De Cocksdorp is a village and was left shouted in capitals.",
+  "title": "Texel, Eierland lighthouse near De Cocksdorp",
+  "was": "Texel, Eierlandse vuurtoren nabij DE COCKSDORP"
  },
  "rijks:RP-F-00-24371": {
   "note": "Dutch; Groete is an old spelling of Groeten, greetings. The earlier rendering was already right; restated so the flag clears.",
