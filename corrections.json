@@ -19,6 +19,11 @@
   "title": "Constantinople. The Dolmabahçe Palace",
   "was": "Constantinople. Le Palais de Dolma-Baghtché"
  },
+ "dc:commonwealth:4168b376m": {
+  "note": "Greek Ερεχθειον names the Erechtheion; the temple name was left untranslated.",
+  "title": "The Erechtheion",
+  "was": "Ερεχθειον"
+ },
  "dc:commonwealth:4m90f153s": {
   "note": "English with a catalogue number; 'Lunch time' tidied to 'Lunchtime'.",
   "title": "62 -- Lunchtime",
@@ -219,6 +224,11 @@
   "title": "Old Graz, from the Schlossberg looking west, 1865, by Reichert",
   "was": "Alt-Graz Von Schlossberg geg. Westen 1865 v. Reichert"
  },
+ "graz:o:gm.4102": {
+  "note": "Latin Graecivm is Graz, vulgo means commonly called, and metropolis Styriae means capital of Styria. The Latin caption was never translated; Gratz is retained as the historical spelling quoted by the title.",
+  "title": "Graz, commonly called Gratz. Capital of Styria",
+  "was": "Graecivm Vulgo Gratz. Metropolis Styriae"
+ },
  "loc:2018690031": {
   "note": "Transliterated Russian, never translated. V skvere na beregu Omi = in the small public garden on the bank of the Om; Om is the river at Omsk.",
   "title": "Omsk. In the public garden on the bank of the Om",
@@ -273,6 +283,11 @@
   "note": "French; Palais de l'empereur. Never translated.",
   "title": "Addis Ababa: The Emperor's Palace",
   "was": "Addis Ababa: Palais de l'empereur"
+ },
+ "loc:2020760247": {
+  "note": "Italian Addis Abeba is the established English Addis Ababa. Uno dei migliori palazzi means one of the finest palaces; the earlier translation left the city name in Italian.",
+  "title": "Addis Ababa. One of the finest palaces",
+  "was": "ADDIS ABEBA, Uno dei migliori palazzi"
  },
  "loc:2020760249": {
   "note": "Italian. Addis Abeba is Addis Ababa. 'Comando Superiore' is a high command, left untranslated.",
@@ -549,6 +564,11 @@
   "title": "An old cane-mill in Porto Rico",
   "was": "An old cane-mill in Porto Rico"
  },
+ "loc:2025702742": {
+  "note": "French tribu de nomades en route means a nomadic tribe on the move. The translation left en route in French; scenes et types is retained as the historical series wording.",
+  "title": "Scenes and types. A nomadic tribe on the move",
+  "was": "Scenes et types, Tribu de Nomades en route"
+ },
  "loc:2025702761": {
   "note": "French, with 'of' left half-translated. Alger is Algiers; El-Kettar is the cemetery in Algiers, a place name. 'd'El-Kettar' is 'of El-Kettar'.",
   "title": "Algiers. Arab cemetery of El-Kettar",
@@ -608,6 +628,16 @@
   "note": "Spanish, never translated. Nahuel Huapi is the national park and lake in Argentina; the archive's stray spaces and 'De' casing split the name. Cerro Bonete is a mountain name.",
   "title": "Nahuel Huapi National Park: Cerro Bonete",
   "was": "Parque Nacional De Nahuel - Huapi: Cerro Bonete"
+ },
+ "loc:2025702925": {
+  "note": "German caption was never translated and the flag captured only its truncated beginning. Translate the current full pool caption: Hofkirche is Court Church, rechts is on the right, and Ernst der Eiserne is Ernest the Iron. Theodoruch and Istgoten are transcription errors for Theodoric and the Ostrogoths. Cornwallis, the dates and Theodobert follow the archive wording rather than silently revising its historical claims.",
+  "title": "Innsbruck. Court Church, group II on the right (King Arthur group). 1. King Arthur of England, fallen at the Battle of Cornwallis, 537. 2. Duke Ernest the Iron, 1424. 3. Duke Theodobert of Burgundy, 640. 4. Theodoric, King of the Ostrogoths",
+  "was": "Innsbruck. Hofkirche-Gruppe II, rechts (King Artur Gruppe). 1. Konig Artur von England gefallen in der Schlacht bei Cornwallis, 537. 2. Herzog Ernst der Eiserne, 1424. 3. Herzog Theodobert von Burgund, 640. 4. Theodoruch, Konig der Istgoten"
+ },
+ "loc:2025702941": {
+  "note": "German Burg is castle and Gang is a passage. Raschauer is the name of this passage, not a word for razor; the machine translation invented Razor aisle.",
+  "title": "Kreuzenstein Castle. Raschauer passage",
+  "was": "Burg Kreuzenstein. Raschauergang"
  },
  "loc:2025703081": {
   "note": "The archive caption lacks its closing parenthesis, which the replacement restores. Vorarlberg, Montafon, Gargellen and the Madriserspitze are all names.",
@@ -749,6 +779,11 @@
   "title": "Cairo. Near the Pyramids",
   "was": "Caire. Pres des Pyramides"
  },
+ "loc:2025704140": {
+  "note": "French Caire is Cairo, and ascension here means climbing the pyramid. The translation left the city name in French.",
+  "title": "Cairo. Climbing the Great Pyramid",
+  "was": "Caire - Ascension de la grande Pyramide"
+ },
  "loc:2025704168": {
   "note": "Language misdetected as Indonesian; the catalogue's 'Mid-day' was corrupted to 'Mid@-@ day' (a tokenisation artefact). Kerdasa is the Egyptian village.",
   "title": "Kerdasa. Midday rest",
@@ -824,6 +859,11 @@
   "title": "In Brittany. Woman of Roscoff (Finistère)",
   "was": "En Bretagne. Femme de Roscoff (Finistere"
  },
+ "loc:2025705805": {
+  "note": "French entree du chateau means entrance to the castle, not Enter du Chateau. I.-et-L. abbreviates the department Indre-et-Loire.",
+  "title": "Chinon (Indre-et-Loire). Entrance to the castle",
+  "was": "Chinon (I.-et-L.) - Entree du Chateau"
+ },
  "loc:2025705980": {
   "note": "Correct; only flagged for the stray comma and regional consistency. Saint-Léonard is a church name.",
   "title": "Honfleur, The Church of Saint Leonard",
@@ -888,6 +928,11 @@
   "note": "French 'attelage du pays' is a local yoke or team of draught animals, not 'country linkage'. La Douce France is a series title.",
   "title": "La Douce France. Basque Country. Local team of animals",
   "was": "La Douce France. Pays Basque. Attelage du pays"
+ },
+ "loc:2025707104": {
+  "note": "Translate the French caption once instead of retaining its duplicate, ungrammatical English version. Rade is a roadstead; Cours Dajot is the named promenade and remains a proper name.",
+  "title": "Brest. The roadstead, viewed from Cours Dajot",
+  "was": "Brest, La Rade, vue prise du Cours Dajot - The Roadstead view take from public walk Dajot"
  },
  "loc:2025707120": {
   "note": "French followed by the archive's own English. The published text translated the French, then repeated the English fragment and was cut off mid-word ('Sailer leaving…'). Brest and the Pont National are names, kept; the duplicate is merged into one sentence.",
@@ -963,6 +1008,11 @@
   "note": "Ramena is the verb ramener, to bring back, and was left in French as if a name. Muiron is the ship's name.",
   "title": "Musee de Marine. The Muiron, frigate built in Venice, brought Bonaparte back from Egypt in 1799",
   "was": "Musee de Marine. Le Muiron, fregate constuite a Venise, Ramena Bonaparte d'Egypte en 1799"
+ },
+ "loc:2025708578": {
+  "note": "Avenue de l'Observatoire is a Paris street name and should remain a proper name, not be translated word by word. The flagged archive wording already identifies it correctly; retain it unchanged as a reviewed caption.",
+  "title": "Paris. Avenue de l'Observatoire",
+  "was": "Paris. Avenue de l'Observatoire"
  },
  "loc:2025708744": {
   "note": "The translator turned 17e into 17th, dropped an article, and left the rest in French -- a caption that looks translated and is not. 17e is the arrondissement, not a date or an ordinal on its own, so it needs the word. Rue Demours is a street and Le Grand Veneur -- the royal Master of the Hunt -- is the restaurant's name; neither is vocabulary.",
@@ -1054,6 +1104,11 @@
   "title": "Pentagonal Tower in Nuremberg",
   "was": "Funfeckiger Turm in Nurnberg"
  },
+ "loc:2025710210": {
+  "note": "Lug ins Land is the name Luginsland, a tower in Nuremberg, not an instruction to look into the country. Nurnberg is Nuremberg in English.",
+  "title": "Nuremberg. Luginsland tower",
+  "was": "Lug ins Land in Nurnberg"
+ },
  "loc:2025710575": {
   "note": "The caption was already English and was wrongly run through a Spanish translator, which turned 'mayor' into 'Major' and the town Todos Santos (Guatemala) into 'All Saints'. Restored to the archive's own words.",
   "title": "Indian mayor, Todos Santos, Guatemala",
@@ -1098,6 +1153,11 @@
   "note": "Italian, never translated. San Remo is the town; Porta S. Giuseppe is a named gate.",
   "title": "San Remo - Porta San Giuseppe",
   "was": "San Remo - Porta S. Giuseppe"
+ },
+ "loc:2025711170": {
+  "note": "Italian dentro means within. The existing translation already correctly identifies the Temple of Hercules and the Acropolis; retain that identification without inventing another temple or changing the archive attribution.",
+  "title": "Castelvetrano–Selinunte. Temple of Hercules within the Acropolis",
+  "was": "Castelvetrano-Selinunte - Tempio d'Ercole dentro l'Acropoli"
  },
  "loc:2025711178": {
   "note": "'Monumento a' was left in Italian; Minos is the figure from the Inferno.",
@@ -1229,10 +1289,25 @@
   "title": "Niju-bashi (Double Bridge), main entrance to the Imperial Palace, Tokyo",
   "was": "Niju-bashi (Double Bridge), main entrance to the Imperial Palace, Tokyo"
  },
+ "loc:2025713538": {
+  "note": "German Schloss means castle. Schlofz is a transcription of the historical spelling with a sharp s, not a place name to leave untranslated.",
+  "title": "View of Riga. The castle",
+  "was": "Blick auf Riga - Schlofz"
+ },
+ "loc:2025713587": {
+  "note": "French Petite Suisse Luxembourgeoise is Luxembourg's Little Switzerland, the regional name; hotel de ville means town hall, not a hotel. The caption had never been translated.",
+  "title": "Luxembourg’s Little Switzerland. Echternach Town Hall",
+  "was": "Petite Suisse Luxembourgeoise. Echternach. L'Hotel de Ville"
+ },
  "loc:2025713681": {
   "note": "Spanish. 'Corrida de toros' is a bullfight, not a 'Toros race'. 'Suerte de vara' is the bullfighting term for the stage where the picador lances the bull; 'Fancy of Rod' translated suerte (here a stage or act) and vara (lance) as everyday words. Kept as the technical term.",
   "title": "Bullfight: Suerte de Vara",
   "was": "Corrida de Toros: Suerte de Vara"
+ },
+ "loc:2025713684": {
+  "note": "Spanish corrida de toros means bullfighting, not a race of bulls. Descabello is the bullfighting term for the finishing thrust at the base of the skull, not hair; retain the technical term with an English gloss.",
+  "title": "Bullfighting. The descabello (finishing thrust)",
+  "was": "Corrida de Toros: El Descabello"
  },
  "loc:2025713741": {
   "note": "Spanish with an English gloss, never translated. San Francisco El Grande is a named church; José Suárez Olvera is the painter; mts. is metres. The English gloss at the end is the archive's own.",
@@ -1256,6 +1331,11 @@
  },
  "loc:2025713820": {
   "note": "Never translated. Place de France is a named square in Casablanca and stays; only the article needed rendering.",
+  "title": "Casablanca. The Place de France",
+  "was": "Casablanca. La Place de France"
+ },
+ "loc:2025713821": {
+  "note": "Place de France is the square's proper name, not vocabulary to translate word by word. Translate the article and retain the name, consistently with the other card of this square already corrected in this file.",
   "title": "Casablanca. The Place de France",
   "was": "Casablanca. La Place de France"
  },
@@ -1499,6 +1579,11 @@
   "title": "Grindelwald. Wetterhorn",
   "was": "Grindelwald. Wetterhorn"
  },
+ "loc:2025716036": {
+  "note": "Geneve is the unaccented French name Genève; its established English name is Geneva. The caption had never been translated.",
+  "title": "Geneva",
+  "was": "Geneve"
+ },
  "loc:2025716203": {
   "note": "French; Damas is Damascus and 'Maison d'Ananais' (sic) the House of Ananias. Never translated.",
   "title": "Damascus. House of Ananias",
@@ -1693,6 +1778,11 @@
   "note": "Never translated. Tombe van Polycarpus is the tomb of Saint Polycarp of Smyrna.",
   "title": "Tomb of Polycarp in Smyrna",
   "was": "Tombe van Polycarpus in Smyrna"
+ },
+ "rijks:RP-F-F04397": {
+  "note": "Dutch autohandel is a car dealership. Dirk van der Mark is the dealership name and must remain intact; the Dutch caption had never been translated.",
+  "title": "Showroom of the Dirk van der Mark car dealership in Amsterdam",
+  "was": "Showroom van autohandel Dirk van der Mark in Amsterdam"
  },
  "rijks:RP-F-F19182": {
   "note": "Dutch; Yselbrug is the old spelling of IJsselbrug, the bridge over the IJssel at Kampen.",
