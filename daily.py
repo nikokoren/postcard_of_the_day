@@ -2245,8 +2245,22 @@ def selftest(entries, day):
           len(translated) > 100,
           "only {} -- the check below would prove nothing".format(
               len(translated)))
-    if translated:
-        before = translated[0]
+    # A card whose title needs none of title_line's repairs, so the
+    # raw catalogue string is the exact answer and the check below can
+    # compare against it rather than against title_line's own output.
+    # Not translated[0]: that was graz:o:gm.4479 for a while, whose
+    # title is missing its closing bracket, and the check read the
+    # repair as a translation leaking through.
+    plain_titled = [e for e in translated
+                    if clean_catalogue(e["t"]) == e["t"]
+                    and balance_brackets(e["t"]) == e["t"]
+                    and len(e["t"]) <= TITLE_LIMIT]
+    check("a Graz card's title survives unrepaired somewhere",
+          bool(plain_titled),
+          "every title is cut, cleaned or rebracketed, so nothing here "
+          "can be compared against the catalogue directly")
+    if plain_titled:
+        before = plain_titled[0]
         # Read off the card before anything touches it, so the check
         # further down that the public feed still has its English is
         # against what that feed would have served, not against the
@@ -2329,22 +2343,52 @@ def selftest(entries, day):
               not outside, "served " + "; ".join(outside[:3]))
 
         # In German, which the builder has its own line for and so can
-        # forget. Checked against what the card says rather than
-        # against a language test: the comparison is the point.
+        # forget.
+        #
+        # The fields are spelled out here rather than taken from
+        # GRAZ_DROP, so that dropping one from GRAZ_DROP fails this
+        # check instead of quietly moving the answer with it. title_line
+        # does the comparing because it also cuts over-long titles and
+        # closes brackets the catalogue left open -- that is the repair
+        # this check once mistook for English leaking through.
+        def source_caption(card):
+            plain = {k: v for k, v in card.items()
+                     if k not in ("te", "ple", "cn")}
+            return title_line(plain), place_line(plain)
+
         by_id = {e["id"]: e for e in entries}
-        englished = []
+
+        def englished(rows):
+            out = []
+            for pick_list, card in rows:
+                if (pick_list[1], pick_list[3]) != source_caption(card):
+                    out.append("{} served {!r}, the card says {!r}".format(
+                        card["id"], pick_list[1], card["t"]))
+            return out
+
+        served_rows = []
         for picks in built["days"].values():
             for pick_list in picks.values():
-                if not pick_list:
-                    continue
-                card = by_id.get(by_image.get(pick_list[0]))
-                if card is None:
-                    continue
-                if pick_list[1] != clean_catalogue(card["t"]) or (
-                        card.get("pl") and pick_list[3] != card["pl"]):
-                    englished.append(pick_list[1])
+                card = pick_list and by_id.get(by_image.get(pick_list[0]))
+                if card is not None:
+                    served_rows.append((pick_list, card))
         check("and in the words the catalogue uses, not the English",
-              not englished, "served " + "; ".join(englished[:2]))
+              not englished(served_rows),
+              "; ".join(englished(served_rows)[:2]))
+
+        # The three days above are whichever three cards came up, so
+        # that check only notices a card it happens to land on -- it
+        # went eight days before meeting the one with the unclosed
+        # bracket. The whole pool, through the same payload builder,
+        # costs nothing and fails on the first run instead.
+        every = [(build_payload(card), card) for card in
+                 cards_for(in_source_language(
+                     entries, {e["id"] for e in graz}), GRAZ_CELL)]
+        off = englished(every)
+        check("and that holds for every card in the feed, not just "
+              "the three on it", not off,
+              "{} of {} are off: {}".format(
+                  len(off), len(every), "; ".join(off[:2])))
         check("and declares the cell it actually served",
               built["cell_keys"] == GRAZ_CELL == built["default"],
               "{} / {}".format(built["cell_keys"], built["default"]))
