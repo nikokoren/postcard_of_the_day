@@ -560,10 +560,37 @@ USABLE_CASES = [
 ]
 
 
+# Proper nouns the guard cannot be allowed to forget, whatever the pool
+# happens to contain this month.
+#
+# invents_a_word checks a word against the English wordlist and against
+# a corpus built from pool.json, and a place name is usually in the
+# corpus rather than the wordlist. That makes the guard's strictness a
+# function of the pool's health, which is how a correct translation came
+# to be refused on 1 November: the Library of Congress was rate-limited
+# out of that harvest, its China postcards left the corpus with it, and
+# "Beijing" became a word no caption said. The harvest is refused for
+# that now, but the guard's own cases must not be hostage to it either
+# -- they are here to prove the rules, not to measure the pool.
+GUARD_VOCABULARY = ("beijing", "peking", "graz", "athens", "acropolis",
+                    "propylaia", "surinamese", "winegrowers")
+
+
 def usable_failures():
     """Empty when every guard case holds."""
-    return ["usable({!r}, {!r}) = {}, want {}".format(s, e, usable(s, e), w)
-            for w, s, e in USABLE_CASES if usable(s, e) is not w]
+    known = known_words()
+    missing = {w for w in GUARD_VOCABULARY if known and w not in known}
+    if missing:
+        # Added for the duration of the check rather than for good: the
+        # live guard should go on reading the pool, so that a word the
+        # archives really do use keeps counting as one.
+        known |= missing
+    try:
+        return ["usable({!r}, {!r}) = {}, want {}".format(
+                    s, e, usable(s, e), w)
+                for w, s, e in USABLE_CASES if usable(s, e) is not w]
+    finally:
+        known -= missing
 
 
 # ------------------------------------------------------------

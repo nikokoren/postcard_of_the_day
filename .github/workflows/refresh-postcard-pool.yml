@@ -33,6 +33,12 @@ jobs:
       - name: Install Pillow, and the offline translator
         run: pip install --quiet pillow numpy argostranslate langdetect
 
+      # Before the crawl, not after: these are the rules that decide
+      # what the crawl is allowed to do to the pool, and an hour of
+      # paging is a long time to find out one of them is broken.
+      - name: Check the rate-limit, shrink and resume rules
+        run: python3 harvest.py --selftest
+
       - name: Harvest the postcard pool
         # EUROPEANA_KEY is a repository secret, never a file in the repo.
         # Without it the Europeana source skips itself and the rest of
@@ -40,6 +46,34 @@ jobs:
         env:
           EUROPEANA_KEY: ${{ secrets.EUROPEANA_KEY }}
         run: python3 harvest.py --pages "${{ github.event.inputs.pages || 400 }}"
+
+      # A refused harvest -- a source that collapsed, or an archive that
+      # stopped answering -- still did real work: pages walked, captions
+      # translated, dimensions measured. Those caches are what lets the
+      # next run carry on from where this one stopped instead of
+      # starting over and being refused again for the same reason. So
+      # they are saved even when the run fails, and the run stays red.
+      - name: Keep the crawl progress from a failed harvest
+        if: failure()
+        run: |
+          git config user.name "GitHub Action"
+          git config user.email "action@github.com"
+          git add crawl.json dimensions.json translations.json quality.json
+          if git diff --staged --quiet; then
+            echo "No progress to keep"
+          else
+            git commit -m "Keep harvest progress from a refused run [$(date -u +'%Y-%m-%d')]"
+            for attempt in 1 2 3; do
+              if git push; then
+                echo "Pushed."
+                exit 0
+              fi
+              git pull --rebase origin "$GITHUB_REF_NAME" || exit 1
+              sleep $((attempt * 5))
+            done
+            echo "Could not push the progress"
+            exit 1
+          fi
 
       - name: Put more captions into English
         # Offline, no key. Budgeted and cached forever, so each refresh
@@ -74,8 +108,8 @@ jobs:
         run: |
           git config user.name "GitHub Action"
           git config user.email "action@github.com"
-          git add pool.json quality.json dimensions.json translations.json \
-                  trmnl/settings.yml postcard.json today.json
+          git add pool.json crawl.json quality.json dimensions.json \
+                  translations.json trmnl/settings.yml postcard.json today.json
 
           if git diff --staged --quiet; then
             echo "Pool unchanged, nothing to commit"

@@ -24,7 +24,6 @@ Usage:
 
 import argparse
 import collections
-import collections
 import html
 import http.client
 import io
@@ -56,6 +55,18 @@ RETRIES = 5
 # pages are skipped and only a run of them stops the crawl.
 MAX_PAGE_FAILURES = 8   # consecutive
 REQUEST_DELAY = 1.0     # between search pages
+# The Library of Congress asks for no more than 20 requests a minute on
+# its search endpoints and blocks for a good while when it is pushed. A
+# second between pages is three times that rate, and on 1 November it
+# cost us the whole collection: one page answered, then 429 on every
+# request after it, and eleven collections gave up at page 1.
+#
+# Slower than that limit rather than level with it, because the job has
+# no idea what else is talking to loc.gov from the same runner. A crawl
+# that does not finish inside one run is no longer a problem -- it
+# resumes from crawl.json on the next one.
+LOC_DELAY = 4.0
+RETRY_CEILING = 120     # no single backoff longer than this
 # Two, not six. A IIIF host behind a shared egress will drop
 # connections under concurrency long before it runs out of capacity:
 # measured against Digital Commonwealth, six workers failed 13 of 20
@@ -74,6 +85,13 @@ POOL_VERSION = 1
 # from the page it stopped on. A cache older than this is re-crawled
 # from the start, because by then the collections have moved.
 CRAWL_MAX_AGE_DAYS = 20
+# An unfinished one is kept longer than that, because the refresh runs
+# monthly and 20 days means every run starts over. A source the Library
+# of Congress rate-limited to a standstill needs two or three runs to
+# page through, and throwing its progress away in between is how it
+# never gets there. Stale pages are worth more than no pages: the entries
+# already harvested stay in the pool while the rest arrives.
+CRAWL_PARTIAL_MAX_AGE_DAYS = 70
 CRAWL_SAVE_EVERY = 10
 
 
@@ -369,9 +387,14 @@ def load_crawl():
             data = json.load(fh)
     except (OSError, ValueError):
         return {}
-    fresh = time.time() - CRAWL_MAX_AGE_DAYS * 86400
-    return {key: state for key, state in (data.get("sources") or {}).items()
-            if state.get("started", 0) >= fresh}
+    now = time.time()
+    fresh = now - CRAWL_MAX_AGE_DAYS * 86400
+    fresh_partial = now - CRAWL_PARTIAL_MAX_AGE_DAYS * 86400
+    return {
+        key: state
+        for key, state in (data.get("sources") or {}).items()
+        if state.get("started", 0) >= (fresh if state.get("done")
+                                       else fresh_partial)}
 
 
 def save_crawl(cache):
@@ -391,6 +414,27 @@ def crawl_state(cache, source_key):
 # http
 # ============================================================
 
+def retry_after(error, fallback):
+    """
+    How long a server asked us to wait, when it bothered to say.
+
+    The Library of Congress sends Retry-After on a 429 and it is
+    routinely longer than any backoff we would have guessed. Honouring
+    it is both politer and faster than guessing again: the alternative
+    is spending the retry budget inside the window it just named.
+    """
+    value = (error.headers or {}).get("Retry-After") if hasattr(
+        error, "headers") else None
+    try:
+        asked = int(str(value).strip())
+    except (TypeError, ValueError):
+        return fallback
+    # A server may name a very long window; waiting it out would burn
+    # the job's whole runtime, and a resumable crawl can come back for
+    # the rest next run.
+    return min(max(asked, fallback), RETRY_CEILING)
+
+
 def fetch(url, accept="application/json", raw=False, tries=RETRIES):
     """GET with backoff. Returns None if it never works."""
     delay = 4
@@ -403,6 +447,8 @@ def fetch(url, accept="application/json", raw=False, tries=RETRIES):
             return body if raw else json.loads(body.decode("utf-8", "replace"))
         except urllib.error.HTTPError as e:
             if e.code in (429, 500, 502, 503, 504):
+                if e.code == 429:
+                    delay = retry_after(e, delay)
                 sys.stderr.write(f"  http {e.code}, retry in {delay}s\n")
             else:
                 return None
@@ -412,7 +458,7 @@ def fetch(url, accept="application/json", raw=False, tries=RETRIES):
             sys.stderr.write(f"  {type(e).__name__}: {e}, retry in {delay}s\n")
         if attempt < tries - 1:
             time.sleep(delay)
-            delay *= 2
+            delay = min(delay * 2, RETRY_CEILING)
     return None
 
 
@@ -755,6 +801,7 @@ def dc_crawl(source_key, config, max_pages, stats, cache):
         sys.stderr.write(f"  resumed: complete, {len(state['entries'])} cards\n")
         return state["entries"]
     entries, page, failures = state["entries"], state["page"], 0
+    finished = False
     if page > 1:
         sys.stderr.write(f"  resuming at page {page}, {len(entries)} cards so far\n")
     while page <= max_pages:
@@ -773,6 +820,7 @@ def dc_crawl(source_key, config, max_pages, stats, cache):
         failures = 0
         rows = data.get("data") or []
         if not rows:
+            finished = True
             break
         if page % 10 == 0:
             sys.stderr.write(f"  page {page}, {len(entries)} kept\n")
@@ -791,8 +839,12 @@ def dc_crawl(source_key, config, max_pages, stats, cache):
             state["page"] = page
             save_crawl(cache)
         time.sleep(REQUEST_DELAY)
-    state["page"], state["done"] = page, True
+    state["page"], state["done"] = page, finished
     save_crawl(cache)
+    if not finished:
+        sys.stderr.write(
+            "  stopped at page {} with {} cards; the rest next run\n"
+            .format(page, len(entries)))
     return entries
 
 
@@ -973,6 +1025,7 @@ def loc_crawl(source_key, config, max_pages, stats, cache):
         sys.stderr.write(f"  resumed: complete, {len(state['entries'])} cards\n")
         return state["entries"]
     entries, page, failures = state["entries"], state["page"], 0
+    finished = False
     if page > 1:
         sys.stderr.write(f"  resuming at page {page}, {len(entries)} cards so far\n")
     while page <= max_pages:
@@ -986,11 +1039,12 @@ def loc_crawl(source_key, config, max_pages, stats, cache):
                 sys.stderr.write("  too many failed pages, stopping this source\n")
                 break
             page += 1
-            time.sleep(REQUEST_DELAY * 3)
+            time.sleep(LOC_DELAY * 3)
             continue
         failures = 0
         rows = data.get("results") or []
         if not rows:
+            finished = True
             break
         if page % 10 == 0:
             sys.stderr.write(f"  page {page}, {len(entries)} kept\n")
@@ -1004,14 +1058,19 @@ def loc_crawl(source_key, config, max_pages, stats, cache):
             if entry:
                 entries.append(entry)
         if not (data.get("pagination") or {}).get("next"):
+            finished = True
             break
         page += 1
         if page % CRAWL_SAVE_EVERY == 0:
             state["page"] = page
             save_crawl(cache)
-        time.sleep(REQUEST_DELAY)
-    state["page"], state["done"] = page, True
+        time.sleep(LOC_DELAY)
+    state["page"], state["done"] = page, finished
     save_crawl(cache)
+    if not finished:
+        sys.stderr.write(
+            "  stopped at page {} with {} cards; the rest next run\n"
+            .format(page, len(entries)))
     return entries
 
 
@@ -2039,8 +2098,202 @@ def describe(entries):
     return "\n".join(out)
 
 
+# How much of a source may go missing before a harvest is refused. The
+# whole-pool figure is the map recipe's, which has held since it was
+# written. The per-source one exists because the whole-pool figure can
+# be satisfied by the wrong cards: on 1 November the Library of Congress
+# came back with 87 of its 12,449 while Digital Commonwealth returned
+# 30,148 records it had never offered before, and a run where those had
+# been measured would have reported a bigger pool with two thirds of the
+# catalogue missing from it.
+#
+# A source is only judged if it had enough cards in the pool to mean
+# anything, so a holding that contributes a handful cannot veto a run.
+POOL_FLOOR = 0.6
+SOURCE_FLOOR = 0.5
+SOURCE_MIN = 50
+
+
+def shrink_refusals(entries, path=POOL_PATH):
+    """
+    Why this harvest must not replace the pool, or nothing.
+
+    A harvest that collapses means an archive changed something or
+    stopped answering, not that the cards are gone. The old pool is
+    worth more than a fresh bad one: the daily job carries on, and
+    every veto, star and hand-written caption still points at cards
+    that exist.
+    """
+    try:
+        with open(path) as fh:
+            previous = json.load(fh).get("entries") or []
+    except (OSError, ValueError):
+        return []
+    if not previous:
+        return []
+
+    out = []
+    if len(entries) < len(previous) * POOL_FLOOR:
+        out.append("the pool: {} cards against {}, under {:.0%}".format(
+            len(entries), len(previous), POOL_FLOOR))
+
+    was = collections.Counter(e.get("src") for e in previous)
+    now = collections.Counter(e.get("src") for e in entries)
+    for src, before in sorted(was.items()):
+        if before < SOURCE_MIN:
+            continue
+        after = now.get(src, 0)
+        if after < before * SOURCE_FLOOR:
+            out.append("{}: {} cards against {}, under {:.0%}".format(
+                src, after, before, SOURCE_FLOOR))
+    return out
+
+
+def selftest():
+    """
+    The rules that decide whether a bad afternoon at loc.gov costs us a
+    month. Each was written after one did.
+    """
+    failures = []
+
+    def check(name, ok, detail=""):
+        if not ok:
+            failures.append(name)
+        print(("  ok   " if ok else "  FAIL ") + name +
+              (f"  {detail}" if detail and not ok else ""))
+
+    class Refused:
+        def __init__(self, value):
+            self.headers = {"Retry-After": value} if value is not None else {}
+
+    check("a Retry-After is honoured", retry_after(Refused("45"), 4) == 45)
+    check("a missing one leaves the backoff alone",
+          retry_after(Refused(None), 4) == 4)
+    check("and so does a date, which we cannot parse",
+          retry_after(Refused("Wed, 21 Oct 2026 07:28:00 GMT"), 4) == 4)
+    check("a shorter one does not speed us up",
+          retry_after(Refused("1"), 4) == 4)
+    check("and an hour-long one is capped, not waited out",
+          retry_after(Refused("3600"), 4) == RETRY_CEILING)
+    check("and loc.gov is paced under its 20 a minute",
+          60.0 / LOC_DELAY <= 20, f"{60.0 / LOC_DELAY:.0f} a minute")
+
+    # And that fetch actually asks. Checking retry_after on its own
+    # leaves the one line that calls it untested, which is how a guard
+    # comes to be correct and unreached.
+    waits = []
+
+    def refuse(request, timeout=None):
+        raise urllib.error.HTTPError(
+            request.full_url, 429, "Too Many Requests",
+            {"Retry-After": "45"}, None)
+
+    real_open, real_sleep = urllib.request.urlopen, time.sleep
+    urllib.request.urlopen = refuse
+    time.sleep = waits.append
+    try:
+        answer = fetch("https://www.loc.gov/collections/x/?fo=json", tries=3)
+    finally:
+        urllib.request.urlopen, time.sleep = real_open, real_sleep
+    check("a refused fetch gives up rather than inventing a page",
+          answer is None)
+    check("and waits as long as the Library asked", waits[:1] == [45],
+          "waited {}".format(waits))
+    check("and keeps honouring it on the way down",
+          all(w >= 45 for w in waits), "waited {}".format(waits))
+
+    # Shrinking. The stand-in pool is the one on disk, so these are the
+    # real proportions rather than invented ones.
+    try:
+        with open(POOL_PATH) as fh:
+            live = json.load(fh).get("entries") or []
+    except (OSError, ValueError):
+        live = []
+    check("there is a pool to measure against", bool(live))
+    if live:
+        by_src = collections.defaultdict(list)
+        for entry in live:
+            by_src[entry.get("src")].append(entry)
+        biggest = max(by_src, key=lambda s: len(by_src[s]))
+
+        check("an unchanged harvest is not refused",
+              shrink_refusals(live) == [])
+
+        # 1 November: the Library of Congress answered 87 times out of
+        # 12,449 while Digital Commonwealth offered 30,148 records it
+        # had never offered before. The pool was the smaller for it, but
+        # a run where those records had been measured would have been
+        # bigger -- and still missing two thirds of the catalogue. That
+        # is the run the per-source rule is for.
+        flooded = [e for s, rows in by_src.items() for e in
+                   (rows[:87] if s == biggest else rows * 20)]
+        refusals = shrink_refusals(flooded)
+        check("a harvest that grew while losing a source is refused",
+              any(biggest in line for line in refusals),
+              "{} cards, said: {}".format(len(flooded), refusals))
+        check("and it is refused on the source, not the total",
+              len(flooded) > len(live),
+              "the total rule would have caught this one anyway")
+
+        thinned = [e for s, rows in by_src.items()
+                   for e in (rows[:len(rows) // 3] if s == biggest else rows)]
+        check("a source losing two thirds is refused",
+              any(biggest in line for line in shrink_refusals(thinned)))
+
+        tenth = [e for s, rows in by_src.items()
+                 for e in rows[:int(len(rows) * 0.9)]]
+        check("a tenth off everything is not", shrink_refusals(tenth) == [])
+
+        small = min(by_src, key=lambda s: len(by_src[s]))
+        if len(by_src[small]) < SOURCE_MIN:
+            gone = [e for e in live if e.get("src") != small]
+            check("a source too small to judge cannot veto a run",
+                  shrink_refusals(gone) == [])
+
+    # Resuming. A crawl stopped by a rate limit must not be remembered
+    # as complete, or the next run reads 87 cards back out of the cache
+    # and never asks again.
+    now = time.time()
+    month = 31 * 86400
+    cache = {
+        "done_fresh":   {"done": True,  "started": now - 5 * 86400},
+        "done_stale":   {"done": True,  "started": now - month},
+        "partial_month": {"done": False, "started": now - month},
+        "partial_ancient": {"done": False,
+                            "started": now - 200 * 86400},
+    }
+    import tempfile
+    path = os.path.join(tempfile.mkdtemp(), "crawl.json")
+    write_json_atomic(path, {"version": 1, "sources": cache})
+    before, globals()["CRAWL_PATH"] = CRAWL_PATH, path
+    try:
+        kept = load_crawl()
+    finally:
+        globals()["CRAWL_PATH"] = before
+        os.remove(path)
+    check("a finished crawl is re-walked next month",
+          "done_stale" not in kept,
+          "the collections have moved and we would not notice")
+    check("but not the same week", "done_fresh" in kept)
+    check("a crawl the Library cut short survives the month",
+          "partial_month" in kept,
+          "it would start over and be cut short again")
+    check("and is not kept for ever", "partial_ancient" not in kept)
+    check("the partial window spans more than one monthly run",
+          CRAWL_PARTIAL_MAX_AGE_DAYS > 31)
+
+    print()
+    if failures:
+        print(f"{len(failures)} failed")
+        return 1
+    print("all good")
+    return 0
+
+
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("--selftest", action="store_true",
+                    help="check the rate-limit, shrink and resume rules")
     ap.add_argument("--pages", type=int, default=400,
                     help="max search pages per source (100 records a page)")
     ap.add_argument("--no-measure", action="store_true",
@@ -2055,6 +2308,9 @@ def main():
                     help="describe the existing pool and exit")
     args = ap.parse_args()
 
+    if args.selftest:
+        return selftest()
+
     if args.report:
         with open(POOL_PATH) as fh:
             print(describe(json.load(fh)["entries"]))
@@ -2065,6 +2321,16 @@ def main():
         args.dims_source)
     if not entries:
         sys.stderr.write("\nnothing harvested; leaving the old pool alone\n")
+        return 1
+
+    refusals = shrink_refusals(entries)
+    if refusals:
+        sys.stderr.write("\n")
+        for line in refusals:
+            sys.stderr.write("  " + line + "\n")
+        sys.stderr.write(
+            "refusing to write a pool this much smaller than the one we "
+            "have; the archives did not lose these cards\n")
         return 1
 
     payload = {
