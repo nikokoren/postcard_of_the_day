@@ -212,6 +212,28 @@ UNREADABLE_DETAIL = 10.0    # a flat, empty scan
 TEXT_RATIO = 3.0            # the address side got in anyway
 MEASURE_SIZE = "!800,480"
 
+# The scorer fetches the card as published and converts it here.
+#
+# It used to ask IIIF for `gray.jpg`, which saved bandwidth and cost a
+# run: iiif.onb.ac.at answers 500 to gray while serving default and
+# color happily, a level-2 compliance claim with a hole in it. The first
+# fix was a per-source quality, which is a special case to maintain for
+# a saving nobody needed.
+#
+# Nothing downstream wants grey from the server either. The feed serves
+# `default.jpg` at panel size and TRMNL does the dithering, which is
+# where that belongs -- it knows the panel. Here the image is converted
+# to L on arrival regardless, so this only ever decided who did the
+# desaturating.
+#
+# One caveat, recorded rather than hidden: scores already in
+# quality.json were measured from server-rendered grey and new ones are
+# measured from a local L conversion, whose channel weights differ
+# slightly. Scores are cached per card and only new cards are rendered,
+# so nothing is rescored and no card moves -- but a card scored today is
+# judged on a very slightly different scale from one scored in August.
+MEASURE_QUALITY = "default"
+
 # The ratio above is a whole-card average, so it only catches a card
 # that is text all over. It is blind to the commonest spoiler of the
 # lot: a card that is half picture and half small print, an Italian view
@@ -493,7 +515,12 @@ def fetch(url, accept="application/json", raw=False, tries=RETRIES):
             if e.code in (429, 500, 502, 503, 504):
                 if e.code == 429:
                     delay = retry_after(e, delay)
-                sys.stderr.write(f"  http {e.code}, retry in {delay}s\n")
+                # Named, like the URLError branch. Leaving it out of this
+                # one is how sixty "http 500" lines went by without
+                # saying which of five hosts was refusing, or that it was
+                # refusing one quality and serving another.
+                sys.stderr.write("  http {} [{}], retry in {}s\n".format(
+                    e.code, host_of(url), delay))
             else:
                 return None
         except (urllib.error.URLError, http.client.HTTPException, TimeoutError,
@@ -2301,6 +2328,20 @@ def ruled_panel(image):
     return round(best[0], 3), round(best[1], 3)
 
 
+def measure_url(entry):
+    """
+    The image the scorer judges: the card as published, at panel size.
+
+    Its own function so a test can read it without Pillow installed --
+    measure() returns early without it, which hid the two checks that
+    were meant to cover this.
+    """
+    if entry.get("k") != "iiif":
+        return entry["b"]
+    return "{}/full/{}/0/{}.jpg".format(
+        entry["b"], MEASURE_SIZE, MEASURE_QUALITY)
+
+
 def measure(entry):
     """
     (mush, detail, texty, rhythm, flat) for one card, or None if it
@@ -2310,9 +2351,7 @@ def measure(entry):
         from PIL import Image, ImageFilter
     except ImportError:
         return None
-    url = (f"{entry['b']}/full/{MEASURE_SIZE}/0/gray.jpg"
-           if entry.get("k") == "iiif" else entry["b"])
-    raw = fetch(url, accept="image/jpeg", raw=True, tries=2)
+    raw = fetch(measure_url(entry), accept="image/jpeg", raw=True, tries=2)
     if not raw:
         return None
     try:
@@ -2370,8 +2409,28 @@ def fill_quality(entries, cache, budget):
         return 0
     sys.stderr.write(f"  rendering {len(todo)} cards to score them\n")
     done = 0
+    refused = collections.Counter()
+    give_up = set()
+
+    def scored(entry):
+        """measure(), but not against a host that has stopped answering."""
+        host = host_of(entry["b"])
+        if host in give_up:
+            return None
+        score = measure(entry)
+        if score:
+            refused[host] = 0
+        else:
+            refused[host] += 1
+            if refused[host] >= HOST_PATIENCE:
+                give_up.add(host)
+                sys.stderr.write(
+                    "  {} has refused {} in a row; leaving it for this "
+                    "run\n".format(host, HOST_PATIENCE))
+        return score
+
     with ThreadPoolExecutor(max_workers=4) as pool:
-        for entry, score in zip(todo, pool.map(measure, todo)):
+        for entry, score in zip(todo, pool.map(scored, todo)):
             cache[entry["id"]] = list(score) if score else None
             done += 1
             if done % 100 == 0:
@@ -2640,32 +2699,44 @@ def probe():
             bases[entry["src"]] = entry["b"]
     bases.setdefault("onb", ONB_IIIF + "AK036_583/583")
 
-    print("{:<12} {:<34} {:>8} {:>8}".format(
-        "source", "host", "https", "http"))
+    print("{:<9} {:<30} {:>7} {:>7} {:>7} {:>8}".format(
+        "source", "host", "https", "http", "gray", "default"))
     worst = 0
     for src, base in sorted(bases.items()):
         host = host_of(base)
-        results = []
+        row = []
         for scheme in ("https", "http"):
             url = re.sub(r"^https?://", scheme + "://", base) + "/info.json"
             start = time.time()
             # One try, short: this is a question, not an attempt.
             info = fetch(url, tries=1)
-            took = time.time() - start
-            ok = isinstance(info, dict) and info.get("width")
-            results.append("{:.1f}s".format(took) if ok else "-")
-        print("{:<12} {:<34} {:>8} {:>8}".format(
-            src, host[:34], results[0], results[1]))
-        if results[0] == "-" and results[1] == "-":
+            row.append("{:.1f}s".format(time.time() - start)
+                       if isinstance(info, dict) and info.get("width")
+                       else "-")
+        # And the two qualities the scorer might ask for. iiif.onb.ac.at
+        # answers 500 to gray and 200 to default, which cost a run and
+        # sixty unattributed "http 500" lines to find.
+        for quality in ("gray", "default"):
+            raw = fetch("{}/full/{}/0/{}.jpg".format(
+                base, MEASURE_SIZE, quality),
+                accept="image/jpeg", raw=True, tries=1)
+            row.append("ok" if raw else "-")
+        print("{:<9} {:<30} {:>7} {:>7} {:>7} {:>8}".format(
+            src, host[:30], *row))
+
+        if row[0] == "-" and row[1] == "-":
+            print("          ^ neither scheme answers at all")
             worst = 1
-        elif results[0] == "-":
-            scheme_now = base.split(":")[0]
-            print("             ^ https does not answer; this source is "
-                  "configured for {}".format(scheme_now))
-            if scheme_now != "http":
-                worst = 1
+        elif row[0] == "-" and base.split(":")[0] != "http":
+            print("          ^ https does not answer, but this source is "
+                  "configured for it")
+            worst = 1
+        if row[2 if MEASURE_QUALITY == "gray" else 3] == "-":
+            print("          ^ the scorer asks this host for {}.jpg and it "
+                  "does not serve it".format(MEASURE_QUALITY))
+            worst = 1
     print()
-    print("A dash means that scheme did not return a usable info.json.")
+    print("A dash means that scheme or quality did not answer.")
     return worst
 
 
@@ -2769,6 +2840,49 @@ def selftest():
     check("and the cap is well under the job's own patience",
           MAX_WAIT_PER_FETCH < 300, f"{MAX_WAIT_PER_FETCH}s a page")
 
+    # What the scorer fetches, and what the feed serves. TRMNL does the
+    # dithering, so nothing here should be asking a server for grey.
+    import daily
+    card = {"id": "x", "k": "iiif", "src": "onb",
+            "b": ONB_IIIF + "AK014_464/464"}
+    check("the scorer asks for the card as published",
+          measure_url(card).endswith("/default.jpg"),
+          "asked for {}".format(measure_url(card).rsplit("/", 1)[-1]))
+    check("and at the size it measures", MEASURE_SIZE in measure_url(card))
+    check("and a fixed source is fetched whole, not sized",
+          measure_url({"id": "y", "k": "fixed", "b": "http://x/y.jpg"})
+          == "http://x/y.jpg")
+    check("and the feed serves the same quality, not a grey one",
+          daily.image_url(card).endswith("/default.jpg"),
+          "feed serves {}".format(daily.image_url(card)))
+    check("so no source needs a quality of its own",
+          isinstance(MEASURE_QUALITY, str),
+          "a per-source table is a special case to maintain")
+
+    # And an HTTP error names the host, like a URLError does. Leaving
+    # this out of one branch is how sixty "http 500" lines went by
+    # without saying which host, or that it served default and refused
+    # gray.
+    import contextlib
+    http_noise = io.StringIO()
+
+    def five_hundred(request, timeout=None):
+        raise urllib.error.HTTPError(
+            request.full_url, 500, "Server Error", {}, None)
+
+    real_open4, real_sleep4 = urllib.request.urlopen, time.sleep
+    urllib.request.urlopen = five_hundred
+    time.sleep = lambda _s: None
+    try:
+        with contextlib.redirect_stderr(http_noise):
+            fetch("http://iiif.example.org/images/x/full/!8,8/0/gray.jpg",
+                  tries=2)
+    finally:
+        urllib.request.urlopen, time.sleep = real_open4, real_sleep4
+    check("an http error names the host too",
+          "iiif.example.org" in http_noise.getvalue(),
+          "said: {!r}".format(http_noise.getvalue()[:70]))
+
     # The circuit breaker. A host that has stopped answering must cost
     # this run seconds, not its budget: 2,500 lookups against an
     # endpoint that times out is an hour of retries and nothing
@@ -2826,6 +2940,25 @@ def selftest():
         fill_dimensions(flaky, flaky_cache, 120)
     finally:
         globals()["fetch_dimensions"] = real_dims2
+    # The scoring step has its own copy of the breaker, and a copy is a
+    # thing that can be missing. 544 cards against a host answering 500
+    # is the same hour of nothing as 2,500 against one that times out.
+    scored_asks = collections.Counter()
+
+    def never(entry):
+        scored_asks[host_of(entry["b"])] += 1
+        return None
+
+    real_measure, globals()["measure"] = measure, never
+    try:
+        fill_quality(dead[:150], {}, 150)
+    finally:
+        globals()["measure"] = real_measure
+    check("the scoring step gives up on a dead host too",
+          scored_asks["dead.example"] <= HOST_PATIENCE + 4,
+          "rendered against it {} times".format(
+              scored_asks["dead.example"]))
+
     check("a host that keeps coming back is not given up on",
           seen["n"] >= len(flaky) - DIMS_WORKERS,
           "stopped after {} of {}".format(seen["n"], len(flaky)))
