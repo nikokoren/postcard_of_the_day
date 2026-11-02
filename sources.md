@@ -170,6 +170,88 @@ thousand.
 
 ---
 
+## Cleared, not yet built
+
+### Austrian National Library (ÖNB) — AKON, Ansichtskarten Online
+
+- Metadata: one file. `https://lod.onb.ac.at/downloads/metadata_akon.tar.bz2`,
+  4.3MB, **75,181 EDM-RDF records**, no key and no crawl.
+- Images: IIIF Image API 2, **Level 2**, at
+  `https://iiif.onb.ac.at/images/AKON/<id>/<n>/`
+- Size: **34,846 cards carry an image**, which is the number that matters.
+- Rights: **Public Domain Mark 1.0** on every one of those, stated per record
+  in `edm:rights`; metadata CC0 under the ÖNB Labs terms.
+
+Measured against the dump rather than the portal's own figures, which are
+stale -- ÖNB Labs still advertises 38,800 records.
+
+The 75,181 split cleanly in two and the split is the whole story:
+
+| `edm:rights` | records | image |
+| --- | --- | --- |
+| Public Domain Mark 1.0 | 34,846 | yes |
+| Copyright Not Evaluated | 40,335 | none |
+
+They publish an image only where they have cleared it, so there is no
+rights judgement for us to make: take the ones with `edm:isShownBy` and
+the rest are not offered.
+
+What the cleared 34,846 carry:
+
+| field | present |
+| --- | --- |
+| `dc:title` | 100% |
+| `dc:date` | 100%, and 4-digit years, not ranges |
+| `sws.geonames.org` id | 99% |
+| `dcterms:spatial` | 89% |
+| `dc:publisher` | 52% |
+| `dc:description` | 44% |
+
+A date on every card is something no other source here manages, and a
+GeoNames id is a better place axis than a string: it resolves to a
+country without us parsing anything. Titles are short -- median 10
+characters, usually the place alone ("Villach", "Budapest") -- but
+`dc:description` carries the subject where it exists, so "Lienz" plus
+"Schloss Bruck" reads as a caption rather than a label.
+
+Years run **1890 to 1925**, peaking in the 1900s (17,129) and 1910s
+(11,661). That is earlier than anything else in the pool and would shift
+the era axis, not just fill it. It is also 73,161 European cards against
+599 Asian and 488 American across the full set -- the opposite bias to
+Digital Commonwealth's 90% United States, which is the imbalance the
+thinning rules exist to fight.
+
+Masters are about **1658x1081** -- a 14x9cm card scanned at 300dpi, which
+is what the FAQ says they did. Under the X's 1872x1404 panel, so those
+cards would be served at their own size rather than filling it. Larger
+than the Europeana providers already accepted and smaller than Graz's
+3000x1947.
+
+Two things recommend it beyond the content. It is **one 4.3MB download**
+rather than a paged crawl, so it cannot be rate-limited, cannot be half
+harvested, and costs the Library nothing -- after the month we have just
+had with loc.gov, that is worth as much as the cards. And Graz is its
+single commonest place (283 cards), so it feeds the Graz feed as well as
+the public one.
+
+Open questions before building it:
+
+- GeoNames ids need resolving to countries. Their API wants a free
+  account and rate-limits; the `allCountries` dump is ~350MB and would be
+  a build-time step, not a runtime one. This is the real work in the job.
+- Ledermann published 10,356 of the 34,846 -- 30% from one house. The
+  existing holding-balance rules should cover it, but it wants checking
+  rather than assuming.
+- The image host refused every direct request from this container
+  (the tunnel closed mid-exchange), so `info.json` was read through a
+  different route. Whether that is our sandbox or something at their end
+  is untested from a GitHub runner, and it decides whether any of this
+  works at all.
+- One card is dated 1827, which predates the picture postcard by half a
+  century; it is the only one before 1890 and the date filter catches it.
+
+---
+
 ## Looked at and left out
 
 **Europeana** is an aggregator, and that is the whole story: it holds the
