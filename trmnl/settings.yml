@@ -40,6 +40,7 @@ custom_fields:
       - Latin America & the Caribbean
       - Asia
       - Middle East
+      - Oceania
   - keyname: era
     field_type: select
     name: Era
@@ -79,8 +80,8 @@ custom_fields:
       -- and unlike your friends and family, it lets you choose where they
       come from. <br><br> Real printed cards from the
       public archives -- the kind somebody bought at a station kiosk, wrote
-      three lines on, and posted. 17,779 of them so far, spanning
-      115 countries and the years 1860 to 1975, held by the
+      three lines on, and posted. 25,541 of them so far, spanning
+      126 countries and the years 1860 to 1975, held by the
       Library of Congress, the Rijksmuseum, the University of Graz and
       more. Each one arrives with whatever the catalogue knows: what it
       shows, where, and when. <br><br> Sort by orientation, region or era -- or change
