@@ -80,6 +80,11 @@ RETRY_CEILING = 120     # no single backoff longer than this
 # fifth retry of this one -- page 10 of that run loaded fine while 2 to
 # 9 were being waited out.
 MAX_WAIT_PER_FETCH = 130
+
+# Consecutive failures from one host before the measuring step stops
+# asking it this run. Enough to ride out a bad patch, few enough that a
+# dead endpoint costs a minute rather than the budget.
+HOST_PATIENCE = 12
 # Two, not six. A IIIF host behind a shared egress will drop
 # connections under concurrency long before it runs out of capacity:
 # measured against Digital Commonwealth, six workers failed 13 of 20
@@ -445,6 +450,13 @@ def crawl_state(cache, source_key):
 # http
 # ============================================================
 
+def host_of(url):
+    try:
+        return urllib.parse.urlsplit(url).netloc or "?"
+    except ValueError:
+        return "?"
+
+
 def retry_after(error, fallback):
     """
     How long a server asked us to wait, when it bothered to say.
@@ -487,7 +499,11 @@ def fetch(url, accept="application/json", raw=False, tries=RETRIES):
         except (urllib.error.URLError, http.client.HTTPException, TimeoutError,
                 ConnectionError, OSError, ValueError) as e:
             # Truncated responses are ordinary on a long paged crawl.
-            sys.stderr.write(f"  {type(e).__name__}: {e}, retry in {delay}s\n")
+            # Named by host, because two hours were spent reading
+            # "urlopen error timed out" without knowing whose edge was
+            # refusing us -- the measurement walks every source at once.
+            sys.stderr.write("  {}: {} [{}], retry in {}s\n".format(
+                type(e).__name__, e, host_of(url), delay))
         if attempt < tries - 1:
             if waited + delay > MAX_WAIT_PER_FETCH:
                 sys.stderr.write(
@@ -726,7 +742,28 @@ def country_slug(name):
 # what loc.gov did to the 1 November run, that is worth as much as the
 # cards.
 ONB_DUMP = "https://lod.onb.ac.at/downloads/metadata_akon.tar.bz2"
-ONB_IIIF = "https://iiif.onb.ac.at/images/AKON/"
+
+# http, not https, and not by preference.
+#
+# iiif.onb.ac.at answers HTTP in 0.7 seconds and does not complete a
+# TLS handshake at all from either of the two datacentre networks this
+# has been tried on: 39 bytes received and the connection dies after ten
+# seconds here, plain timeouts on a GitHub runner, where 2,500
+# measurements turned into an hour of nothing. It does work over HTTPS
+# from an ordinary connection, so this is something about their edge and
+# cloud clients rather than a dead certificate.
+#
+# The dump's own records say http, which is the library telling us which
+# one it stands behind. I overrode that to https on the reasoning that a
+# panel should not load an image over plain HTTP, and that reasoning was
+# worth less than the measurement: TRMNL renders server-side, so the
+# fetch that matters comes from a datacentre too, and an https URL that
+# times out is a blank screen.
+#
+# --probe reports both schemes for every source, so this can be revisited
+# with evidence rather than reversed on a hunch.
+ONB_SCHEME = "http"
+ONB_IIIF = ONB_SCHEME + "://iiif.onb.ac.at/images/AKON/"
 ONB_ITEM = "https://data.onb.ac.at/AKON/"
 ONB_HOLDER = "Austrian National Library"
 
@@ -2096,10 +2133,37 @@ def fill_dimensions(entries, cache, budget, only_source=None):
     if not todo:
         return 0
     sys.stderr.write(f"  measuring {len(todo)} of {len(entries)} cards\n")
+
+    # A host that has stopped answering should cost this run seconds,
+    # not its whole budget. 2,500 lookups against an endpoint that times
+    # out is an hour of retries and nothing measured, which is how a
+    # broken scheme on one source hid behind "urlopen error timed out".
+    #
+    # Counted by host and only while nothing is getting through: one
+    # success clears the tally, so a slow host is tolerated and a dead
+    # one is dropped.
+    refused = collections.Counter()
+    give_up = set()
+
+    def measure(entry):
+        host = host_of(entry["b"])
+        if host in give_up:
+            return None
+        dims = fetch_dimensions(entry["b"])
+        if dims:
+            refused[host] = 0
+        else:
+            refused[host] += 1
+            if refused[host] >= HOST_PATIENCE:
+                give_up.add(host)
+                sys.stderr.write(
+                    "  {} has refused {} in a row; leaving it for this "
+                    "run\n".format(host, HOST_PATIENCE))
+        return dims
+
     done = 0
     with ThreadPoolExecutor(max_workers=DIMS_WORKERS) as pool:
-        for entry, dims in zip(todo, pool.map(
-                lambda e: fetch_dimensions(e["b"]), todo)):
+        for entry, dims in zip(todo, pool.map(measure, todo)):
             cache[entry["id"]] = list(dims) if dims else None
             done += 1
             # Checkpoint. This phase is the long pole of a refresh, and
@@ -2550,6 +2614,61 @@ def shrink_refusals(entries, path=POOL_PATH):
     return out
 
 
+def probe():
+    """
+    Can we reach each source's image host, and over which scheme?
+
+    Written after two hour-long runs failed on an endpoint that answers
+    HTTP in under a second and does not complete a TLS handshake from a
+    datacentre at all. The question took an hour a go to ask; it should
+    take one request.
+
+    Both schemes for every host, because the answer differs by host and
+    by network, and the scheme a source serves is a one-line constant
+    that should be set from a measurement.
+    """
+    try:
+        with open(POOL_PATH) as fh:
+            entries = json.load(fh).get("entries") or []
+    except (OSError, ValueError):
+        entries = []
+
+    # One card per source, plus AKON, which may not be in the pool yet.
+    bases = {}
+    for entry in entries:
+        if entry.get("k") == "iiif" and entry.get("src") not in bases:
+            bases[entry["src"]] = entry["b"]
+    bases.setdefault("onb", ONB_IIIF + "AK036_583/583")
+
+    print("{:<12} {:<34} {:>8} {:>8}".format(
+        "source", "host", "https", "http"))
+    worst = 0
+    for src, base in sorted(bases.items()):
+        host = host_of(base)
+        results = []
+        for scheme in ("https", "http"):
+            url = re.sub(r"^https?://", scheme + "://", base) + "/info.json"
+            start = time.time()
+            # One try, short: this is a question, not an attempt.
+            info = fetch(url, tries=1)
+            took = time.time() - start
+            ok = isinstance(info, dict) and info.get("width")
+            results.append("{:.1f}s".format(took) if ok else "-")
+        print("{:<12} {:<34} {:>8} {:>8}".format(
+            src, host[:34], results[0], results[1]))
+        if results[0] == "-" and results[1] == "-":
+            worst = 1
+        elif results[0] == "-":
+            scheme_now = base.split(":")[0]
+            print("             ^ https does not answer; this source is "
+                  "configured for {}".format(scheme_now))
+            if scheme_now != "http":
+                worst = 1
+    print()
+    print("A dash means that scheme did not return a usable info.json.")
+    return worst
+
+
 def selftest():
     """
     The rules that decide whether a bad afternoon at loc.gov costs us a
@@ -2598,6 +2717,27 @@ def selftest():
         urllib.request.urlopen, time.sleep = real_open, real_sleep
     check("a refused fetch gives up rather than inventing a page",
           answer is None)
+
+    # And says whose edge refused us. Two hour-long runs were spent
+    # reading "urlopen error timed out" with no way to tell which of
+    # five hosts it meant.
+    import contextlib
+    noise = io.StringIO()
+
+    def drop(request, timeout=None):
+        raise urllib.error.URLError("timed out")
+
+    real_open3, real_sleep3 = urllib.request.urlopen, time.sleep
+    urllib.request.urlopen = drop
+    time.sleep = lambda _s: None
+    try:
+        with contextlib.redirect_stderr(noise):
+            fetch("https://iiif.example.org/images/x/info.json", tries=2)
+    finally:
+        urllib.request.urlopen, time.sleep = real_open3, real_sleep3
+    check("and a failed request names the host",
+          "iiif.example.org" in noise.getvalue(),
+          "said: {!r}".format(noise.getvalue()[:70]))
     check("and waits as long as the Library asked", waits[:1] == [45],
           "waited {}".format(waits))
     check("and keeps honouring it on the way down",
@@ -2628,6 +2768,67 @@ def selftest():
           "waited {}".format(slow_waits))
     check("and the cap is well under the job's own patience",
           MAX_WAIT_PER_FETCH < 300, f"{MAX_WAIT_PER_FETCH}s a page")
+
+    # The circuit breaker. A host that has stopped answering must cost
+    # this run seconds, not its budget: 2,500 lookups against an
+    # endpoint that times out is an hour of retries and nothing
+    # measured, which is how a broken scheme on one source hid behind
+    # "urlopen error timed out".
+    check("a host is read off a URL",
+          host_of("http://iiif.onb.ac.at/images/AKON/x/1")
+          == "iiif.onb.ac.at")
+
+    dead = [{"id": f"dead:{n}", "k": "iiif",
+             "b": "http://dead.example/img/" + str(n)} for n in range(200)]
+    alive = [{"id": f"live:{n}", "k": "iiif",
+              "b": "http://live.example/img/" + str(n)} for n in range(40)]
+    asked = collections.Counter()
+
+    def stub(base):
+        asked[host_of(base)] += 1
+        return None if "dead" in base else (1600, 1000)
+
+    real_dims, globals()["fetch_dimensions"] = fetch_dimensions, stub
+    try:
+        cache = {}
+        fill_dimensions(dead + alive, cache, 240)
+    finally:
+        globals()["fetch_dimensions"] = real_dims
+    check("a dead host is dropped after a dozen refusals",
+          asked["dead.example"] <= HOST_PATIENCE + DIMS_WORKERS,
+          "asked it {} times".format(asked["dead.example"]))
+    check("and a host that answers is not",
+          asked["live.example"] == len(alive),
+          "asked the good host {} of {}".format(
+              asked["live.example"], len(alive)))
+    check("and the cards it refused are left unmeasured, not recorded "
+          "as sizeless",
+          sum(1 for k, v in cache.items() if k.startswith("dead:")
+              and v is not None) == 0)
+    check("while the good host's cards are measured",
+          sum(1 for k, v in cache.items() if k.startswith("live:")
+              and v) == len(alive))
+
+    # And a host that fails almost enough, then answers, forever. The
+    # tally has to reset on success or a merely unreliable host is
+    # dropped as a dead one.
+    flaky = [{"id": f"flaky:{n}", "k": "iiif",
+              "b": "http://flaky.example/img/" + str(n)} for n in range(120)]
+    seen = {"n": 0}
+
+    def sometimes(base):
+        seen["n"] += 1
+        return (1600, 1000) if seen["n"] % HOST_PATIENCE == 0 else None
+
+    real_dims2, globals()["fetch_dimensions"] = fetch_dimensions, sometimes
+    try:
+        flaky_cache = {}
+        fill_dimensions(flaky, flaky_cache, 120)
+    finally:
+        globals()["fetch_dimensions"] = real_dims2
+    check("a host that keeps coming back is not given up on",
+          seen["n"] >= len(flaky) - DIMS_WORKERS,
+          "stopped after {} of {}".format(seen["n"], len(flaky)))
 
     # A targeted run. Every row needs an entry in SOURCE_SRC or a run
     # that skips it drops its cards instead of keeping them.
@@ -2748,17 +2949,21 @@ def selftest():
           ONB_RIGHTS.search(cleared).group(1) == ONB_PDM)
     base = onb_iiif_base(ONB_IMAGE.search(cleared).group(1))
     check("and its IIIF base is the image URL without the size",
-          base == "https://iiif.onb.ac.at/images/AKON/AK014_464/464",
-          "got {}".format(base))
-    check("and the base is served over https, whatever the record says",
-          base.startswith("https://"),
-          "the dump gives http:// and a panel will not load it")
+          base == ONB_IIIF + "AK014_464/464", "got {}".format(base))
+    # Not `base.startswith(ONB_SCHEME)`, which would pass whatever
+    # ONB_SCHEME said. Pinned to the measurement: iiif.onb.ac.at answers
+    # HTTP and does not complete a TLS handshake from a datacentre, and
+    # `--probe` is how to check whether that has changed.
+    check("and AKON images are asked for over http, which is the scheme "
+          "that host answers",
+          base.startswith("http://") and ONB_SCHEME == "http",
+          "{} -- run --probe before changing this".format(base))
     check("and a base is refused if it is not an AKON image service",
           onb_iiif_base("https://example.org/img/full/full/0/default.jpg")
           is None)
     check("the dimension step would ask the right URL",
           base + "/info.json" ==
-          "https://iiif.onb.ac.at/images/AKON/AK014_464/464/info.json")
+          ONB_IIIF + "AK014_464/464/info.json")
 
     # The split that decides the whole source: no image means not
     # cleared, and those records are skipped rather than failed.
@@ -2800,7 +3005,7 @@ def selftest():
         check("and the year as an integer", entry["y"] == 1917)
         check("and the publisher kept", entry.get("pub") == "Ledermann")
         check("and an item URL on the library's own host",
-              entry["u"] == "https://data.onb.ac.at/AKON/AK014_464")
+              entry["u"] == ONB_ITEM + "AK014_464")
     # A card whose place nobody has looked up yet keeps its caption and
     # loses its region. It must not borrow one: nearly all of AKON is
     # Austrian, so defaulting to Austria would be right often enough to
@@ -2908,6 +3113,9 @@ def selftest():
 
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("--probe", action="store_true",
+                    help="check each source's image host over https and "
+                         "http, and exit")
     ap.add_argument("--selftest", action="store_true",
                     help="check the rate-limit, shrink and resume rules")
     ap.add_argument("--pages", type=int, default=400,
@@ -2930,6 +3138,9 @@ def main():
     ap.add_argument("--report", action="store_true",
                     help="describe the existing pool and exit")
     args = ap.parse_args()
+
+    if args.probe:
+        return probe()
 
     if args.selftest:
         return selftest()
