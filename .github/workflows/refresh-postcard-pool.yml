@@ -12,6 +12,18 @@ on:
         description: "Max search pages per source (100 records each)"
         required: false
         default: "400"
+      # A newly added source arrives in whatever slice of the shared
+      # measurement budget it can win, and an unmeasured card is
+      # dropped. These two exist so a first pass can be spent on one
+      # source rather than waiting months for it to come round.
+      dims_source:
+        description: "Spend the whole measurement budget on one source (e.g. onb)"
+        required: false
+        default: ""
+      dims_budget:
+        description: "info.json lookups this run (default 2500)"
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -45,7 +57,13 @@ jobs:
         # the harvest runs exactly as before, so a fork works unchanged.
         env:
           EUROPEANA_KEY: ${{ secrets.EUROPEANA_KEY }}
-        run: python3 harvest.py --pages "${{ github.event.inputs.pages || 400 }}"
+          DIMS_SOURCE: ${{ github.event.inputs.dims_source }}
+          DIMS_BUDGET: ${{ github.event.inputs.dims_budget }}
+        run: |
+          python3 harvest.py \
+            --pages "${{ github.event.inputs.pages || 400 }}" \
+            ${DIMS_SOURCE:+--dims-source "$DIMS_SOURCE"} \
+            ${DIMS_BUDGET:+--dims-budget "$DIMS_BUDGET"}
 
       # A refused harvest -- a source that collapsed, or an archive that
       # stopped answering -- still did real work: pages walked, captions
