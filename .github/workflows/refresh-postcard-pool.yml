@@ -24,6 +24,10 @@ on:
         description: "info.json lookups this run (default 2500)"
         required: false
         default: ""
+      only:
+        description: "Harvest only these sources, comma separated (e.g. onb-akon). Others keep their current cards."
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -59,11 +63,13 @@ jobs:
           EUROPEANA_KEY: ${{ secrets.EUROPEANA_KEY }}
           DIMS_SOURCE: ${{ github.event.inputs.dims_source }}
           DIMS_BUDGET: ${{ github.event.inputs.dims_budget }}
+          ONLY: ${{ github.event.inputs.only }}
         run: |
           python3 harvest.py \
             --pages "${{ github.event.inputs.pages || 400 }}" \
             ${DIMS_SOURCE:+--dims-source "$DIMS_SOURCE"} \
-            ${DIMS_BUDGET:+--dims-budget "$DIMS_BUDGET"}
+            ${DIMS_BUDGET:+--dims-budget "$DIMS_BUDGET"} \
+            ${ONLY:+--only "$ONLY"}
 
       # A refused harvest -- a source that collapsed, or an archive that
       # stopped answering -- still did real work: pages walked, captions

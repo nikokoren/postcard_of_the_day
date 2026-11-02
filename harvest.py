@@ -68,6 +68,18 @@ REQUEST_DELAY = 1.0     # between search pages
 # resumes from crawl.json on the next one.
 LOC_DELAY = 4.0
 RETRY_CEILING = 120     # no single backoff longer than this
+
+# And a bound on what one page may cost in total. Honouring Retry-After
+# is right and it made the failure worse: loc.gov names 120 seconds and
+# there are five retries, so a page that will not load burns ten
+# minutes. The 2 November run spent its whole budget in backoff.
+#
+# One honouring of the window, then move on. A server that asks for two
+# minutes and asks again after we have waited them is not rate-limiting
+# us, it is refusing us, and the next page is a better bet than the
+# fifth retry of this one -- page 10 of that run loaded fine while 2 to
+# 9 were being waited out.
+MAX_WAIT_PER_FETCH = 130
 # Two, not six. A IIIF host behind a shared egress will drop
 # connections under concurrency long before it runs out of capacity:
 # measured against Digital Commonwealth, six workers failed 13 of 20
@@ -341,6 +353,23 @@ SOURCES = [
     ("onb-akon", "onb", "Austrian National Library", {}),
 ]
 
+# Which `src` each row writes on its cards. Spelled out rather than
+# derived from the key, because they do not match: the row is
+# "rijksmuseum" and the card says "rijks", and both Digital
+# Commonwealth rows write "dc". A targeted run uses this to work out
+# whose cards it is replacing, so a wrong entry would drop a source
+# from the pool rather than carry it forward. The selftest checks every
+# row has one.
+SOURCE_SRC = {
+    "loc-postcards": "loc",
+    "dc-open": "dc",
+    "dc-cc": "dc",
+    "rijksmuseum": "rijks",
+    "graz": "graz",
+    "europeana-de": "europeana",
+    "onb-akon": "onb",
+}
+
 # Resolving one Rijksmuseum card costs three requests -- the object, the
 # visual item it shows, and the digital object that visual item is
 # served as -- so the full 16,020 is around 48,000 requests and not
@@ -440,6 +469,7 @@ def retry_after(error, fallback):
 def fetch(url, accept="application/json", raw=False, tries=RETRIES):
     """GET with backoff. Returns None if it never works."""
     delay = 4
+    waited = 0
     for attempt in range(tries):
         try:
             req = urllib.request.Request(
@@ -459,7 +489,13 @@ def fetch(url, accept="application/json", raw=False, tries=RETRIES):
             # Truncated responses are ordinary on a long paged crawl.
             sys.stderr.write(f"  {type(e).__name__}: {e}, retry in {delay}s\n")
         if attempt < tries - 1:
+            if waited + delay > MAX_WAIT_PER_FETCH:
+                sys.stderr.write(
+                    "  {}s of waiting on one request is enough\n"
+                    .format(waited))
+                return None
             time.sleep(delay)
+            waited += delay
             delay = min(delay * 2, RETRY_CEILING)
     return None
 
@@ -2283,14 +2319,66 @@ def fill_quality(entries, cache, budget):
 # pool
 # ============================================================
 
+def partial_source(only):
+    """
+    The source a targeted run would half-refresh, or None.
+
+    Two rows write "dc", so asking for one of them drops every Digital
+    Commonwealth card -- they share a src and carry_sources cannot tell
+    them apart -- and then re-harvests only half of them. The pool would
+    come back 900 cards short with nothing in the log to say why. Easier
+    to refuse than to explain.
+    """
+    asked = {SOURCE_SRC[key] for key in only}
+    for key, _kind, _label, _config in SOURCES:
+        if key not in only and SOURCE_SRC[key] in asked:
+            return SOURCE_SRC[key]
+    return None
+
+
+def carry_sources(only):
+    """
+    The existing pool's cards for every source this run is not
+    harvesting.
+
+    A targeted run exists because one source is new and the others cost
+    an hour of loc.gov saying no. Reusing their cards keeps the pool
+    whole, keeps every veto and hand-written caption pointing at
+    something, and keeps the shrink guard quiet -- it is not a smaller
+    harvest, it is the same harvest with one source refreshed.
+    """
+    try:
+        with open(POOL_PATH) as fh:
+            previous = json.load(fh).get("entries") or []
+    except (OSError, ValueError):
+        previous = []
+    refreshing = {SOURCE_SRC[key] for key in only}
+    return [entry for entry in previous
+            if entry.get("src") not in refreshing]
+
+
 def build_pool(max_pages, do_measure, dims_budget=DIMS_BUDGET,
                rijks_budget=RIJKS_BUDGET, dims_source=None,
-               geo_budget=GEONAMES_BUDGET):
+               geo_budget=GEONAMES_BUDGET, only=None):
     stats = collections.Counter()
     entries, seen_ids = [], set()
 
     cache = load_crawl()
+    if only:
+        # The sources not asked for keep the cards they already have --
+        # which is the difference between "refresh one source" and
+        # "throw the others away".
+        kept = carry_sources(only)
+        for entry in kept:
+            if entry["id"] not in seen_ids:
+                seen_ids.add(entry["id"])
+                entries.append(entry)
+        sys.stderr.write(
+            "carrying {} cards forward from the sources not asked for\n"
+            .format(len(kept)))
     for source_key, kind, label, config in SOURCES:
+        if only and source_key not in only:
+            continue
         sys.stderr.write(f"\n{source_key} ({label})\n")
         crawler = CRAWLERS[kind]
         budget = {"rijksmuseum": rijks_budget,
@@ -2514,6 +2602,84 @@ def selftest():
           "waited {}".format(waits))
     check("and keeps honouring it on the way down",
           all(w >= 45 for w in waits), "waited {}".format(waits))
+
+    # The wait cap. Honouring Retry-After made a blocked page cost ten
+    # minutes, and eleven of them cost the job -- so the honouring is
+    # bounded.
+    slow_waits = []
+
+    def refuse_forever(request, timeout=None):
+        raise urllib.error.HTTPError(
+            request.full_url, 429, "Too Many Requests",
+            {"Retry-After": "120"}, None)
+
+    real_open, real_sleep = urllib.request.urlopen, time.sleep
+    urllib.request.urlopen = refuse_forever
+    time.sleep = slow_waits.append
+    try:
+        fetch("https://www.loc.gov/collections/x/?fo=json")
+    finally:
+        urllib.request.urlopen, time.sleep = real_open, real_sleep
+    check("a page that keeps being refused is given up on",
+          sum(slow_waits) <= MAX_WAIT_PER_FETCH,
+          "waited {}s in total: {}".format(sum(slow_waits), slow_waits))
+    check("but the window is honoured once before that",
+          slow_waits and slow_waits[0] == 120,
+          "waited {}".format(slow_waits))
+    check("and the cap is well under the job's own patience",
+          MAX_WAIT_PER_FETCH < 300, f"{MAX_WAIT_PER_FETCH}s a page")
+
+    # A targeted run. Every row needs an entry in SOURCE_SRC or a run
+    # that skips it drops its cards instead of keeping them.
+    missing = [key for key, _k, _l, _c in SOURCES if key not in SOURCE_SRC]
+    check("every source says which cards are its own", not missing,
+          "no SOURCE_SRC for: " + ", ".join(missing))
+    check("and no row claims a source that nothing writes",
+          set(SOURCE_SRC) == {key for key, _k, _l, _c in SOURCES},
+          "SOURCE_SRC and SOURCES disagree")
+
+    try:
+        with open(POOL_PATH) as fh:
+            pool_now = json.load(fh).get("entries") or []
+    except (OSError, ValueError):
+        pool_now = []
+    if pool_now:
+        before = collections.Counter(e.get("src") for e in pool_now)
+        kept = carry_sources({"onb-akon"})
+        after = collections.Counter(e.get("src") for e in kept)
+        check("a targeted run keeps every other source whole",
+              all(after[src] == n for src, n in before.items()
+                  if src != "onb"),
+              "{} against {}".format(dict(after), dict(before)))
+        check("and drops the cards of the source being refreshed",
+              after["onb"] == 0,
+              "{} stale AKON cards would survive the refresh".format(
+                  after["onb"]))
+        check("and carrying forward is not itself a shrink",
+              shrink_refusals(kept + [e for e in pool_now
+                                      if e.get("src") == "onb"]) == [],
+              "a targeted run would be refused by its own guard")
+        both = carry_sources({"dc-open", "dc-cc"})
+        check("and both Digital Commonwealth rows drop together",
+              collections.Counter(
+                  e.get("src") for e in both)["dc"] == 0,
+              "one row refreshed dc while the other carried it forward")
+
+    # Half-refreshing a shared source is refused rather than explained.
+    shares = collections.Counter(SOURCE_SRC.values())
+    doubled = [src for src, n in shares.items() if n > 1]
+    check("some source is written by more than one row", bool(doubled),
+          "nothing shares a src, so the check below proves nothing")
+    if doubled:
+        rows = [k for k, v in SOURCE_SRC.items() if v == doubled[0]]
+        check("asking for one row of a shared source is refused",
+              partial_source({rows[0]}) == doubled[0],
+              "a run would drop {} and re-harvest half of it".format(
+                  doubled[0]))
+        check("and asking for all of them is allowed",
+              partial_source(set(rows)) is None)
+    check("and a source nothing shares is allowed on its own",
+          partial_source({"onb-akon"}) is None)
 
     # Shrinking. The stand-in pool is the one on disk, so these are the
     # real proportions rather than invented ones.
@@ -2752,6 +2918,10 @@ def main():
                     help="info.json lookups this run (the orientation axis)")
     ap.add_argument("--rijks-budget", type=int, default=RIJKS_BUDGET,
                     help="Rijksmuseum cards to resolve this run")
+    ap.add_argument("--only",
+                    help="harvest only these source keys, comma separated "
+                         "(e.g. onb-akon); every other source keeps the "
+                         "cards it already has in the pool")
     ap.add_argument("--geo-budget", type=int, default=GEONAMES_BUDGET,
                     help="GeoNames places to resolve this run (the AKON "
                          "region axis)")
@@ -2769,9 +2939,23 @@ def main():
             print(describe(json.load(fh)["entries"]))
         return 0
 
+    only = {k.strip() for k in (args.only or "").split(",") if k.strip()}
+    unknown = only - set(SOURCE_SRC)
+    if unknown:
+        sys.stderr.write("no such source: {} (have: {})\n".format(
+            ", ".join(sorted(unknown)), ", ".join(sorted(SOURCE_SRC))))
+        return 1
+    shared = partial_source(only)
+    if shared:
+        sys.stderr.write(
+            "{!r} is written by more than one source and you have asked "
+            "for some of them; name them all or none, or the pool loses "
+            "the half you left out\n".format(shared))
+        return 1
+
     entries, stats, scored, sized = build_pool(
         args.pages, not args.no_measure, args.dims_budget, args.rijks_budget,
-        args.dims_source, args.geo_budget)
+        args.dims_source, args.geo_budget, only)
     if not entries:
         sys.stderr.write("\nnothing harvested; leaving the old pool alone\n")
         return 1
