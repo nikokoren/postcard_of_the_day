@@ -1,4 +1,7 @@
 __pycache__/
 *.pyc
 preview.png
-crawl.json
+# crawl.json is committed on purpose. It is the bookmark a paged crawl
+# resumes from, and while it was ignored every monthly run started at
+# page 1 -- which is how a rate-limited loc.gov cost us a whole harvest
+# rather than half of one.

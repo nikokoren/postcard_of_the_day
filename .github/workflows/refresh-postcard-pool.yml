@@ -76,8 +76,14 @@ jobs:
         run: |
           git config user.name "GitHub Action"
           git config user.email "action@github.com"
-          git add crawl.json dimensions.json geonames.json \
-                  translations.json quality.json
+          # Only what is there. This step runs because something went
+          # wrong, and the thing that went wrong may be the reason a
+          # file is missing -- a `git add` on an absent path exits 1 and
+          # would turn a saved-what-we-could step into a second failure.
+          for cache in crawl.json dimensions.json geonames.json \
+                       translations.json quality.json; do
+            [ -f "$cache" ] && git add "$cache"
+          done
           if git diff --staged --quiet; then
             echo "No progress to keep"
           else
