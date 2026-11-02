@@ -71,41 +71,6 @@ jobs:
             ${DIMS_BUDGET:+--dims-budget "$DIMS_BUDGET"} \
             ${ONLY:+--only "$ONLY"}
 
-      # A refused harvest -- a source that collapsed, or an archive that
-      # stopped answering -- still did real work: pages walked, captions
-      # translated, dimensions measured. Those caches are what lets the
-      # next run carry on from where this one stopped instead of
-      # starting over and being refused again for the same reason. So
-      # they are saved even when the run fails, and the run stays red.
-      - name: Keep the crawl progress from a failed harvest
-        if: failure()
-        run: |
-          git config user.name "GitHub Action"
-          git config user.email "action@github.com"
-          # Only what is there. This step runs because something went
-          # wrong, and the thing that went wrong may be the reason a
-          # file is missing -- a `git add` on an absent path exits 1 and
-          # would turn a saved-what-we-could step into a second failure.
-          for cache in crawl.json dimensions.json geonames.json \
-                       translations.json quality.json; do
-            [ -f "$cache" ] && git add "$cache"
-          done
-          if git diff --staged --quiet; then
-            echo "No progress to keep"
-          else
-            git commit -m "Keep harvest progress from a refused run [$(date -u +'%Y-%m-%d')]"
-            for attempt in 1 2 3; do
-              if git push; then
-                echo "Pushed."
-                exit 0
-              fi
-              git pull --rebase origin "$GITHUB_REF_NAME" || exit 1
-              sleep $((attempt * 5))
-            done
-            echo "Could not push the progress"
-            exit 1
-          fi
-
       - name: Put more captions into English
         # Offline, no key. Budgeted and cached forever, so each refresh
         # covers more of the pool; a failure here must not cost the
@@ -139,9 +104,21 @@ jobs:
         run: |
           git config user.name "GitHub Action"
           git config user.email "action@github.com"
-          git add pool.json crawl.json quality.json dimensions.json \
-                  geonames.json translations.json trmnl/settings.yml \
-                  postcard.json today.json
+          # The outputs must exist -- if today.json is missing, the run
+          # did not do its job and should say so.
+          git add pool.json postcard.json today.json trmnl/settings.yml
+
+          # The caches are added only if they are there. Not every run
+          # writes every one: `--only onb-akon` never runs a paged crawl,
+          # so crawl.json does not exist, and `git add` on an absent path
+          # exits 128. That killed a successful run on 2 November after
+          # it had measured eight thousand cards -- the pool was built,
+          # today.json was written, and the commit step fell over naming
+          # a file the run had no reason to produce.
+          for cache in crawl.json quality.json dimensions.json \
+                       geonames.json translations.json; do
+            [ -f "$cache" ] && git add "$cache"
+          done
 
           if git diff --staged --quiet; then
             echo "Pool unchanged, nothing to commit"
@@ -157,5 +134,48 @@ jobs:
               sleep $((attempt * 5))
             done
             echo "Could not push after 3 attempts"
+            exit 1
+          fi
+
+      # A run that fails still did real work: pages walked, captions
+      # translated, dimensions measured. Those caches are what lets the
+      # next run carry on instead of starting over and failing again
+      # for the same reason. Saved even when the run fails, and the run
+      # stays red.
+      #
+      # Last in the job, not next to the harvest. It used to sit after
+      # the harvest step, which meant it was skipped on the one run
+      # where it would have mattered most: the harvest succeeded, the
+      # commit step failed, and eight thousand measurements went with
+      # it. A backstop belongs after the thing it is backing up.
+      #
+      # cancelled() as well as failure(), because a job killed at its
+      # timeout is cancelled rather than failed.
+      - name: Keep whatever progress the run made
+        if: failure() || cancelled()
+        run: |
+          git config user.name "GitHub Action"
+          git config user.email "action@github.com"
+          # Only what is there. This step runs because something went
+          # wrong, and the thing that went wrong may be the reason a
+          # file is missing -- a `git add` on an absent path exits 1 and
+          # would turn a saved-what-we-could step into a second failure.
+          for cache in crawl.json dimensions.json geonames.json \
+                       translations.json quality.json; do
+            [ -f "$cache" ] && git add "$cache"
+          done
+          if git diff --staged --quiet; then
+            echo "No progress to keep"
+          else
+            git commit -m "Keep harvest progress from a refused run [$(date -u +'%Y-%m-%d')]"
+            for attempt in 1 2 3; do
+              if git push; then
+                echo "Pushed."
+                exit 0
+              fi
+              git pull --rebase origin "$GITHUB_REF_NAME" || exit 1
+              sleep $((attempt * 5))
+            done
+            echo "Could not push the progress"
             exit 1
           fi
