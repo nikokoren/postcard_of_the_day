@@ -31,6 +31,7 @@ import json
 import os
 import re
 import sys
+import tarfile
 import time
 import urllib.error
 import urllib.parse
@@ -337,6 +338,7 @@ SOURCES = [
       "collection": "GrazMuseum Ansichtskarten"}),
     ("europeana-de", "europeana", "Europeana",
      {"providers": EUROPEANA_DE, "country": "Germany"}),
+    ("onb-akon", "onb", "Austrian National Library", {}),
 ]
 
 # Resolving one Rijksmuseum card costs three requests -- the object, the
@@ -516,6 +518,13 @@ COUNTRY_ALIASES = {
     "deutschland": "Germany", "west germany": "Germany",
     "east germany": "Germany", "german empire": "Germany",
     "czechoslovakia": "Czech Republic", "czechia": "Czech Republic",
+    # GeoNames names countries as they are named today, which is right
+    # for an axis and occasionally a spelling this table had not met.
+    "türkiye": "Turkey", "turkiye": "Turkey",
+    # An Arctic territory of Norway, and the only one of AKON's 72
+    # countries the region table had no answer for. A card of
+    # Spitsbergen is a card of Europe as far as this axis goes.
+    "svalbard and jan mayen": "Norway",
     "ussr": "Russia", "soviet union": "Russia",
     "burma": "Myanmar", "siam": "Thailand", "persia": "Iran",
     "ceylon": "Sri Lanka", "rhodesia": "Zimbabwe",
@@ -669,6 +678,306 @@ def normalise_country(name):
 
 def country_slug(name):
     return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
+
+
+# ============================================================
+# source: Austrian National Library (AKON)
+# ============================================================
+
+# AKON is the one source here that needs no crawl. The whole catalogue
+# arrives as a single 4.3MB file, which cannot be rate-limited, cannot
+# be half harvested, and costs the library one request a month. After
+# what loc.gov did to the 1 November run, that is worth as much as the
+# cards.
+ONB_DUMP = "https://lod.onb.ac.at/downloads/metadata_akon.tar.bz2"
+ONB_IIIF = "https://iiif.onb.ac.at/images/AKON/"
+ONB_ITEM = "https://data.onb.ac.at/AKON/"
+ONB_HOLDER = "Austrian National Library"
+
+# Every record states its own rights, and the collection splits in two
+# on that one field: 34,846 carry the Public Domain Mark and an image,
+# 40,335 carry "Copyright Not Evaluated" and no image at all. They
+# publish a scan only where they have cleared it, so there is no rights
+# judgement left for us to make -- take the ones with an image.
+ONB_PDM = "http://creativecommons.org/publicdomain/mark/1.0/"
+
+ONB_FIELDS = {name: re.compile(r"<{0}>(.*?)</{0}>".format(name), re.S)
+              for name in ("dc:title", "dc:date", "dc:publisher",
+                           "dc:description", "dcterms:spatial",
+                           "dc:identifier")}
+ONB_RIGHTS = re.compile(r'<edm:rights rdf:resource="(.*?)"')
+ONB_IMAGE = re.compile(r'<edm:isShownBy rdf:resource="(.*?)"')
+ONB_GEO = re.compile(r"sws\.geonames\.org/(\d+)")
+ONB_YEAR = re.compile(r"(1[6-9]\d\d|20\d\d)")
+
+# GeoNames, for the region axis. A card carries a place id and no
+# country, and the id is the better half of that bargain: it resolves to
+# a country without us guessing at a string, and it says Czechia for a
+# card captioned "Komotau" in 1911, which is the right answer twice over
+# -- the caption keeps the name the card was printed with and the axis
+# files it where a reader would look for it.
+#
+# about.rdf needs no key and no account, which is the only reason this
+# is a runtime lookup rather than a 350MB build step. 5,793 distinct
+# places cover all 34,846 cards, cached here for good.
+GEONAMES_ABOUT = "https://sws.geonames.org/{}/about.rdf"
+GEONAMES_PATH = os.path.join(HERE, "geonames.json")
+GEONAMES_BUDGET = 2500
+GEONAMES_WORKERS = 4
+GN_NAME = re.compile(r"<gn:name>(.*?)</gn:name>", re.S)
+GN_CODE = re.compile(r"<gn:countryCode>(.*?)</gn:countryCode>", re.S)
+GN_PARENT = re.compile(r'gn:parentCountry rdf:resource="[^"]*?/(\d+)/')
+
+_geonames = None
+
+
+def geonames():
+    """The place cache: GeoNames id -> {place, country}."""
+    global _geonames
+    if _geonames is None:
+        try:
+            with open(GEONAMES_PATH) as fh:
+                data = json.load(fh)
+            _geonames = {"places": data.get("places") or {},
+                         "countries": data.get("countries") or {}}
+        except (OSError, ValueError):
+            _geonames = {"places": {}, "countries": {}}
+    return _geonames
+
+
+def save_geonames():
+    write_json_atomic(GEONAMES_PATH, {
+        "version": 1,
+        "places": geonames()["places"],
+        "countries": geonames()["countries"],
+    })
+
+
+def geonames_fetch(gid):
+    """(place name, parent country id, country code) for one id."""
+    body = fetch(GEONAMES_ABOUT.format(gid), accept="application/rdf+xml",
+                 raw=True, tries=3)
+    if not body:
+        return None
+    text = body.decode("utf-8", "replace")
+    name = GN_NAME.search(text)
+    parent = GN_PARENT.search(text)
+    code = GN_CODE.search(text)
+    if not name:
+        return None
+    return (html.unescape(name.group(1)).strip(),
+            parent.group(1) if parent else None,
+            code.group(1).strip() if code else None)
+
+
+def resolve_places(ids, budget, stats):
+    """
+    Fill the place cache for as many ids as the budget allows.
+
+    Two lookups deep: the place names itself and points at its country,
+    and the country names itself. The second is cached by country, so it
+    costs about forty requests in total rather than one a card.
+    """
+    cache = geonames()
+    # Deduplicated first. `ids` is one per card, 34,637 of them for 5,793
+    # places, so spending the budget on the list as it comes means
+    # fetching Vienna three hundred times and running out before
+    # reaching anywhere else.
+    wanted = list(dict.fromkeys(ids))
+    todo = [gid for gid in wanted if gid not in cache["places"]][:budget]
+    if not todo:
+        return 0
+    sys.stderr.write("  geonames: resolving {} places ({} cached)\n"
+                     .format(len(todo), len(cache["places"])))
+    done = 0
+    with ThreadPoolExecutor(max_workers=GEONAMES_WORKERS) as pool:
+        for gid, found in zip(todo, pool.map(geonames_fetch, todo)):
+            if not found:
+                stats["onb: place unreadable"] += 1
+                continue
+            name, parent, code = found
+            cache["places"][gid] = {"pl": name, "parent": parent,
+                                    "cc": code or ""}
+            done += 1
+            if done % 500 == 0:
+                sys.stderr.write(f"    {done}/{len(todo)}\n")
+                save_geonames()
+
+    # And the countries those places point at, once each.
+    wanted = {row.get("parent") for row in cache["places"].values()
+              if row.get("parent")}
+    missing = sorted(wanted - set(cache["countries"]))
+    if missing:
+        sys.stderr.write(f"  geonames: naming {len(missing)} countries\n")
+        with ThreadPoolExecutor(max_workers=GEONAMES_WORKERS) as pool:
+            for gid, found in zip(missing, pool.map(geonames_fetch, missing)):
+                if found:
+                    cache["countries"][gid] = found[0]
+    save_geonames()
+    return done
+
+
+def place_of(gid):
+    """(place, country) for a GeoNames id, as far as the cache knows."""
+    row = geonames()["places"].get(gid)
+    if not row:
+        return None, None
+    country = geonames()["countries"].get(row.get("parent") or "")
+    return row.get("pl"), normalise_country(country) if country else None
+
+
+def onb_cleared(text):
+    """
+    (image URL, None) for a record we may take, or (None, why not).
+
+    The two fields always travel together -- the library publishes a
+    scan only where it has cleared one -- and this checks both anyway.
+    An image without the Public Domain Mark would be a change of policy
+    rather than a card to take, and it should stop the record rather
+    than be read as consent.
+    """
+    image = ONB_IMAGE.search(text)
+    if not image:
+        return None, "onb: not cleared for publication"
+    rights = ONB_RIGHTS.search(text)
+    if not rights or rights.group(1) != ONB_PDM:
+        return None, "rights"
+    return image.group(1), None
+
+
+def onb_records(stats):
+    """
+    Every AKON record that has an image, read out of the dump.
+
+    Yields dicts of the fields we use. The dump is 75,181 small RDF
+    files in one archive; the 40,335 without an image are the ones the
+    library has not cleared, and they are skipped here rather than
+    counted as failures.
+    """
+    body = fetch(ONB_DUMP, raw=True, tries=3)
+    if not body:
+        sys.stderr.write("  could not fetch the AKON dump, skipping\n")
+        return
+    with tarfile.open(fileobj=io.BytesIO(body), mode="r:bz2") as archive:
+        for member in archive:
+            if not member.isfile() or not member.name.endswith(".rdf"):
+                continue
+            handle = archive.extractfile(member)
+            if handle is None:
+                continue
+            text = handle.read().decode("utf-8", "replace")
+            stats["seen"] += 1
+            image, refusal = onb_cleared(text)
+            if not image:
+                stats[refusal] += 1
+                continue
+            row = {"image": image}
+            for name, pattern in ONB_FIELDS.items():
+                found = pattern.search(text)
+                if found:
+                    row[name.split(":")[1]] = html.unescape(
+                        found.group(1)).strip()
+            geo = ONB_GEO.search(text)
+            row["geonames"] = geo.group(1) if geo else None
+            yield row
+
+
+def onb_iiif_base(image_url):
+    """
+    The IIIF base to serve, from the image URL the record carries.
+
+    The record gives a full `.../full/full/0/default.jpg`; everything
+    before `/full/` is the base the rest of this program appends sizes
+    to. Taken from the record rather than assembled from the id, because
+    the trailing image number is not always the digits after the
+    underscore.
+    """
+    head = image_url.split("/full/")[0]
+    if "/images/AKON/" not in head:
+        return None
+    return ONB_IIIF + head.split("/images/AKON/", 1)[1]
+
+
+def onb_evaluate(row, stats):
+    """One AKON record as a pool entry, or None."""
+    akon_id = row.get("identifier")
+    base = onb_iiif_base(row.get("image") or "")
+    if not akon_id or not base:
+        stats["onb: no image service"] += 1
+        return None
+
+    title = tidy_title(row.get("title") or "")
+    # A title is usually the place alone -- "Villach", "Budapest", a
+    # median of ten characters -- and dc:description carries what the
+    # card actually shows. Joined, "Lienz" and "Schloss Bruck" read as a
+    # caption; apart, one is a label and the other is orphaned.
+    detail = tidy_title(row.get("description") or "")
+    if detail and detail.lower() not in title.lower():
+        title = "{}, {}".format(title, detail)
+    if not usable_title(title):
+        stats["title"] += 1
+        return None
+
+    year = ONB_YEAR.search(row.get("date") or "")
+    if not year:
+        stats["no date"] += 1
+        return None
+    year = int(year.group(1))
+    if year < MIN_YEAR or year > MAX_YEAR:
+        # One card is dated 1827, half a century before the picture
+        # postcard, and it is the only one outside the range.
+        stats["out of range"] += 1
+        return None
+
+    place, country = place_of(row.get("geonames") or "")
+    entry = {
+        "id": "onb:" + akon_id,
+        "b": base,
+        "k": "iiif",
+        "t": title,
+        "y": year,
+        "src": "onb",
+        "r": "Public Domain Mark 1.0",
+        "u": ONB_ITEM + akon_id,
+        "h": ONB_HOLDER,
+        "col": "AKON - Ansichtskarten Online",
+    }
+    # The place a card is of, preferring GeoNames' own spelling of the
+    # settlement over the catalogue's string, which repeats the title.
+    if place or row.get("spatial"):
+        entry["pl"] = place or row["spatial"]
+    if country:
+        entry["cn"] = country
+        entry["c"] = country_slug(country)
+    else:
+        # An unresolved place is a card with no region, not a card to
+        # throw away: the axis has carried "unknown" from the start, and
+        # the next run's budget fills it in.
+        stats["onb: place not resolved yet"] += 1
+    if row.get("publisher"):
+        entry["pub"] = row["publisher"]
+    return entry
+
+
+def onb_crawl(source_key, config, max_pages, stats, cache):
+    """
+    The whole catalogue, from one file, with the places filled in as
+    far as this run's budget reaches.
+    """
+    rows = list(onb_records(stats))
+    if not rows:
+        return []
+    sys.stderr.write(f"  {len(rows)} cleared records in the dump\n")
+
+    ids = [row["geonames"] for row in rows if row.get("geonames")]
+    resolve_places(ids, config.get("geo_budget", GEONAMES_BUDGET), stats)
+
+    entries = [entry for entry in (onb_evaluate(row, stats) for row in rows)
+               if entry]
+    placed = sum(1 for entry in entries if entry.get("cn"))
+    sys.stderr.write("  kept {} ({} placed, {} waiting on a place)\n"
+                     .format(len(entries), placed, len(entries) - placed))
+    return entries
 
 
 # ============================================================
@@ -1286,6 +1595,7 @@ def europeana_crawl(source_key, config, max_pages, stats, cache):
 
 
 CRAWLERS["europeana"] = europeana_crawl
+CRAWLERS["onb"] = onb_crawl
 
 
 # ============================================================
@@ -1974,7 +2284,8 @@ def fill_quality(entries, cache, budget):
 # ============================================================
 
 def build_pool(max_pages, do_measure, dims_budget=DIMS_BUDGET,
-               rijks_budget=RIJKS_BUDGET, dims_source=None):
+               rijks_budget=RIJKS_BUDGET, dims_source=None,
+               geo_budget=GEONAMES_BUDGET):
     stats = collections.Counter()
     entries, seen_ids = [], set()
 
@@ -1984,7 +2295,9 @@ def build_pool(max_pages, do_measure, dims_budget=DIMS_BUDGET,
         crawler = CRAWLERS[kind]
         budget = {"rijksmuseum": rijks_budget,
                   "europeana": EUROPEANA_BUDGET}.get(kind, GAMS_BUDGET)
-        found = crawler(source_key, dict(config, budget=budget),
+        found = crawler(source_key,
+                        dict(config, budget=budget,
+                             geo_budget=geo_budget),
                         max_pages, stats, cache)
         added = 0
         for entry in found:
@@ -2250,6 +2563,143 @@ def selftest():
             check("a source too small to judge cannot veto a run",
                   shrink_refusals(gone) == [])
 
+    # AKON. The reader, against records written out by hand, because the
+    # dump is a 4.3MB download and a selftest should not need the
+    # network to know whether the parsing is right.
+    cleared = """<rdf:RDF><edm:WebResource rdf:about="x">
+      <sioc:has_service rdf:resource="y"/></edm:WebResource>
+      <edm:Place rdf:about="http://data.onb.ac.at/AKON/GN_2771766">
+      <owl:sameAs rdf:resource="http://sws.geonames.org/2771766"/></edm:Place>
+      <edm:ProvidedCHO><dc:identifier>AK014_464</dc:identifier>
+      <dc:publisher>Ledermann</dc:publisher><dc:date>1917</dc:date>
+      <edm:rights rdf:resource="http://creativecommons.org/publicdomain/mark/1.0/"/>
+      <dcterms:spatial>Mautern an der Donau</dcterms:spatial>
+      <dc:title>Mautern an der Donau</dc:title></edm:ProvidedCHO>
+      <ore:Aggregation><edm:isShownBy rdf:resource="http://iiif.onb.ac.at/images/AKON/AK014_464/464/full/full/0/default.jpg"/>
+      </ore:Aggregation></rdf:RDF>"""
+
+    check("a cleared record carries the Public Domain Mark",
+          ONB_RIGHTS.search(cleared).group(1) == ONB_PDM)
+    base = onb_iiif_base(ONB_IMAGE.search(cleared).group(1))
+    check("and its IIIF base is the image URL without the size",
+          base == "https://iiif.onb.ac.at/images/AKON/AK014_464/464",
+          "got {}".format(base))
+    check("and the base is served over https, whatever the record says",
+          base.startswith("https://"),
+          "the dump gives http:// and a panel will not load it")
+    check("and a base is refused if it is not an AKON image service",
+          onb_iiif_base("https://example.org/img/full/full/0/default.jpg")
+          is None)
+    check("the dimension step would ask the right URL",
+          base + "/info.json" ==
+          "https://iiif.onb.ac.at/images/AKON/AK014_464/464/info.json")
+
+    # The split that decides the whole source: no image means not
+    # cleared, and those records are skipped rather than failed.
+    uncleared = cleared.replace(
+        '<edm:isShownBy rdf:resource="http://iiif.onb.ac.at/images/AKON/'
+        'AK014_464/464/full/full/0/default.jpg"/>', "").replace(
+        ONB_PDM, "http://rightsstatements.org/vocab/CNE/1.0/")
+    check("the reader takes a cleared record",
+          onb_cleared(cleared) == (ONB_IMAGE.search(cleared).group(1), None))
+    check("and refuses one with no image",
+          onb_cleared(uncleared) ==
+          (None, "onb: not cleared for publication"))
+    # An image without the mark is the case that should never arrive,
+    # which is exactly why it is checked: it would be a change of
+    # policy, and policy must not be inferred from a missing field.
+    unmarked = cleared.replace(ONB_PDM,
+                               "http://rightsstatements.org/vocab/CNE/1.0/")
+    check("and refuses an image that is not Public Domain Marked",
+          onb_cleared(unmarked) == (None, "rights"),
+          "got {}".format(onb_cleared(unmarked)))
+    check("and refuses one with no rights statement at all",
+          onb_cleared(cleared.replace(
+              '<edm:rights rdf:resource="' + ONB_PDM + '"/>', ""))
+          == (None, "rights"))
+
+    rows = {name.split(":")[1]: pattern.search(cleared).group(1).strip()
+            for name, pattern in ONB_FIELDS.items()
+            if pattern.search(cleared)}
+    rows["image"] = ONB_IMAGE.search(cleared).group(1)
+    rows["geonames"] = ONB_GEO.search(cleared).group(1)
+    check("the reader finds the GeoNames id", rows["geonames"] == "2771766")
+
+    onb_stats = collections.Counter()
+    entry = onb_evaluate(dict(rows), onb_stats)
+    check("a cleared record becomes an entry", entry is not None)
+    if entry:
+        check("with the id namespaced to this source",
+              entry["id"] == "onb:AK014_464")
+        check("and the year as an integer", entry["y"] == 1917)
+        check("and the publisher kept", entry.get("pub") == "Ledermann")
+        check("and an item URL on the library's own host",
+              entry["u"] == "https://data.onb.ac.at/AKON/AK014_464")
+    # A card whose place nobody has looked up yet keeps its caption and
+    # loses its region. It must not borrow one: nearly all of AKON is
+    # Austrian, so defaulting to Austria would be right often enough to
+    # look fine and would file every unresolved card in the wrong place.
+    unplaced = onb_evaluate(dict(rows, geonames="no-such-id"), onb_stats)
+    check("a card with an unresolved place gets no country",
+          unplaced is not None and "cn" not in unplaced
+          and "c" not in unplaced,
+          "invented {!r}".format(unplaced and unplaced.get("cn")))
+    check("and is kept rather than dropped",
+          unplaced is not None and unplaced["t"],
+          "an unresolved place should cost the region, not the card")
+
+    # The title join. A bare place name is a label; the description is
+    # what the card shows.
+    joined = onb_evaluate(dict(rows, title="Lienz",
+                               description="Schloss Bruck"), onb_stats)
+    check("a bare title takes the description with it",
+          joined and joined["t"] == "Lienz, Schloss Bruck",
+          "got {}".format(joined and joined["t"]))
+    repeated = onb_evaluate(dict(rows, title="Bad Ischl, Esplanade",
+                                 description="Esplanade"), onb_stats)
+    check("but not twice when it is already in the title",
+          repeated and repeated["t"] == "Bad Ischl, Esplanade",
+          "got {}".format(repeated and repeated["t"]))
+
+    # The one card from 1827, half a century before the picture postcard.
+    check("a date outside the range is dropped",
+          onb_evaluate(dict(rows, date="1827"), onb_stats) is None)
+    check("and so is a record with no date at all",
+          onb_evaluate(dict(rows, date=""), onb_stats) is None)
+    check("and one whose image is not an AKON service",
+          onb_evaluate(dict(rows, image="https://example.org/a.jpg"),
+                       onb_stats) is None)
+
+    # Places, against the cache as it stands rather than the network.
+    cached = geonames()["places"]
+    check("the place cache has been filled", len(cached) > 1000,
+          "{} places -- the region axis is mostly empty".format(len(cached)))
+    if cached:
+        sample = next(iter(cached))
+        place, country = place_of(sample)
+        check("a cached place resolves to a name", bool(place))
+        check("and to a country this pool has a region for",
+              country is None or region_for(country)[0] is not None,
+              "{!r} is not in COUNTRY_REGION, so the card would have no "
+              "region".format(country))
+        check("an id nobody has resolved yet resolves to nothing",
+              place_of("does-not-exist") == (None, None))
+
+    # Every country the cache names has to land somewhere on the axis,
+    # or cards arrive with a country and no region -- which reads as a
+    # bug on the panel rather than as missing data.
+    named = [c for c in geonames()["countries"].values() if c]
+    # The list has to be non-empty for the check below to mean anything;
+    # emptying it is the one way to make that check pass while the axis
+    # goes wrong, and nothing but this line would notice.
+    check("there are countries to check at all", len(named) > 30,
+          "{} named -- the check below would prove nothing".format(
+              len(named)))
+    homeless = sorted({c for c in named
+                       if region_for(normalise_country(c))[0] is None})
+    check("every country AKON names has a region",
+          not homeless, "no region for: " + ", ".join(homeless[:6]))
+
     # Resuming. A crawl stopped by a rate limit must not be remembered
     # as complete, or the next run reads 87 cards back out of the cache
     # and never asks again.
@@ -2302,6 +2752,9 @@ def main():
                     help="info.json lookups this run (the orientation axis)")
     ap.add_argument("--rijks-budget", type=int, default=RIJKS_BUDGET,
                     help="Rijksmuseum cards to resolve this run")
+    ap.add_argument("--geo-budget", type=int, default=GEONAMES_BUDGET,
+                    help="GeoNames places to resolve this run (the AKON "
+                         "region axis)")
     ap.add_argument("--dims-source",
                     help="spend the whole dimension budget on one source")
     ap.add_argument("--report", action="store_true",
@@ -2318,7 +2771,7 @@ def main():
 
     entries, stats, scored, sized = build_pool(
         args.pages, not args.no_measure, args.dims_budget, args.rijks_budget,
-        args.dims_source)
+        args.dims_source, args.geo_budget)
     if not entries:
         sys.stderr.write("\nnothing harvested; leaving the old pool alone\n")
         return 1
