@@ -169,6 +169,11 @@
   "title": "Constantinople. The Castles of Europe",
   "was": "Constantinople. Châteaux d'Europe"
  },
+ "dc:commonwealth:wh249d894": {
+  "note": "French 'Châteaux d'Europe' names the fortresses on the European shore of the Bosphorus; kept as a title-cased name rather than a generic 'castles of Europe' remark.",
+  "title": "Constantinople. The Castles of Europe",
+  "was": "Constantinople. Châteaux d'Europe"
+ },
  "dc:commonwealth:x346fm32m": {
   "note": "The Spanish runs two noun phrases together with no punctuation between them. The translator read them as one compound and capitalised mid-phrase, giving Municipal Aqueduct purification plant; they are two things, the aqueduct and its purification plant.",
   "title": "Municipal aqueduct, purification plant, Cali, Colombia",
@@ -198,6 +203,11 @@
   "note": "'deside avión' is a misspelling of 'desde avión' (from an airplane); the translator kept it as 'deside plane'. La Popa is the convent on the hill in Cartagena, a place name. 'Col' is Colombia.",
   "title": "Convent of La Popa, seen from an airplane, Cartagena, Colombia",
   "was": "Convento de la Popa deside avión, Cartagena, Col"
+ },
+ "dc:commonwealth:x346fp86b": {
+  "note": "Spanish 'Castillo de' put the castle first as 'San Fernando de Bocachica Castle', which reads as a different name order; San Fernando de Bocachica is the fort's name. The archive's 'Col' is truncated and left as is, not expanded.",
+  "title": "Castle of San Fernando de Bocachica (main entrance), Cartagena, Col",
+  "was": "Castillo de San Fernando de Bocachica (entrada principal), Cartagena, Col"
  },
  "dc:commonwealth:x346fp984": {
   "note": "Never translated. Colegio Presbiteriano is the Presbyterian College; \"La Progresiva\" is the school's own name and Cárdenas a town, so both stay.",
@@ -294,6 +304,11 @@
   "title": "Graz. Market life at Kaiser-Josef-Platz",
   "was": "Graz. Marktleben am Kaiser-Josef-Platz"
  },
+ "graz:o:gm.1532": {
+  "note": "Paradeishof is a named courtyard in Graz, not vocabulary; 'Alt-Graz' is Old Graz. Arkaden are arcades.",
+  "title": "Old Graz: Paradeishof. Arcades",
+  "was": "Alt-Graz: Paradeishof. Arkaden"
+ },
  "graz:o:gm.1694": {
   "note": "German. 'vormals' means 'formerly' (successor to Gustav Jandl's firm), left as a bare name relationship; Spezialgeschäft is a specialist shop, not a 'special store', and 'Ansichts- und Künstlerkarten' is a suspended compound meaning view and artist postcards, which the translator cut to 'postcards and artists'. Stempfergasse is a Graz street.",
   "title": "Ernst Opila, formerly Gustav Jandl. Graz, Stempfergasse 4. First specialist shop for view and artist postcards",
@@ -303,6 +318,11 @@
   "note": "German 'Hochbau' is above-ground construction (superstructure), 'Gas- und Elektrizitätswerk' the gas and electricity works. Not 'construction work for the plant'.",
   "title": "Graz - Superstructure of the gas and electricity works",
   "was": "Graz - Hochbau des Gas- und Elektrizitätswerkes"
+ },
+ "graz:o:gm.2558": {
+  "note": "'Partien' on a Gruss-aus card means views/scenes of a place, not games (Partie as in a game of cards). Schlossberg is the hill in Graz.",
+  "title": "Greetings from Graz. Views of the Schlossberg",
+  "was": "Gruss aus Graz. Partien v. Schlossberg"
  },
  "graz:o:gm.2615": {
   "note": "German, never translated. Kriegsteig is the name of a path on the Schloßberg (Graz's castle hill) and stays a name rather than being read as 'war' + 'path'; 'am' = on the.",
@@ -318,6 +338,11 @@
   "note": "German, never translated properly. Künstlerkarte is an artist-designed postcard, not an 'artist card'. Mur is the river through Graz and Schlossberg the castle hill: both place names, left as names.",
   "title": "Artist postcard. Graz, the Mur, Schlossberg",
   "was": "Künstlerkarte Graz Mur Schlossberg"
+ },
+ "graz:o:gm.336": {
+  "note": "Glockenspielplatz is a named square, not 'Bell playground' (Platz is square, Spiel here belongs to the Glockenspiel). Hof is a courtyard.",
+  "title": "Graz - Glockenspielplatz, Courtyard",
+  "was": "Graz - Glockenspielplatz, Hof"
  },
  "graz:o:gm.337": {
   "note": "Glockenspielplatz is the name of a square in Graz and was translated as 'Bell Playground'. Hof here is a courtyard.",
@@ -343,6 +368,11 @@
   "note": "Latin Graecivm is Graz, vulgo means commonly called, and metropolis Styriae means capital of Styria. The Latin caption was never translated; Gratz is retained as the historical spelling quoted by the title.",
   "title": "Graz, commonly called Gratz. Capital of Styria",
   "was": "Graecivm Vulgo Gratz. Metropolis Styriae"
+ },
+ "loc:2018689644": {
+  "note": "Romanized Russian: 'polotno dorogi' is the roadbed, 'pad'' (dative 'padi') is a waterfall, and Kirkirei is a place name. The language detector had no clue and the translator produced 'Polo high to fall Kirkire.'",
+  "title": "Roadbed to the Kirkirei waterfall",
+  "was": "Polotno dorogi k padi Kirkireĭ"
  },
  "loc:2018690031": {
   "note": "Transliterated Russian, never translated. V skvere na beregu Omi = in the small public garden on the bank of the Om; Om is the river at Omsk.",
@@ -383,6 +413,11 @@
   "note": "Transliterated Russian wrongly detected as Slovenian; the translation just cut off 'skver' and the diacritic. Pushkinskiĭ skver is Pushkin Square (a small public garden); Gorod Vladivostok is the city of Vladivostok.",
   "title": "Gorod Vladivostok. Pushkin Square",
   "was": "Gorod Vladivostok. Pushkinskiĭ skver"
+ },
+ "loc:2018691215": {
+  "note": "Romanized Russian (Baĭkal, skala = rock, Malai︠a︡ Kolokolʹni︠a︡ = Little Bell Tower, the rock's name). Never translated; Malaya Kolokolnya kept as the name.",
+  "title": "Baikal. Malaya Kolokolnya Rock",
+  "was": "Baĭkal. Skala Malai︠a︡ Kolokolʹni︠a︡"
  },
  "loc:2018691239": {
   "note": "Transliterated Russian: derevʹi︠a︡ = trees, na khodulʹnykh korni︠a︡kh = on stilt roots. Baikal is the lake.",
@@ -464,6 +499,11 @@
   "title": "A.O.I. - Ethiopia - An Abyssinian Chief in Gala Dress",
   "was": "A.o.i. - Etiopia - UN Capo Abissino IN Abito DI Gala"
  },
+ "loc:2020760430": {
+  "note": "Italian, never translated. 'ora sede' is 'now the seat of'. Addis Abeba is Addis Ababa.",
+  "title": "Addis Ababa - Bank of Ethiopia, now the seat of the Bank of Italy",
+  "was": "Addis Abeba - Banca d'Etiopia ora sede Banca d'Italia"
+ },
  "loc:2020760454": {
   "note": "German 'bedeutender Marktplatz' is a major/significant marketplace; 'important marketplace' was stilted, with a missing article. Aliu-Amba and Shoa are place names and stay.",
   "title": "Aliu-Amba, a major marketplace in Shoa",
@@ -524,6 +564,11 @@
   "title": "Asmara - Viale Crispi",
   "was": "Asmara - Il Viale Crispi"
  },
+ "loc:2020760599": {
+  "note": "Italian spelling Massaua is Massawa. The pool caption has lost its closing parenthesis (re-catalogued as 'Massaua - (Eritrea'); the title restores it.",
+  "title": "Massawa - (Eritrea)",
+  "was": "Massaua - (Eritrea"
+ },
  "loc:2020760600": {
   "note": "Never translated. Italian 'Massaua' is Massawa (Eritrean port, a place name); 'Moschea' is mosque.",
   "title": "Massawa - Mosque",
@@ -533,6 +578,11 @@
   "note": "Italian. Strada delle pendici orientali = road on the eastern slopes; Massaua stays a place name.",
   "title": "Road on the eastern slopes, which leads to Massaua",
   "was": "Strada delle pendici orientali, che porta a Massaua"
+ },
+ "loc:2020760610": {
+  "note": "Italian 'Sul fiume' is 'on the river'; Barea is the river's name. The published text split it as 'Bare a'.",
+  "title": "192 - On the Barea River",
+  "was": "192 - Sul fiume Barea"
  },
  "loc:2020760615": {
   "note": "Italian. Degiac is the Italian spelling of the Ethiopian title Dejazmach (dejjazmach); Alemnè and Ras Uoldeghirghis (Ras Wolde Giorgis) are people. 'di' is 'of'; 'by' wrongly implied authorship.",
@@ -884,6 +934,11 @@
   "title": "Burg Kreuzenstein. Entrance gate",
   "was": "Burg Kreuzenstein. Eingangstor"
  },
+ "loc:2025702956": {
+  "note": "Burg Kreuzenstein is a castle's name; 'im Norden gelegene Wand' is the wall lying to the north.",
+  "title": "Burg Kreuzenstein. Chapel, wall on the north side",
+  "was": "Burg Kreuzenstein. Kapelle, im Norden gelegene Wand"
+ },
  "loc:2025703081": {
   "note": "The archive caption lacks its closing parenthesis, which the replacement restores. Vorarlberg, Montafon, Gargellen and the Madriserspitze are all names.",
   "title": "From Vorarlberg in Montafon, Gargellen, with Madriserspitze, (2766 m)",
@@ -913,6 +968,11 @@
   "note": "Portuguese. 'Bom Jesus de Matosinhos' is the name of the sanctuary, and 'de' was translated to 'of' inside it. Congonhas do Campo and M. (Minas) Gerais are places.",
   "title": "Facade of the Church of Bom Jesus de Matosinhos. Congonhas do Campo - M. Gerais - Brazil",
   "was": "Fachada da Igreja de Bom Jesus de Matosinhos. Congonhas do Campo - M. Gerais - Brasil"
+ },
+ "loc:2025703303": {
+  "note": "Museu da Inconfidência is the museum's proper name (after the Inconfidência Mineira conspiracy), not 'Museum of Confidence'. Chafariz is a public fountain.",
+  "title": "Museu da Inconfidencia, Fountain, Ouro Preto - Minas Gerais - Brazil",
+  "was": "Museu da Inconfidencia, Chafariz, Ouro Preto - Minas Gerais - Brasil"
  },
  "loc:2025703305": {
   "note": "Portuguese. 'Matriz' is the mother (parish) church, not 'Matrix'; the translator also turned the name Nossa Senhora do Pilar into 'Ouro Senhora do Pilar', swapping in the city name Ouro (Preto). The church name is kept in Portuguese.",
@@ -1189,6 +1249,11 @@
   "title": "Coucy-le-Château, The Soissons Gate",
   "was": "Coucy-le-Chateau, The Soissons Gate"
  },
+ "loc:2025705917": {
+  "note": "French street name in Draguignan; left untranslated as a name.",
+  "title": "Draguignan. Rue de la Juiverie",
+  "was": "Draguignan. Rue de la Juiverie"
+ },
  "loc:2025705980": {
   "note": "Correct; only flagged for the stray comma and regional consistency. Saint-Léonard is a church name.",
   "title": "Honfleur, The Church of Saint Leonard",
@@ -1294,6 +1359,11 @@
   "title": "Cité de Carcassonne. View of the Tour de la Justice",
   "was": "Cite de Carcassonne. Vue sur la Tour de la Justice"
  },
+ "loc:2025707205": {
+  "note": "French, never translated. L'Échauguette is a corbelled watchtower turret on the fortifications.",
+  "title": "La Cité de Carcassonne - The Watchtower",
+  "was": "La Cite de Carcassonne - L'Echauguette"
+ },
  "loc:2025707304": {
   "note": "Three faults at once. The cathedral's name and the century were left in French; pourtour du choeur is the sculpted screen enclosing the choir, not Around the Choir; and the second panel was dropped altogether -- Visite de la Sainte Vierge a Sainte Elisabeth is the Visitation.",
   "title": "Chartres Cathedral. The choir screen (16th century). \"The Annunciation\", \"The Visitation\"",
@@ -1344,6 +1414,11 @@
   "title": "Normandy. Headdress of Honfleur",
   "was": "La Normandie. Coiffe D'Honfleur"
  },
+ "loc:2025707882": {
+  "note": "'ça devrait durer toute l'année': ought to last all year. La Normandie Pittoresque is a series name and kept.",
+  "title": "La Normandie Pittoresque - Holidays ought to last the whole year",
+  "was": "La Normandie Pittoresque - Les vacances, ca devrait durer toute l'annee"
+ },
  "loc:2025708188": {
   "note": "French, never translated. Musée de Cluny is a museum name; coffre-fort is a strongbox, ciselé means chased/chiselled; fin du XVIIe siècle is the end of the 17th century.",
   "title": "Cluny Museum. Chased steel strongbox. French art, late 17th century",
@@ -1363,6 +1438,11 @@
   "note": "French; Hôtel des Invalides is a named building. Seurre is the sculptor. Pool text lacked the closing parenthesis.",
   "title": "Hôtel des Invalides - Statue of Napoleon (by Seurre)",
   "was": "Hotel des Invalides - Statue de Napoleon (par Seurre"
+ },
+ "loc:2025708405": {
+  "note": "Les Invalides is the Paris building (Hôtel des Invalides), a name; the translator turned it into 'Invalids'.",
+  "title": "Paris. Les Invalides",
+  "was": "Paris. Les Invalides"
  },
  "loc:2025708448": {
   "note": "Ramena is the verb ramener, to bring back, and was left in French as if a name. Muiron is the ship's name.",
@@ -1429,6 +1509,11 @@
   "title": "Greetings from the Moselle (Koblenz ... Trier)",
   "was": "Gruss von der Mosel (Coblenz ...Trier"
  },
+ "loc:2025709243": {
+  "note": "'Spind' is a cupboard (also a locker); 'An' here is 'at'. Published as 'To Grandmother's locker'.",
+  "title": "At Grandmother's cupboard",
+  "was": "An Grossmutters Spind"
+ },
  "loc:2025709249": {
   "note": "German 'Gesamtansicht' is a general view; the translation left it in German and wrote 'Engraving of' for 'Stich von'.",
   "title": "Kassel, general view. Engraving by Braun and Hogenberg, 1580",
@@ -1494,6 +1579,11 @@
   "title": "Munich. Schwabing is more than a district of Munich. In the foreground the Ludwig-Maximilians-University, behind it the Academy of Fine Arts and the Siegestor (\"Dedicated to victory, destroyed by war, a reminder of peace\"). Am Hor",
   "was": "Munchen. Schwabing ist mehr als ein Stadtteil von Munchen. Im Vordergrund die Ludwig-Maximilians-Universitat, dahinter die Akademie der bildenden Kunste und das Siegestro (\"Dem Sieg geweiht, vom Krieg zerstort, zum Frieden mahnend\"). Am Hor"
  },
+ "loc:2025710146": {
+  "note": "German; the published title dropped everything after 'Doric style', including the architect Leo von Klenze and the sculptor-name Hiltensperger, and left Propyloaen untranslated.",
+  "title": "Munich. Propylaea on the Royal Square in Munich, gate in the Doric style, 1854-62 by Leo von Klenze. Tower reliefs of the Propylaea after Hiltensperger",
+  "was": "Munchen. Propyloaen auf dem Koniglichen Platz in Munchen Tor im dorischen Stil, 1854-62 von Leo von Klenze Turmreliefs der Propylaen nach Hiltensperger"
+ },
  "loc:2025710160": {
   "note": "Earlier translation was sound; Schloss Neuschwanstein is a castle's name. Restated.",
   "title": "Schloss Neuschwanstein. Bedroom",
@@ -1513,6 +1603,11 @@
   "note": "Lug ins Land is the name Luginsland, a tower in Nuremberg, not an instruction to look into the country. Nurnberg is Nuremberg in English.",
   "title": "Nuremberg. Luginsland tower",
   "was": "Lug ins Land in Nurnberg"
+ },
+ "loc:2025710225": {
+  "note": "Historischer Hof is a name (an establishment/courtyard), and the card does not say which; kept as a name rather than 'Historical Court'.",
+  "title": "Nurnberg, Historischer Hof",
+  "was": "Nurnberg Historischer Hof"
  },
  "loc:2025710425": {
   "note": "Already English. Pool text was cut mid-abbreviation; Ganesha and Samalaji are names.",
@@ -1584,6 +1679,11 @@
   "title": "Rimini - Rocca Malatestiana (Malatesta fortress)",
   "was": "Rimini - Rocca Malatestiana"
  },
+ "loc:2025711111": {
+  "note": "Italian: Duomo is the cathedral, Atrio the atrium, Campanile the bell tower. Published title left half of it in Italian.",
+  "title": "Salerno - Cathedral, Atrium and Bell Tower",
+  "was": "Salerno - Duomo, Atrio e Campanile"
+ },
  "loc:2025711122": {
   "note": "Italian, never translated. San Remo is the town; Porta S. Giuseppe is a named gate.",
   "title": "San Remo - Porta San Giuseppe",
@@ -1603,6 +1703,11 @@
   "note": "Italian, never translated. The pool text lost its closing bracket. Secolo XII = 12th century; Ossola is a valley.",
   "title": "Villadossola - Church of S. Bartolomeo, the oldest in the Ossola (12th century)",
   "was": "Villadossola - Chiesa di S. Bartolomeo la piu antica dell'Ossola (Secolo XII"
+ },
+ "loc:2025711327": {
+  "note": "Italian, never translated. The Torri Asinelli e Garisenda are the two towers of Bologna.",
+  "title": "Bologna - Asinelli and Garisenda Towers",
+  "was": "Bologna - Torri Asinelli e Garisenda"
  },
  "loc:2025711391": {
   "note": "Italian. Firenze is Florence in English; the Bargello is a museum/palace, a name.",
@@ -1709,6 +1814,11 @@
   "title": "Siena. Palazzo Comunale (formerly of the Government)",
   "was": "Siena. Palazzo Comunale (Gia del Governo"
  },
+ "loc:2025712926": {
+  "note": "Italian, never translated. Villa Adriana is Hadrian's Villa; 'Avanzi' are remains; 'Terme' are baths.",
+  "title": "Tivoli. Hadrian's Villa - Remains of the Baths",
+  "was": "Tivoli. Villa Adriana - Avanzi della Terme"
+ },
  "loc:2025713021": {
   "note": "Italian, never translated. Campanile = bell tower.",
   "title": "Urbino - Bell tower of S. Girolamo",
@@ -1758,6 +1868,11 @@
   "note": "Already English with a typo ('Equisite') in the archive; heiden is the Japanese Shinto hall of offering.",
   "title": "Heiden (lit. offering Hall): Exquisite picture of a phoenix painted on the wall",
   "was": "Heiden (lit. offering Hall): Equisite picture of a phoenix painted on the wall"
+ },
+ "loc:2025713267": {
+  "note": "Already English; no translation needed, the flag alone changed nothing. Kept as the archive wrote it.",
+  "title": "A scene of Nagasaki harbor with exotic moods",
+  "was": "A scene of Nagasaki harbor with exotic moods"
  },
  "loc:2025713284": {
   "note": "Never translated. The archive's English is garbled: 'Connectedo-steamer' is a connecting steamer (ferry). Shimonoseki and Fusan (Busan) are place names.",
@@ -2079,6 +2194,11 @@
   "title": "Madeira. Monte Elevator",
   "was": "Madeira. Elevador do Monte"
  },
+ "loc:2025715032": {
+  "note": "Romanian 'Palatul Postelor' is the Palace of the Posts (the postal service headquarters), not 'Post Palace'. Bucuresti is Bucharest.",
+  "title": "Bucharest - Palace of the Posts",
+  "was": "Bucuresti - Palatul Postelor"
+ },
  "loc:2025715064": {
   "note": "Already English; names and initials only.",
   "title": "Astrakhan. Monument to S.M. Kirov. Sculptor N.V. Tomsky",
@@ -2194,6 +2314,11 @@
   "title": "Swiss National Park. Schweizer Nationalpark. Parc naziunal. Parc national suisse. Parco nazionale svizzero",
   "was": "Schweizer Nationalpark. Parc naziunal. Parc national suisse. Parco nazionale Svizzero"
  },
+ "loc:2025715974": {
+  "note": "Freilichtmuseum is an open-air museum; Ballenberg is the place, a name.",
+  "title": "Ballenberg Open-Air Museum",
+  "was": "Freilichtmuseum Ballenberg"
+ },
  "loc:2025715995": {
   "note": "German; Kehrsiten is a Swiss lakeside village translated as 'Sweets'. Bürgenstock is the mountain resort.",
   "title": "Kehrsiten with Bürgenstock",
@@ -2213,6 +2338,11 @@
   "note": "Geneve is the unaccented French name Genève; its established English name is Geneva. The caption had never been translated.",
   "title": "Geneva",
   "was": "Geneve"
+ },
+ "loc:2025716157": {
+  "note": "Beatenbucht is a place on Lake Thun, not 'Beaten Bay' as published. Monch and Junfrau were also misspelled; the mountains are the Eiger, Mönch and Jungfrau.",
+  "title": "Lake Thun. Beatenbucht with the Eiger, Mönch and Jungfrau",
+  "was": "Thunersee. Beatenbucht mit Eiger, Monch, und Junfrau"
  },
  "loc:2025716203": {
   "note": "French; Damas is Damascus and 'Maison d'Ananais' (sic) the House of Ananias. Never translated.",
@@ -2274,6 +2404,11 @@
   "title": "Constantinople. Landing stage at Scutari",
   "was": "Constantinople. Debarcadere de Scuatari"
  },
+ "loc:2025716263": {
+  "note": "French. Eyoub is the French spelling of the Constantinople district Eyüp. Corne d'Or is the Golden Horn.",
+  "title": "Constantinople - Eyoub, view of the Golden Horn",
+  "was": "Constantinople - Eyoub vue sur la Corne d'Or"
+ },
  "loc:2025716264": {
   "note": "French; Rue des cordonniers = street of the shoemakers. Never translated.",
   "title": "Constantinople. Stamboul. Grand Bazaar, Street of the Shoemakers",
@@ -2293,6 +2428,11 @@
   "note": "A trilingual title, English, French and German, all naming the Galata Bridge. It was never rendered into one.",
   "title": "The Galata Bridge",
   "was": "The Galata-Bridge. Le pont de Galata. Die Galata-Brucke"
+ },
+ "loc:2025716280": {
+  "note": "'Saltan' is the card's misspelling of Sultan; the published text carried the typo through.",
+  "title": "Constantinople - Tomb of Sultan Suleiman",
+  "was": "Constantinople - Tombeau du Saltan Suleiman"
  },
  "loc:2025716317": {
   "note": "Mixed. Krym is Russian for Crimea and Lastochkino Gnezdo is the Swallow's Nest castle at Gaspra (the archive has 'Ghezdo', a typo); the pool text was re-catalogued with a stray bracket.",
@@ -2354,6 +2494,76 @@
   "title": "Prostenje near St. Simon, by Zagreb",
   "was": "Prostenje kod Sv. Simuna kraj Zagreba"
  },
+ "onb:AK058_562": {
+  "note": "Place name only (the Adriatic resort, Opatija today), never translated. Left as a name.",
+  "title": "Abbazia",
+  "was": "Abbazia"
+ },
+ "onb:AK065_115": {
+  "note": "Ritten is the plateau in South Tyrol, a place name; the translator read it as English 'Rites'. Erdpyramiden are earth pyramids.",
+  "title": "Ritten, Earth Pyramids",
+  "was": "Ritten, Erdpyramiden"
+ },
+ "onb:AK069_573": {
+  "note": "Wallfahrtskirche is a pilgrimage church, not a 'sanctuary'. Filippsdorf is the place.",
+  "title": "Pilgrimage Church of Filippsdorf",
+  "was": "Wallfahrtskirche Filippsdorf"
+ },
+ "onb:AK091_037": {
+  "note": "Place name only, never translated; nothing to change but it is now explicit.",
+  "title": "Calcutta",
+  "was": "Calcutta"
+ },
+ "onb:AK093_545": {
+  "note": "'Petit Lac' is the French colonial name for the lake in Hanoi, so a name rather than 'Little Lake'.",
+  "title": "Hanoi, Petit Lac",
+  "was": "Hanoi, Petit Lac"
+ },
+ "onb:AK095_054": {
+  "note": "Never translated. 'Mosque' is the generic word; Mohammed-El-Worde is the mosque's name as the card spells it.",
+  "title": "Cairo, Mohammed El-Worde Mosque",
+  "was": "Cairo, Mosque Mohammed-El-Worde"
+ },
+ "onb:AK103_108": {
+  "note": "French, never translated. Château Bacciochi is a named building in Ajaccio; kept as the name.",
+  "title": "Ajaccio, Château Bacciochi",
+  "was": "Ajaccio, Château Bacciochi"
+ },
+ "onb:AK103_160": {
+  "note": "French, never translated. Alger is Algiers; Rue Kleber is a street name (Kléber).",
+  "title": "Algiers, Rue Kléber",
+  "was": "Alger, Rue Kleber"
+ },
+ "onb:AK108_380": {
+  "note": "Orschwiller is the village and Hochkönigsburg the castle (the Haut-Koenigsbourg); both names kept.",
+  "title": "Orschwiller, Hochkönigsburg",
+  "was": "Orschwiller, Hochkönigsburg"
+ },
+ "onb:AK109_332": {
+  "note": "'hl.' abbreviates heilig (saint) and the saint is Georg, i.e. St. George. The published 'hl. George' mixed German abbreviation with a half-translated name.",
+  "title": "Judea, Monastery of St. George",
+  "was": "Judäa, Kloster des hl. Georg"
+ },
+ "onb:AK109_419": {
+  "note": "French, never translated. Kairoun is the card's spelling of Kairouan; Gafsa is a Tunisian town.",
+  "title": "Kairoun, the Road to Gafsa",
+  "was": "Kairoun, La Route de Gafsa"
+ },
+ "onb:AK110_387": {
+  "note": "French 'Ministère de la Marine' is the Ministry of the Navy (naval ministry), not 'Marine' in the sense of a marine corps.",
+  "title": "Constantinople, Golden Horn, Ministry of the Navy",
+  "was": "Constantinople, Corne d'or, Ministère de la Marine"
+ },
+ "onb:AK110_390": {
+  "note": "The Seraskerat was the Ottoman war ministry (its tower is now Beyazit Tower); a name, so kept as Seraskerat.",
+  "title": "Constantinople, Tower of the Seraskerat",
+  "was": "Constantinople, Tour du Séraskérat"
+ },
+ "onb:AK111_359": {
+  "note": "Existing translation was acceptable; Galata Tower is a named building.",
+  "title": "Constantinople, Galata Tower",
+  "was": "Constantinople, Tour de Galata"
+ },
  "rijks:NG-2009-94-79": {
   "note": "Dutch; Surinaamse vrouw met kind. Never translated.",
   "title": "Surinamese woman with child",
@@ -2373,6 +2583,11 @@
   "note": "Dutch, but Gravenstraat is a street name in Paramaribo and stays as the name; the rest is already the place.",
   "title": "Gravenstraat in Paramaribo",
   "was": "Gravenstraat in Paramaribo"
+ },
+ "rijks:NG-2016-50-25": {
+  "note": "Dutch street name; nothing to translate.",
+  "title": "Stoelmanstraat",
+  "was": "Stoelmanstraat"
  },
  "rijks:NG-2016-50-29": {
   "note": "Dutch, never translated. Surinaamse is 'Surinamese', from Suriname.",
@@ -2408,6 +2623,11 @@
   "note": "Dutch, never translated. Surinaamse is 'Surinamese'; ezel is donkey.",
   "title": "Surinamese boy with donkey",
   "was": "Surinaamse jongen met ezel"
+ },
+ "rijks:NG-2016-50-8": {
+  "note": "Dutch 'slagerij' is a butcher's shop; 'Publication by butchery' misread the structure.",
+  "title": "Announcement by a butcher's shop",
+  "was": "Bekendmaking door slagerij"
  },
  "rijks:RP-F-00-24092": {
   "note": "German; Erinnerungen an = memories of. Ludwig II. von Bayern is King Ludwig II of Bavaria.",
