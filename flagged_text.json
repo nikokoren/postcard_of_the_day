@@ -3010,5 +3010,269 @@
   "lang": "nl",
   "shown": "Ede, sheep cage on the Ginkel",
   "source": "Ede, Schaapskooi op de Ginkel"
+ },
+ {
+  "id": "dc:commonwealth:wh249d894",
+  "lang": "fr",
+  "shown": "Constantinople. Castles of Europe",
+  "source": "Constantinople. Ch\u00e2teaux d'Europe"
+ },
+ {
+  "id": "dc:commonwealth:x346fp86b",
+  "lang": "es",
+  "shown": "San Fernando de Bocachica Castle (main entrance), Cartagena, Col",
+  "source": "Castillo de San Fernando de Bocachica (entrada principal), Cartagena, Col"
+ },
+ {
+  "id": "graz:o:gm.1532",
+  "lang": "de",
+  "shown": "Old Graz: Paradeishof. Arcades",
+  "source": "Alt-Graz: Paradeishof. Arkaden"
+ },
+ {
+  "id": "graz:o:gm.2558",
+  "lang": "de",
+  "shown": "Greetings from Graz. Games of Schlossberg",
+  "source": "Gruss aus Graz. Partien v. Schlossberg"
+ },
+ {
+  "id": "graz:o:gm.336",
+  "lang": "de",
+  "shown": "Graz - Bell playground, court",
+  "source": "Graz - Glockenspielplatz, Hof"
+ },
+ {
+  "id": "loc:2018689644",
+  "lang": "sl",
+  "shown": "Polo high to fall Kirkire.",
+  "source": "Polotno dorogi k padi Kirkire\u012d"
+ },
+ {
+  "id": "loc:2018691215",
+  "lang": "",
+  "shown": "Ba\u012dkal. Skala Malai\ufe20a\ufe21 Kolokol\u02b9ni\ufe20a\ufe21",
+  "source": "Ba\u012dkal. Skala Malai\ufe20a\ufe21 Kolokol\u02b9ni\ufe20a\ufe21"
+ },
+ {
+  "id": "loc:2020760430",
+  "lang": "",
+  "shown": "Addis Abeba - Banca d'Etiopia ora sede Banca d'Italia",
+  "source": "Addis Abeba - Banca d'Etiopia ora sede Banca d'Italia"
+ },
+ {
+  "id": "loc:2020760599",
+  "lang": "",
+  "shown": "Massaua - (Eritrea)",
+  "source": "Massaua - (Eritrea)"
+ },
+ {
+  "id": "loc:2020760610",
+  "lang": "ro",
+  "shown": "192 - Sul fiume Bare a",
+  "source": "192 - Sul fiume Barea"
+ },
+ {
+  "id": "loc:2025702956",
+  "lang": "de",
+  "shown": "Burg Kreuzenstein. Chapel, north wall",
+  "source": "Burg Kreuzenstein. Kapelle, im Norden gelegene Wand"
+ },
+ {
+  "id": "loc:2025703303",
+  "lang": "pt",
+  "shown": "Museum of Confidence, Chafariz, Ouro Preto - Minas Gerais - Brazil",
+  "source": "Museu da Inconfidencia, Chafariz, Ouro Preto - Minas Gerais - Brasil"
+ },
+ {
+  "id": "loc:2025705917",
+  "lang": "",
+  "shown": "Draguignan. Rue de la Juiverie",
+  "source": "Draguignan. Rue de la Juiverie"
+ },
+ {
+  "id": "loc:2025707205",
+  "lang": "",
+  "shown": "La Cite de Carcassonne - L'Echauguette",
+  "source": "La Cite de Carcassonne - L'Echauguette"
+ },
+ {
+  "id": "loc:2025707882",
+  "lang": "fr",
+  "shown": "La Normandie Pittoresque - Holidays should last all year.",
+  "source": "La Normandie Pittoresque - Les vacances, ca devrait durer toute l'annee"
+ },
+ {
+  "id": "loc:2025708405",
+  "lang": "fr",
+  "shown": "Paris. Invalids",
+  "source": "Paris. Les Invalides"
+ },
+ {
+  "id": "loc:2025709243",
+  "lang": "de",
+  "shown": "To Grandmother's locker",
+  "source": "An Grossmutters Spind"
+ },
+ {
+  "id": "loc:2025710146",
+  "lang": "de",
+  "shown": "Munchen. Propyloaen on the Royal Square in Munchen Gate in Doric style",
+  "source": "Munchen. Propyloaen auf dem Koniglichen Platz in Munchen Tor im dorischen Stil, 1854-62 von Leo von Klenze Turmreliefs der Propylaen nach Hiltensperger"
+ },
+ {
+  "id": "loc:2025710225",
+  "lang": "de",
+  "shown": "Nurnberg Historical Court",
+  "source": "Nurnberg Historischer Hof"
+ },
+ {
+  "id": "loc:2025711111",
+  "lang": "it",
+  "shown": "Salerno - Duomo, Atrio and Campanile",
+  "source": "Salerno - Duomo, Atrio e Campanile"
+ },
+ {
+  "id": "loc:2025711327",
+  "lang": "",
+  "shown": "Bologna - Torri Asinelli e Garisenda",
+  "source": "Bologna - Torri Asinelli e Garisenda"
+ },
+ {
+  "id": "loc:2025712926",
+  "lang": "",
+  "shown": "Tivoli. Villa Adriana - Avanzi della Terme",
+  "source": "Tivoli. Villa Adriana - Avanzi della Terme"
+ },
+ {
+  "id": "loc:2025713267",
+  "lang": "",
+  "shown": "A scene of Nagasaki harbor with exotic moods",
+  "source": "A scene of Nagasaki harbor with exotic moods"
+ },
+ {
+  "id": "loc:2025715032",
+  "lang": "ro",
+  "shown": "Bucuresti - Post Palace",
+  "source": "Bucuresti - Palatul Postelor"
+ },
+ {
+  "id": "loc:2025715974",
+  "lang": "de",
+  "shown": "Open Air Museum Ballenberg",
+  "source": "Freilichtmuseum Ballenberg"
+ },
+ {
+  "id": "loc:2025716157",
+  "lang": "de",
+  "shown": "Thunersee. Beaten Bay with Eiger, Monch, and Junfrau",
+  "source": "Thunersee. Beatenbucht mit Eiger, Monch, und Junfrau"
+ },
+ {
+  "id": "loc:2025716263",
+  "lang": "fr",
+  "shown": "Constantinople - Eyoub view of the Golden Horn",
+  "source": "Constantinople - Eyoub vue sur la Corne d'Or"
+ },
+ {
+  "id": "loc:2025716280",
+  "lang": "fr",
+  "shown": "Constantinople - Tomb of Saltan Suleiman",
+  "source": "Constantinople - Tombeau du Saltan Suleiman"
+ },
+ {
+  "id": "onb:AK058_562",
+  "lang": "",
+  "shown": "Abbazia",
+  "source": "Abbazia"
+ },
+ {
+  "id": "onb:AK065_115",
+  "lang": "de",
+  "shown": "Rites, earth pyramids",
+  "source": "Ritten, Erdpyramiden"
+ },
+ {
+  "id": "onb:AK069_573",
+  "lang": "de",
+  "shown": "Sanctuary of Filippsdorf",
+  "source": "Wallfahrtskirche Filippsdorf"
+ },
+ {
+  "id": "onb:AK091_037",
+  "lang": "",
+  "shown": "Calcutta",
+  "source": "Calcutta"
+ },
+ {
+  "id": "onb:AK093_545",
+  "lang": "fr",
+  "shown": "Hanoi, Little Lake",
+  "source": "Hanoi, Petit Lac"
+ },
+ {
+  "id": "onb:AK095_054",
+  "lang": "",
+  "shown": "Cairo, Mosque Mohammed-El-Worde",
+  "source": "Cairo, Mosque Mohammed-El-Worde"
+ },
+ {
+  "id": "onb:AK103_108",
+  "lang": "",
+  "shown": "Ajaccio, Ch\u00e2teau Bacciochi",
+  "source": "Ajaccio, Ch\u00e2teau Bacciochi"
+ },
+ {
+  "id": "onb:AK103_160",
+  "lang": "",
+  "shown": "Alger, Rue Kleber",
+  "source": "Alger, Rue Kleber"
+ },
+ {
+  "id": "onb:AK108_380",
+  "lang": "",
+  "shown": "Orschwiller, Hochk\u00f6nigsburg",
+  "source": "Orschwiller, Hochk\u00f6nigsburg"
+ },
+ {
+  "id": "onb:AK109_332",
+  "lang": "de",
+  "shown": "Jud\u00e4a, Kloster des hl. George",
+  "source": "Jud\u00e4a, Kloster des hl. Georg"
+ },
+ {
+  "id": "onb:AK109_419",
+  "lang": "",
+  "shown": "Kairoun, La Route de Gafsa",
+  "source": "Kairoun, La Route de Gafsa"
+ },
+ {
+  "id": "onb:AK110_387",
+  "lang": "fr",
+  "shown": "Constantinople, Golden Horn, Ministry of Marine",
+  "source": "Constantinople, Corne d'or, Minist\u00e8re de la Marine"
+ },
+ {
+  "id": "onb:AK110_390",
+  "lang": "fr",
+  "shown": "Constantinople, Seraskerat Tower",
+  "source": "Constantinople, Tour du S\u00e9rask\u00e9rat"
+ },
+ {
+  "id": "onb:AK111_359",
+  "lang": "fr",
+  "shown": "Constantinople, Galata Tower",
+  "source": "Constantinople, Tour de Galata"
+ },
+ {
+  "id": "rijks:NG-2016-50-25",
+  "lang": "",
+  "shown": "Stoelmanstraat",
+  "source": "Stoelmanstraat"
+ },
+ {
+  "id": "rijks:NG-2016-50-8",
+  "lang": "nl",
+  "shown": "Publication by butchery",
+  "source": "Bekendmaking door slagerij"
  }
 ]
