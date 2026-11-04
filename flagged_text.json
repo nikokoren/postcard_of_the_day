@@ -3274,5 +3274,155 @@
   "lang": "nl",
   "shown": "Publication by butchery",
   "source": "Bekendmaking door slagerij"
+ },
+ {
+  "id": "dc:commonwealth:rx9168656",
+  "lang": "el",
+  "shown": "Mars ice and Theseion",
+  "source": "\u0391\u03c1\u03b5\u03b9\u03bf\u03c2 \u03c0\u03b1\u03b3\u03bf\u03c2 \u03ba\u03b1\u03b9 \u0398\u03b7\u03c3\u03b5\u03b9\u03bf\u03bd"
+ },
+ {
+  "id": "graz:o:gm.2499",
+  "lang": "de",
+  "shown": "Electrical railway to Schlossberg Graz",
+  "source": "Electrische Bahn nach dem Schlossberg Graz"
+ },
+ {
+  "id": "graz:o:gm.2703",
+  "lang": "",
+  "shown": "Graz, Schweizerhaus am Schlo\u00dfberg",
+  "source": "Graz, Schweizerhaus am Schlo\u00dfberg"
+ },
+ {
+  "id": "loc:2018690381",
+  "lang": "sl",
+  "shown": "\"Stolby.\" \"Ded Rock\"",
+  "source": "Krasnoi\ufe20a\ufe21rski\u012d zapovednik \"Stolby\". Skala \"Ded\""
+ },
+ {
+  "id": "loc:2020760500",
+  "lang": "fr",
+  "shown": "ABYSSINE - Entrance to Ras Makonnen Palace in Harrar",
+  "source": "ABYSSINE - Entr\u00e9e du Palais du Ras Makonnen a Harrar"
+ },
+ {
+  "id": "loc:2025702813",
+  "lang": "",
+  "shown": "Constantine. Boulevard de l'Abime",
+  "source": "Constantine. Boulevard de l'Abime"
+ },
+ {
+  "id": "loc:2025704130",
+  "lang": "fr",
+  "shown": "Caire - Barques on the Nile",
+  "source": "Caire - Barques sur le Nil"
+ },
+ {
+  "id": "loc:2025708513",
+  "lang": "fr",
+  "shown": "Paris. Our Lady. Gargoyles, Waterspouts",
+  "source": "Paris. Notre-Dame. Gargouilles, Water-spouts"
+ },
+ {
+  "id": "loc:2025708817",
+  "lang": "fr",
+  "shown": "Reims, The Nef of the Church of Saint Remi",
+  "source": "Reims, La Nef de l'Eglise Saint-Remi"
+ },
+ {
+  "id": "loc:2025709550",
+  "lang": "de",
+  "shown": "Sudfront of the town hall on the market",
+  "source": "Sudfront des Rathauses am Markt"
+ },
+ {
+  "id": "loc:2025709678",
+  "lang": "de",
+  "shown": "Castle with Bastille",
+  "source": "Schloss mit Bastille"
+ },
+ {
+  "id": "loc:2025713921",
+  "lang": "es",
+  "shown": "Tetuan (Marruecos) - Rincon of the Zoco Fokki",
+  "source": "Tetuan (Marruecos) - Rincon del Zoco el Fokki"
+ },
+ {
+  "id": "loc:2025715111",
+  "lang": "",
+  "shown": "Moscou. Vue prise du pont Oustyinsky",
+  "source": "Moscou. Vue prise du pont Oustyinsky"
+ },
+ {
+  "id": "onb:AK007_388",
+  "lang": "",
+  "shown": "Schreckenstein",
+  "source": "Schreckenstein"
+ },
+ {
+  "id": "onb:AK009_017",
+  "lang": "",
+  "shown": "Szabadka, e\u00f6tv\u00f6s-utca",
+  "source": "Szabadka, e\u00f6tv\u00f6s-utca"
+ },
+ {
+  "id": "onb:AK025_262",
+  "lang": "",
+  "shown": "Sz\u00e1szv\u00e1ros",
+  "source": "Sz\u00e1szv\u00e1ros"
+ },
+ {
+  "id": "onb:AK038_436",
+  "lang": "",
+  "shown": "Schottwien, Sonnwendstein",
+  "source": "Schottwien, Sonnwendstein"
+ },
+ {
+  "id": "onb:AK057_099",
+  "lang": "",
+  "shown": "Rosenau",
+  "source": "Rosenau"
+ },
+ {
+  "id": "onb:AK066_433",
+  "lang": "cs",
+  "shown": "Charles T\u00fdn Castle",
+  "source": "Hrad Karl\u016fv T\u00fdn"
+ },
+ {
+  "id": "onb:AK078_456",
+  "lang": "",
+  "shown": "Bad Luha\u010dovic",
+  "source": "Bad Luha\u010dovic"
+ },
+ {
+  "id": "onb:AK086_398",
+  "lang": "",
+  "shown": "Amassia, Grande Citadelle",
+  "source": "Amassia, Grande Citadelle"
+ },
+ {
+  "id": "onb:AK095_028",
+  "lang": "",
+  "shown": "Col de Tirourda, Kabylie",
+  "source": "Col de Tirourda, Kabylie"
+ },
+ {
+  "id": "onb:AK099_586",
+  "lang": "",
+  "shown": "Ayuthia, Elephant Kraal",
+  "source": "Ayuthia, Elephant Kraal"
+ },
+ {
+  "id": "onb:AK103_416",
+  "lang": "",
+  "shown": "Ambon, Fort Nieuw-Victoria",
+  "source": "Ambon, Fort Nieuw-Victoria"
+ },
+ {
+  "id": "onb:AK109_418",
+  "lang": "",
+  "shown": "Kairoun, Porte de Tunis",
+  "source": "Kairoun, Porte de Tunis"
  }
 ]
