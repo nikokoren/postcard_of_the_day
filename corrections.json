@@ -144,6 +144,11 @@
   "title": "Baalbek - Temple of Jupiter and Bacchus",
   "was": "Baalbek - Temple de Jupiter et Bacchus"
  },
+ "dc:commonwealth:rx9168656": {
+  "note": "Greek 'Αρειος παγος' is the Areopagus, the rock below the Acropolis in Athens (Areios Pagos, Hill of Ares). The translator read pagos as 'ice' and Areios as Mars. Θησειον is the Theseion, the temple in Athens; 'Theseion' was fine.",
+  "title": "The Areopagus and the Theseion",
+  "was": "Αρειος παγος και Θησειον"
+ },
  "dc:commonwealth:rx916873w": {
   "note": "The published English is sound; the French sultans' names are kept in the archive's spelling (Mahmoud, Abd-ul-Aziz). Rewritten so the flag resolves and the names are pinned as names.",
   "title": "Constantinople. Tombs of the Sultans Mahmoud II and Abd-ul-Aziz",
@@ -319,6 +324,11 @@
   "title": "Graz - Superstructure of the gas and electricity works",
   "was": "Graz - Hochbau des Gas- und Elektrizitätswerkes"
  },
+ "graz:o:gm.2499": {
+  "note": "German 'Electrische Bahn' is an electric railway. Schlossberg is the castle hill in Graz, a place name; the old translation was acceptable apart from awkward wording and punctuation, which are tidied.",
+  "title": "Electric railway to the Schlossberg, Graz",
+  "was": "Electrische Bahn nach dem Schlossberg Graz"
+ },
  "graz:o:gm.2558": {
   "note": "'Partien' on a Gruss-aus card means views/scenes of a place, not games (Partie as in a game of cards). Schlossberg is the hill in Graz.",
   "title": "Greetings from Graz. Views of the Schlossberg",
@@ -333,6 +343,11 @@
   "note": "German. Kriegssteig is the name of a path on the Schloßberg in Graz (literally 'war path'); the translator rendered it as 'War crest' (mistaking Steig, path, for a crest). Kept as a proper name.",
   "title": "Graz. Schloßberg. Kriegssteig",
   "was": "Graz. Schloßberg. Kriegssteig"
+ },
+ "graz:o:gm.2703": {
+  "note": "Never translated. 'Am Schloßberg' is 'on the Schlossberg' (Graz's castle hill); Schweizerhaus is the name of the building or inn and is kept as a name.",
+  "title": "Graz, Schweizerhaus on the Schlossberg",
+  "was": "Graz, Schweizerhaus am Schloßberg"
  },
  "graz:o:gm.3249": {
   "note": "German, never translated properly. Künstlerkarte is an artist-designed postcard, not an 'artist card'. Mur is the river through Graz and Schlossberg the castle hill: both place names, left as names.",
@@ -393,6 +408,11 @@
   "note": "Russian transliteration, misdetected as Slovenian and mangled ('Great. Vostochnai'). Krasnoyarsk is the city; Stolby ('the pillars') is the nature reserve (goszapovednik = state reserve); Vtoroi stolb is the second pillar; Pered pryzhkom is 'before the jump'.",
   "title": "Krasnoyarsk. Eastern Siberia. Stolby Nature Reserve. Second pillar. Before the jump",
   "was": "Krasnoi︠a︡rsk. Vostochnai︠a︡ Sibirʹ. Goszapovednik \"Stolby\". Vtoroĭ stolb. Pered pryzhkom"
+ },
+ "loc:2018690381": {
+  "note": "Romanized Russian: zapovednik is a strict nature reserve and Stolby (Pillars) is the name of the Krasnoyarsk reserve; the translator dropped Krasnoyarsk. Skala is a rock or cliff, and \"Ded\" (Grandfather) is the rock's name, not the common noun.",
+  "title": "Krasnoyarsk Nature Reserve \"Stolby\". \"Ded\" Rock",
+  "was": "Krasnoi︠a︡rskiĭ zapovednik \"Stolby\". Skala \"Ded\""
  },
  "loc:2018690572": {
   "note": "Transliterated Russian: pereprava = crossing, cherez reku Angaru = across the Angara River, plashkout = a pontoon ferry. Angara is the river.",
@@ -518,6 +538,11 @@
   "note": "French, never translated. Harar is a city in Ethiopia and Abyssinie is the period name for Ethiopia; both are places.",
   "title": "1. Harar Mission (Abyssinia) - Orphans",
   "was": "1. Mission d'Harar (Abyssinie) - Orphelines"
+ },
+ "loc:2020760500": {
+  "note": "French. ABYSSINE is Abyssinia, left untranslated. Ras Makonnen is a person and Harrar a place (Harar). 'Palais du Ras Makonnen' is the Palace of Ras Makonnen.",
+  "title": "ABYSSINIA - Entrance to the Palace of Ras Makonnen at Harrar",
+  "was": "ABYSSINE - Entrée du Palais du Ras Makonnen a Harrar"
  },
  "loc:2020760514": {
   "note": "Italian. Scirè is a place (the Shire region of Tigray) and the 'Submission' is a second title running on without punctuation; 'mussulman' is an old Italian spelling of Muslims, plural intended.",
@@ -864,6 +889,11 @@
   "title": "Constantine. The Place du Palais",
   "was": "Constantine. La Place du Palais"
  },
+ "loc:2025702813": {
+  "note": "Never translated. Constantine is the Algerian city; Boulevard de l'Abîme (Abyss Boulevard, above the Rhumel gorge) is a street name, kept in French with its accent restored.",
+  "title": "Constantine. Boulevard de l'Abîme",
+  "was": "Constantine. Boulevard de l'Abime"
+ },
  "loc:2025702836": {
   "note": "Never translated. Spanish 'Portal Colonial en Buenos Aires'; Buenos Aires is a place name.",
   "title": "Colonial Portal in Buenos Aires",
@@ -1128,6 +1158,11 @@
   "note": "French. Caire = Cairo; près des = near the.",
   "title": "Cairo - Near the Pyramids",
   "was": "Caire - Pres des Pyramides"
+ },
+ "loc:2025704130": {
+  "note": "French. 'Caire' (Cairo) and 'Barques' (boats) were both left in French by the translator, giving the half-translated 'Caire - Barques on the Nile'.",
+  "title": "Cairo - Boats on the Nile",
+  "was": "Caire - Barques sur le Nil"
  },
  "loc:2025704131": {
   "note": "Caire was left in French; it is Cairo. Pres des was rendered but dropped the article.",
@@ -1454,6 +1489,11 @@
   "title": "Paris. Notre-Dame. Chimera",
   "was": "Paris. Notre-Dame. Chimere, Chimaera"
  },
+ "loc:2025708513": {
+  "note": "Notre-Dame is the cathedral's name, not 'Our Lady'; the translator rendered it as vocabulary.",
+  "title": "Paris. Notre-Dame. Gargoyles, Water-spouts",
+  "was": "Paris. Notre-Dame. Gargouilles, Water-spouts"
+ },
  "loc:2025708578": {
   "note": "Avenue de l'Observatoire is a Paris street name and should remain a proper name, not be translated word by word. The flagged archive wording already identifies it correctly; retain it unchanged as a reviewed caption.",
   "title": "Paris. Avenue de l'Observatoire",
@@ -1483,6 +1523,11 @@
   "note": "French followed by an English gloss in the same caption; the French half was never translated. Reims Cathedral is a named building. The repetition is the archive's own.",
   "title": "Reims - The Cathedral before the bombardment. The cathedral before the bombardment",
   "was": "Reims - La Cathedrale avant le bombardement. The cathedral before the bombardment"
+ },
+ "loc:2025708817": {
+  "note": "French 'Nef' is the nave of a church; it was left as 'Nef'. Saint-Remi is the church's name (Basilica of Saint-Remi), kept as a name.",
+  "title": "Reims, The Nave of the Church of Saint-Remi",
+  "was": "Reims, La Nef de l'Eglise Saint-Remi"
  },
  "loc:2025708827": {
   "note": "French. 'Interieur' is interior, not 'Inner'; 'au fond' is 'at the far end', not 'in the bottom'; 'trou cause par' is 'hole caused by'. The archive caption is cut off after '380' (a shell calibre), and the closing parenthesis is supplied only for readability.",
@@ -1539,10 +1584,20 @@
   "title": "Hotel \"Zu den Roten Forellen\" (At the Red Trout), Hotel Ilsestein, Hotel Prinzess Ilse, Ilsenburg am Harz",
   "was": "Hotel \"Zu den Roten Forellen\", Hotel Ilsestein, Hotel Prinzess Ilse, Ilsenburg am Harz"
  },
+ "loc:2025709550": {
+  "note": "German 'Sudfront' (Südfront) is the south front; the translator left it half-German. 'Am Markt' is on the market square.",
+  "title": "South front of the Town Hall on the Market Square",
+  "was": "Sudfront des Rathauses am Markt"
+ },
  "loc:2025709600": {
   "note": "German. 'mit stein. Brücke' is 'with the stone bridge' (the Steinerne Brücke of Regensburg); the translator split it into 'stone. Brucke', leaving Brücke untranslated.",
   "title": "Regensburg with the Stone Bridge",
   "was": "Regensburg mit stein. Brucke"
+ },
+ "loc:2025709678": {
+  "note": "German 'Bastille' here is the old word for a bastion or fortified outwork (as in the Paris Bastille's own name), not a reference to the Paris prison; no place is named in the caption.",
+  "title": "Castle with bastion",
+  "was": "Schloss mit Bastille"
  },
  "loc:2025709772": {
   "note": "German. Unter den Linden is the name of the Berlin boulevard, not 'under the lindens'.",
@@ -2119,6 +2174,11 @@
   "title": "Tétouan (Morocco) - Street of the Post Offices",
   "was": "Tetuan (Marruecos) - Calle de los Correos"
  },
+ "loc:2025713921": {
+  "note": "Spanish. 'Rincon' is a corner, left untranslated. Zoco el Fokki is the name of a market place in Tetouan and the translator dropped 'el'. Marruecos (Morocco) is kept as the archive has it.",
+  "title": "Tetuan (Marruecos) - Corner of the Zoco el Fokki",
+  "was": "Tetuan (Marruecos) - Rincon del Zoco el Fokki"
+ },
  "loc:2025713924": {
   "note": "Spanish. Marruecos is Morocco, and Maniobras Militares are military maneuvers, not 'operations'.",
   "title": "Tetuan (Morocco) - Military Maneuvers",
@@ -2213,6 +2273,11 @@
   "note": "English, never translated. Astrakhan is a city and the Volga a river; 'of the Volga' is changed to 'on' for the English sense.",
   "title": "Astrakhan. Sunset on the Volga",
   "was": "Astrakhan. Sunset of the Volga"
+ },
+ "loc:2025715111": {
+  "note": "Never translated. French 'Moscou' is Moscow; 'Oustyinsky' is the French transliteration of Ustinsky (Ustinsky Bridge), a name.",
+  "title": "Moscow. View taken from the Ustinsky Bridge",
+  "was": "Moscou. Vue prise du pont Oustyinsky"
  },
  "loc:2025715148": {
   "note": "Le tzar des canons is the Tsar Cannon, a named object, not the cannon tzar. Moscou is Moscow.",
@@ -2494,6 +2559,31 @@
   "title": "Prostenje near St. Simon, by Zagreb",
   "was": "Prostenje kod Sv. Simuna kraj Zagreba"
  },
+ "onb:AK007_388": {
+  "note": "Never translated. Schreckenstein is a place name; nothing to translate and no detail may be added.",
+  "title": "Schreckenstein",
+  "was": "Schreckenstein"
+ },
+ "onb:AK009_017": {
+  "note": "Never translated. Szabadka is the Hungarian name of the town (now Subotica); Eötvös-utca is Eötvös Street, named for a person.",
+  "title": "Szabadka, Eötvös Street",
+  "was": "Szabadka, eötvös-utca"
+ },
+ "onb:AK025_262": {
+  "note": "Never translated. Szászváros is the Hungarian name of a town (now Orăștie); a name, nothing to translate.",
+  "title": "Szászváros",
+  "was": "Szászváros"
+ },
+ "onb:AK038_436": {
+  "note": "Never translated. Schottwien is a village and Sonnwendstein a mountain; both are names.",
+  "title": "Schottwien, Sonnwendstein",
+  "was": "Schottwien, Sonnwendstein"
+ },
+ "onb:AK057_099": {
+  "note": "Never translated. Rosenau is a place name.",
+  "title": "Rosenau",
+  "was": "Rosenau"
+ },
  "onb:AK058_562": {
   "note": "Place name only (the Adriatic resort, Opatija today), never translated. Left as a name.",
   "title": "Abbazia",
@@ -2504,10 +2594,25 @@
   "title": "Ritten, Earth Pyramids",
   "was": "Ritten, Erdpyramiden"
  },
+ "onb:AK066_433": {
+  "note": "Czech. 'Hrad' is castle. Karlův Týn (Charles's Týn, the old name of Karlštejn) is the castle's name; the translator translated Karlův as 'Charles' and left Týn.",
+  "title": "Karlův Týn Castle",
+  "was": "Hrad Karlův Týn"
+ },
  "onb:AK069_573": {
   "note": "Wallfahrtskirche is a pilgrimage church, not a 'sanctuary'. Filippsdorf is the place.",
   "title": "Pilgrimage Church of Filippsdorf",
   "was": "Wallfahrtskirche Filippsdorf"
+ },
+ "onb:AK078_456": {
+  "note": "Never translated. Bad is the German word for spa; Luhačovice is the Czech spa town, and the archive's 'Luhačovic' is a truncated form of its name.",
+  "title": "Bad Luhačovice",
+  "was": "Bad Luhačovic"
+ },
+ "onb:AK086_398": {
+  "note": "Never translated. French 'Grande Citadelle' is the Great Citadel. Amassia is the French spelling of Amasya, a town, kept as the archive writes it.",
+  "title": "Amassia, Great Citadel",
+  "was": "Amassia, Grande Citadelle"
  },
  "onb:AK091_037": {
   "note": "Place name only, never translated; nothing to change but it is now explicit.",
@@ -2519,10 +2624,20 @@
   "title": "Hanoi, Petit Lac",
   "was": "Hanoi, Petit Lac"
  },
+ "onb:AK095_028": {
+  "note": "Never translated. French 'Col' is a mountain pass; Col de Tirourda is the pass's name in Kabylie (Algeria), so both are kept as names.",
+  "title": "Col de Tirourda, Kabylie",
+  "was": "Col de Tirourda, Kabylie"
+ },
  "onb:AK095_054": {
   "note": "Never translated. 'Mosque' is the generic word; Mohammed-El-Worde is the mosque's name as the card spells it.",
   "title": "Cairo, Mohammed El-Worde Mosque",
   "was": "Cairo, Mosque Mohammed-El-Worde"
+ },
+ "onb:AK099_586": {
+  "note": "Already English in the archive. Ayuthia (Ayutthaya) is a place name; the elephant kraal is the stockade for elephants. No change needed.",
+  "title": "Ayuthia, Elephant Kraal",
+  "was": "Ayuthia, Elephant Kraal"
  },
  "onb:AK103_108": {
   "note": "French, never translated. Château Bacciochi is a named building in Ajaccio; kept as the name.",
@@ -2534,6 +2649,11 @@
   "title": "Algiers, Rue Kléber",
   "was": "Alger, Rue Kleber"
  },
+ "onb:AK103_416": {
+  "note": "Already largely a name. Ambon is the island and town; Fort Nieuw-Victoria is the Dutch fort's name and must not be translated.",
+  "title": "Ambon, Fort Nieuw-Victoria",
+  "was": "Ambon, Fort Nieuw-Victoria"
+ },
  "onb:AK108_380": {
   "note": "Orschwiller is the village and Hochkönigsburg the castle (the Haut-Koenigsbourg); both names kept.",
   "title": "Orschwiller, Hochkönigsburg",
@@ -2543,6 +2663,11 @@
   "note": "'hl.' abbreviates heilig (saint) and the saint is Georg, i.e. St. George. The published 'hl. George' mixed German abbreviation with a half-translated name.",
   "title": "Judea, Monastery of St. George",
   "was": "Judäa, Kloster des hl. Georg"
+ },
+ "onb:AK109_418": {
+  "note": "Never translated. French 'Porte de Tunis' is the Tunis Gate (a gate of Kairouan); Kairoun is the archive's spelling of the city.",
+  "title": "Kairoun, Porte de Tunis",
+  "was": "Kairoun, Porte de Tunis"
  },
  "onb:AK109_419": {
   "note": "French, never translated. Kairoun is the card's spelling of Kairouan; Gafsa is a Tunisian town.",
