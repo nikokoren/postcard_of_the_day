@@ -2938,5 +2938,55 @@
   "note": "Never translated. German: 'bei' is near. Abbazia (now Opatija), Ika and Lovrana (now Lovran) are places on the Kvarner coast, kept as names.",
   "title": "Abbazia, Ika near Lovrana",
   "was": "Abbazia, Ika bei Lovrana"
+ },
+ "dc:commonwealth:x346fm060": {
+  "note": "Spanish: 'Aeropuerto' is airport. Lansa is the name of the airline/airport operator (Líneas Aéreas Nacionales S.A.), a proper name; it was left in scare quotes as if it were a word, so it is now plainly part of the name.",
+  "title": "Lansa Airport in Bogotá, Colombia",
+  "was": "Aeropuerto \"Lansa\" en Bogotá, Colombia"
+ },
+ "graz:o:gm.3905": {
+  "note": "German 'Über den Dächern' is an idiom for 'above the rooftops' (a view from high up); 'Over the roofs' was literal and lowercase for a title.",
+  "title": "Above the Rooftops",
+  "was": "\"Über den Dächern\""
+ },
+ "loc:2025706368": {
+  "note": "French, never translated. Château d'Ussé is the castle in the Loire valley, kept as a name. XVe et XVIe Siècles are the 15th and 16th centuries. The archive's own text had lost its closing parenthesis; this correction matches the re-catalogued caption, which still lacks it.",
+  "title": "Château d'Ussé (15th and 16th Centuries)",
+  "was": "Le Chateau D'Usse (XVe et XVIe Siecles"
+ },
+ "loc:2025706768": {
+  "note": "French 'prise des Arènes' is 'taken from the Arènes' (the Roman amphitheatre of Arles), a photographic viewpoint; the translator read 'prise' as a noun ('take of'). Arènes kept as the monument's name.",
+  "title": "Arles, General view, taken from the Arènes",
+  "was": "Arles, Vue generale, prise des Arenes"
+ },
+ "loc:2025707530": {
+  "note": "French. The Grille d'Honneur is the monument's gate/railing, not an 'Honour Grid'; the Cour des Adieux is the Farewell Courtyard where Napoleon took leave of his Guard, not 'Court of Adieu'. Both are place names so the originals are kept with a gloss.",
+  "title": "Palais de Fontainebleau - The Grille d'Honneur (Gate of Honour) and the Cour des Adieux (Farewell Courtyard)",
+  "was": "Palais de Fontainebleau - La Grille d'Honneur et la Cour des Adieux"
+ },
+ "loc:2025713971": {
+  "note": "German 'Friesche Kleederdracht' (old spelling) is Frisian traditional dress; the translator took 'Kleeder' for clover and 'Dracht' for dragon. 'Tracht'/'Dracht' means costume.",
+  "title": "Frisian Traditional Costume",
+  "was": "Friesche Kleederdracht"
+ },
+ "loc:2025714392": {
+  "note": "Never translated. Mostly English already, but 'Gammel Same' is Norwegian for 'old Sámi', the Sámi being the Indigenous people of Finnmark. Left the archive's period term 'Lappie' as it is the archive's own wording; Finnmark is a place name.",
+  "title": "Finnmark, North Norway. Gammel Same (old Sámi). The old Lappie",
+  "was": "Finnmark, North Norway. Gammel Same. The old Lappie"
+ },
+ "onb:AK069_110": {
+  "note": "Never translated. German 'Margareteninsel' is Margaret Island (Margitsziget), the island in the Danube at Budapest; a place name rendered in English.",
+  "title": "Budapest, Margaret Island",
+  "was": "Budapest, Margareteninsel"
+ },
+ "onb:AK114_166": {
+  "note": "Language detected as Turkish in error; it is German. The translator appended a stray 'Tags' to Lenaviadukt. Bergün and Preda are places on the Albula line in Graubünden; Albulabahn is the Albula Railway and Lenaviadukt the Lena Viaduct.",
+  "title": "Bergün, Preda, Albula Railway, Lena Viaduct",
+  "was": "Bergün, Preda, Albulabahn, Lenaviadukt"
+ },
+ "rijks:RP-P-2010-310-95-53": {
+  "note": "Never translated; the English was a stiff rendering. Hiroshige's series is the Fifty-three Stations of the Tōkaidō, so 'noted places' is replaced by 'stations'. Kusatsu and Tōkaidō are names.",
+  "title": "No. 53. Kusatsu: one of the fifty-three stations on the Tōkaidō, painted by Hiroshige",
+  "was": "No. 53. Kusatsu: one of the fifty-three noted places on Tokaido, painted by Hiroshige"
  }
 }
