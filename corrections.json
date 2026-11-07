@@ -2853,5 +2853,90 @@
   "note": "Dutch 'vliegtuig' is an aircraft; the existing translation was acceptable. Henri Farman is the aircraft's maker, a person's name.",
   "title": "Portrait of Bertram Dickson on Henri Farman's aeroplane",
   "was": "Portret van Bertram Dickson op het vliegtuig van Henri Farman"
+ },
+ "loc:2020760801": {
+  "note": "Italian; 'Passagio' is a crossing, not a passage in the corridor sense. Published 'River Passage' dropped the 'di un' (of a river) construction; 'un fiume' is a river. Uppercase ERITREA is the colony, kept.",
+  "title": "ERITREA - Crossing of a River",
+  "was": "ERITREA - Passagio di un fiume"
+ },
+ "loc:2025702753": {
+  "note": "French; 'Alger' is the French name of Algiers, a city, and was left untranslated in the middle of an English sentence. Palais d'Hiver is the Winter Palace, a building name, fine as it was.",
+  "title": "Algiers. The Cathedral and the Winter Palace",
+  "was": "Alger. La Cathedrale et le Palais d'Hiver"
+ },
+ "loc:2025703306": {
+  "note": "Portuguese; 'Nossa Senhora do Pilar' is Our Lady of the Pillar, a dedication. The translator split it and attached 'Ouro' (the town, Ouro Preto) to it, giving 'Ouro Senhora do Pilar'. Igreja Matriz is the mother (parish) church.",
+  "title": "Mother Church of Our Lady of the Pillar, Ouro Preto - Minas Gerais - Brazil",
+  "was": "Igreja Matriz de Nossa Senhora do Pilar, Ouro Preto - Minas Gerais - Brasil"
+ },
+ "loc:2025705281": {
+  "note": "Never translated. Swedish: 'Nikolai Kyrkan' is St. Nicholas Church (Helsingfors is the Swedish name of Helsinki, kept as the archive gives it).",
+  "title": "Helsingfors-Helsinki. St. Nicholas Church",
+  "was": "Helsingfors-Helsinki. Nikolai Kyrkan"
+ },
+ "loc:2025705550": {
+  "note": "French; 'L'Attique' is the attic storey, not Attica (the region of Greece). Archive text is cut off after '(nord-ouest'; the closing parenthesis is supplied.",
+  "title": "Blois, Château, the Attic and the Gargoyles (northwest)",
+  "was": "Blois, Chateau, L'Attique et les Gargouilles (nord-ouest"
+ },
+ "loc:2025708799": {
+  "note": "French; 'Abside' is the apse of the cathedral, not an abbey (abbaye), and 'Chimères' is chimeras, the carved fantastic figures, not 'Chimeres'.",
+  "title": "Reims before the bombardment, The Cathedral, Detail of the Apse, The Chimeras",
+  "was": "Reims avant le bombardement, La Cathedrale, Detail de l'Abside, Les Chimeres"
+ },
+ "loc:2025709291": {
+  "note": "Never translated. German: Salzbergwerk is a salt mine; Ferdinandsberg is the name of the mine and Berchtesgaden the town, both kept as names.",
+  "title": "Ferdinandsberg Salt Mine. Berchtesgaden",
+  "was": "Salzbergwerk Ferdinandsberg. Berchtesgaden"
+ },
+ "loc:2025710723": {
+  "note": "French; the first part was left in French and 'Pont de Bateaux' was rendered 'Boat Bridge'. It is a bridge of boats (pontoon bridge). Mosul was already right.",
+  "title": "Dominican Mission of Mesopotamia. Mosul, the Bridge of Boats and the City",
+  "was": "Mission Dominicaine de Mesopotamie. Mossoul, Le Pont de Bateaux et la Ville"
+ },
+ "loc:2025710819": {
+  "note": "Never rewritten; the caption is already English, but it was word-order awkward ('background the Gran Paradiso'). Gran Paradiso is a mountain name, kept.",
+  "title": "Aosta Valley - Cogne - Valnontey 1630 m, Gran Paradiso 4061 m in the background",
+  "was": "Valley of Aosta - Cogne - Valnontey 1630 m background the Gran Paradiso 4061 m"
+ },
+ "loc:2025710930": {
+  "note": "Italian; the existing translation was essentially right. Abbreviation 'S.' expanded to San, as it stands for the saint's name in the place name San Domenico (di Fiesole).",
+  "title": "San Domenico and Panorama of Fiesole",
+  "was": "S. Domenico e Panorama di Fiesole"
+ },
+ "loc:2025713974": {
+  "note": "Dutch (detected as German). 'Kleederdracht' is traditional dress, from kleding + dracht (costume). The translator split it into 'clover dragon', reading Klee/Drache as German words.",
+  "title": "Frisian Costume",
+  "was": "Friesche Kleederdracht"
+ },
+ "loc:2025716282": {
+  "note": "'Hyppodrome' is a misspelling of the Hippodrome (Constantinople/Istanbul). 'La colonne serpentine' is the Serpent Column, a monument, not 'serpentine columns' (plural). The language was French, not Italian.",
+  "title": "Hippodrome. The Serpent Column",
+  "was": "Hyppodrome. La colonne serpentine"
+ },
+ "onb:AK050_502": {
+  "note": "Never translated. German: Fluß is river; Miljacka is the river through Sarajevo, a name, kept.",
+  "title": "Sarajevo, Miljacka River",
+  "was": "Sarajevo, Miljacka-Fluß"
+ },
+ "onb:AK064_552": {
+  "note": "German; Haida is the German name of the town now called Nový Bor, a place, kept. 'Ring' in Bohemian/Silesian usage is the central market square (Ringplatz), not a ring.",
+  "title": "Haida, Old Market Square",
+  "was": "Haida, Alter Ring"
+ },
+ "onb:AK090_501": {
+  "note": "Never translated; both are names, not vocabulary: Bruggen is a locality in St. Gallen and the Sitter is the river there. Kept as the archive gives them.",
+  "title": "Bruggen, Sitter",
+  "was": "Bruggen, Sitter"
+ },
+ "onb:AK101_298": {
+  "note": "Portuguese; Avenida Central was the avenue's name at the time (later Avenida Rio Branco). A street name is a name, so it stays in the original rather than 'Central Avenue'.",
+  "title": "Rio de Janeiro, Avenida Central",
+  "was": "Rio de Janeiro, Avenida Central"
+ },
+ "onb:AK108_538": {
+  "note": "Never translated. German: 'bei' is near. Abbazia (now Opatija), Ika and Lovrana (now Lovran) are places on the Kvarner coast, kept as names.",
+  "title": "Abbazia, Ika near Lovrana",
+  "was": "Abbazia, Ika bei Lovrana"
  }
 }
