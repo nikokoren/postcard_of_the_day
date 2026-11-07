@@ -2699,8 +2699,8 @@ def probe():
             bases[entry["src"]] = entry["b"]
     bases.setdefault("onb", ONB_IIIF + "AK036_583/583")
 
-    print("{:<9} {:<30} {:>7} {:>7} {:>7} {:>8}".format(
-        "source", "host", "https", "http", "gray", "default"))
+    print("{:<9} {:<30} {:>7} {:>7} {:>7} {:>8} {:>7}".format(
+        "source", "host", "https", "http", "gray", "default", "master"))
     worst = 0
     for src, base in sorted(bases.items()):
         host = host_of(base)
@@ -2721,8 +2721,21 @@ def probe():
                 base, MEASURE_SIZE, quality),
                 accept="image/jpeg", raw=True, tries=1)
             row.append("ok" if raw else "-")
-        print("{:<9} {:<30} {:>7} {:>7} {:>7} {:>8}".format(
+        # And the full-size link the review page offers for printing.
+        # IIIF 2 spells that size `full` and IIIF 3 `max`, nothing takes
+        # both, and daily.py keeps a per-source table -- so ask with
+        # whatever that table says and report whether it answered.
+        import daily
+        size = daily.MASTER_SIZE.get(src, daily.MASTER_SIZE_DEFAULT)
+        got = fetch("{}/full/{}/0/default.jpg".format(base, size),
+                    accept="image/jpeg", raw=True, tries=1)
+        row.append(size if got else "-")
+        print("{:<9} {:<30} {:>7} {:>7} {:>7} {:>8} {:>7}".format(
             src, host[:30], *row))
+        if not got:
+            print("          ^ the printable link asks this host for "
+                  "{} and it does not serve it".format(size))
+            worst = 1
 
         if row[0] == "-" and row[1] == "-":
             print("          ^ neither scheme answers at all")

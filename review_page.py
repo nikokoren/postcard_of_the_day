@@ -156,6 +156,11 @@ def main():
         "n": len(i.get("when") or []),
         "new": i["id"] not in previous,
         "img": i.get("thumb") or "",
+        # The scan at its own size, and what that size is. For printing:
+        # a card the archive holds at 1650x1070 is a 14x9cm print and no
+        # bigger, which is worth knowing before downloading it.
+        "full": i.get("master") or "",
+        "px": i.get("pixels") or None,
     } for i in items]
 
     payload = json.dumps({

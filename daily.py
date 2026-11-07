@@ -606,6 +606,51 @@ def image_url(entry, box=DEFAULT_BOX, quality="default"):
     return "{}/full/!{},{}/0/{}.jpg".format(base, box[0], box[1], quality)
 
 
+# How to ask each host for the scan at its own size. IIIF 2 spells it
+# `full` and IIIF 3 renamed it `max`, and nothing accepts both:
+# measured, `full` works at the Library of Congress, Graz, the ÖNB and
+# Digital Commonwealth, and the Rijksmuseum's host answers 400; `max`
+# works there and at the ÖNB and Digital Commonwealth, and the Library
+# and Graz answer 400. So it is per source, and `harvest.py --probe`
+# checks it rather than anyone remembering.
+MASTER_SIZE = {"rijks": "max"}
+MASTER_SIZE_DEFAULT = "full"
+
+
+def master_url(entry):
+    """
+    The largest the archive will serve, for someone who wants to print it.
+
+    The scan at its own size rather than fitted to a panel. A fixed
+    source is already the master -- that is all it is -- and the Library
+    will sometimes serve the same scan through IIIF, which is better to
+    link because the raw master can be a 200MB TIFF.
+    """
+    base = entry.get("b")
+    if entry.get("k") == "fixed":
+        served = load_loc_iiif().get(loc_path(base))
+        if not served:
+            return base
+        base = loc_iiif_candidate(base)
+    size = MASTER_SIZE.get(entry.get("src"), MASTER_SIZE_DEFAULT)
+    return "{}/full/{}/0/default.jpg".format(base, size)
+
+
+def master_pixels(entry):
+    """
+    (width, height) of what master_url serves, or None.
+
+    Worth saying next to the link: a 14x9cm card at 300dpi is about
+    1650x1070, which prints at that size and no larger, and the pool
+    knows which cards those are. Measured from info.json by the harvest,
+    so it is the scan's own size rather than a guess.
+    """
+    width, height = entry.get("w"), entry.get("h_px")
+    if not (width and height):
+        return None
+    return int(width), int(height)
+
+
 def warm(urls):
     """
     Pre-render every image the feed points at. Failures are not fatal:
@@ -1466,6 +1511,11 @@ def review_manifest(entries, day, days, path, skip=0):
                 "date": date_line(entry),
                 "place": place_line(entry),
                 "thumb": image_url(entry, (400, 400)),
+                # The scan at its own size, for printing, with what that
+                # size is -- a 1650x1070 card is a 14x9cm print and no
+                # more, and knowing that before downloading 8MB matters.
+                "master": master_url(entry),
+                "pixels": master_pixels(entry),
                 "item": entry.get("u") or "",
                 "holding": entry.get("h") or "",
                 "score": (scores.get(entry["id"]) or [None, None])[1],
@@ -2396,6 +2446,44 @@ def selftest(entries, day):
               not built["keys_by_label"] and not built["region_options"],
               "an axis the one-cell feed cannot satisfy")
         os.remove(scratch)
+
+    # The printable link. Separate from the panel URL on purpose: the
+    # panel gets a card fitted to it, a sheet of paper gets the scan.
+    by_src = {}
+    for entry in entries:
+        by_src.setdefault(entry.get("src"), entry)
+    check("the pool still holds every source this knows about",
+          set(MASTER_SIZE) <= set(by_src),
+          "no card from: " + ", ".join(sorted(set(MASTER_SIZE) - set(by_src))))
+    for src, entry in sorted(by_src.items()):
+        link = master_url(entry)
+        check("the printable link for {} is not the panel one".format(src),
+              link != image_url(entry),
+              "both are {}".format(link))
+        check("and asks for a size, not a box",
+              "/full/" in link and "!" not in link.rsplit("/full/", 1)[-1],
+              link)
+    # Pinned to the measurement rather than read back off MASTER_SIZE,
+    # which would pass whatever it said. IIIF 2 spells this size `full`
+    # and IIIF 3 `max`; the Rijksmuseum's host answers 400 to `full` and
+    # the Library answers 400 to `max`. `harvest.py --probe` is how to
+    # check whether that has changed.
+    if "rijks" in by_src:
+        check("the Rijksmuseum is asked for max, which its host serves",
+              master_url(by_src["rijks"]).endswith("/full/max/0/default.jpg"),
+              master_url(by_src["rijks"]))
+    if "loc" in by_src:
+        check("and the Library for full, which its host serves",
+              "/full/full/0/" in master_url(by_src["loc"]),
+              master_url(by_src["loc"]))
+
+    sized = next((e for e in entries if e.get("w") and e.get("h_px")), None)
+    if sized:
+        check("the size offered is the scan's own",
+              master_pixels(sized) == (int(sized["w"]), int(sized["h_px"])))
+    check("and a card nobody has measured offers none",
+          master_pixels({"id": "x"}) is None,
+          "a guess would be worse than silence next to a print link")
 
     check("a file that is not there carries nothing",
           load_published(os.path.join(HERE, "no-such-feed.json")) == {})
