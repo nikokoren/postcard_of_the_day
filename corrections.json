@@ -2988,5 +2988,100 @@
   "note": "Never translated; the English was a stiff rendering. Hiroshige's series is the Fifty-three Stations of the Tōkaidō, so 'noted places' is replaced by 'stations'. Kusatsu and Tōkaidō are names.",
   "title": "No. 53. Kusatsu: one of the fifty-three stations on the Tōkaidō, painted by Hiroshige",
   "was": "No. 53. Kusatsu: one of the fifty-three noted places on Tokaido, painted by Hiroshige"
+ },
+ "dc:commonwealth:4t64k6293": {
+  "was": "Caïque d'Ambassade au Bosphore",
+  "title": "Embassy Caïque on the Bosphorus",
+  "note": "French, never translated. Caïque is a boat type (kept as a loanword); the Bosphorus is a strait and a place name."
+ },
+ "dc:commonwealth:x346fn98x": {
+  "was": "Estadio de la Ciudad Deportiva, Chihuahua, Chih., Mexico",
+  "title": "Sports City Stadium, Chihuahua, Chih., Mexico",
+  "note": "Spanish, never translated. Ciudad Deportiva is a sports complex; Chihuahua and Chih. (the state) are places."
+ },
+ "dc:commonwealth:x346fp321": {
+  "was": "Hotel del Caribe (desde el lago), Cartagena, Col",
+  "title": "Hotel del Caribe (from the lake), Cartagena, Colombia",
+  "note": "Spanish; the hotel name was kept correctly. 'Col' is the archive's abbreviation for Colombia (Cartagena de Indias), now spelled out so it is not read as a word."
+ },
+ "dc:commonwealth:x346fp38p": {
+  "was": "Iglesia Catedral, Cartagena, Col",
+  "title": "Cathedral Church, Cartagena, Colombia",
+  "note": "Language was detected as Catalan but the caption is Spanish. 'Col' abbreviates Colombia; spelled out."
+ },
+ "dc:commonwealth:x346fv917": {
+  "was": "Estrecho de Tiquina en el lago Titicaca. La Paz, Bolivia S. A",
+  "title": "Strait of Tiquina on Lake Titicaca. La Paz, Bolivia, S. A.",
+  "note": "Spanish, never translated. Tiquina and Titicaca are place names; 'S. A.' is South America."
+ },
+ "dc:commonwealth:x346fw21r": {
+  "was": "Barrio industrial. La Paz, Bolivia S. A",
+  "title": "Industrial district. La Paz, Bolivia, S. A.",
+  "note": "Spanish, never translated. Barrio industrial is an industrial district; La Paz is a place; 'S. A.' is South America."
+ },
+ "graz:o:gm.1201": {
+  "was": "Alt Graz. Landesfürstliches Zeughaus",
+  "title": "Old Graz. Sovereign's Armoury (Landesfürstliches Zeughaus)",
+  "note": "German. Landesfürstlich means belonging to the sovereign prince of the land (not merely 'princely'); the building's German name is kept as a proper name."
+ },
+ "graz:o:gm.2160": {
+  "was": "Graz Stmk. Motiv a. Schloßberg",
+  "title": "Graz, Styria. View at the Schloßberg",
+  "note": "Stmk. is Steiermark (Styria), a place, left as an abbreviation; 'Motiv a.' is 'Motiv am', a scene at the hill. Schloßberg is a place name; the archive spelling is kept."
+ },
+ "graz:o:gm.2488": {
+  "was": "Graz, Schloßbergrestauration und Glockenturm",
+  "title": "Graz, Schloßberg Restaurant and Bell Tower",
+  "note": "Old German 'Restauration' means a restaurant/inn, not a restoration (false friend). Schloßberg is the hill, a place name; Glockenturm is the Bell Tower."
+ },
+ "loc:2020760823": {
+  "was": "ERITERA - Strada di Barentù",
+  "title": "ERITERA [sic] - Road to Barentù",
+  "note": "Italian, never translated. 'ERITERA' is the archive's misspelling of Eritrea; Barentù is a town. 'Strada di Barentù' is the Barentù road."
+ },
+ "loc:2025706269": {
+  "was": "Nice, Avenue de la Victoire",
+  "title": "Nice, Avenue de la Victoire",
+  "note": "French, never translated. Nice is the city and Avenue de la Victoire is a street name, so both stay as names rather than being translated."
+ },
+ "loc:2025706350": {
+  "was": "L'Auvergne, Le Chateau de Tournoel",
+  "title": "L'Auvergne, Château de Tournoël",
+  "note": "French, never translated. L'Auvergne is a region and the Château de Tournoël a named castle; both are names. Archive had 'Chateau' without the accent and 'Tournoel' for Tournoël."
+ },
+ "loc:2025711360": {
+  "was": "Capri. Marina grande. Hotel Manfredi - Pagano. Capri",
+  "title": "Capri. Marina Grande. Hotel Manfredi - Pagano. Capri",
+  "note": "Marina Grande is the name of Capri's main harbour quarter; the translator rendered it as 'Big Navy' (marina read as navy). Hotel Manfredi - Pagano is a hotel name."
+ },
+ "loc:2025711367": {
+  "was": "Firenze. Loggia dell'Orcagna",
+  "title": "Florence. Loggia dell'Orcagna",
+  "note": "Italian, never translated. Firenze is Florence; Loggia dell'Orcagna is the building's name (the Loggia dei Lanzi, after Orcagna), kept as a name."
+ },
+ "loc:2025711586": {
+  "was": "Girgenti - Tempio della Concordia (lato est",
+  "title": "Girgenti - Temple of Concordia (east side)",
+  "note": "Girgenti is the former name of Agrigento, a place, and was correctly kept. Archive caption lacks the closing parenthesis after 'lato est'; it is supplied here."
+ },
+ "loc:2025713573": {
+  "was": "Druskininkai. Lake Druskonis",
+  "title": "Druskininkai. Lake Druskonis",
+  "note": "The archive caption was already English and the language detector wrongly called it Lithuanian. Druskonis is the lake's name (from druska, salt) but was rendered 'Lake Salt'."
+ },
+ "loc:2025715881": {
+  "was": "Vignerons vaudois",
+  "title": "Vaudois winegrowers",
+  "note": "French, never translated. Vaudois means of the Swiss canton of Vaud (a place); vignerons are winegrowers."
+ },
+ "onb:AK097_456": {
+  "was": "Brieg",
+  "title": "Brieg",
+  "note": "A single word, a place name (a town), never translated. Left as the archive's name; it is not vocabulary."
+ },
+ "onb:AK107_481": {
+  "was": "Carthage, Necropole des 1500 Tombeaux",
+  "title": "Carthage, Necropolis of the 1,500 Tombs",
+  "note": "French, never translated. Carthage is a place; Nécropole des 1500 Tombeaux is the Necropolis of the 1,500 Tombs."
  }
 }
