@@ -3083,5 +3083,60 @@
   "was": "Carthage, Necropole des 1500 Tombeaux",
   "title": "Carthage, Necropolis of the 1,500 Tombs",
   "note": "French, never translated. Carthage is a place; Nécropole des 1500 Tombeaux is the Necropolis of the 1,500 Tombs."
+ },
+ "graz:o:gm.1056": {
+  "note": "German. ALT is 'old' and was rendered correctly, but Luegg is the surname-name of Haus Luegg on the Hauptplatz (the record's place field says so); the bare 'Luegg' was left unexplained. Added 'House' from the record's own place field.",
+  "title": "Old Graz. Luegg House",
+  "was": "ALT Graz. Luegg"
+ },
+ "loc:2024686754": {
+  "note": "English already; never translated and nothing to translate. Mt. Ericsson, Harrison Pass and South American Lake are place names (Sierra Nevada, California) and are kept verbatim; the caption only needed to be left as it is, with the flag cleared by this entry.",
+  "title": "Mt. Ericsson and Harrison Pass from South American Lake Trail",
+  "was": "Mt. Ericsson and Harrison Pass from South American Lake Trail"
+ },
+ "loc:2025663026": {
+  "note": "English, with an elided place ('...'). Kings River and Wonder Valley are proper names; the ellipsis stood for a comma before the state, which the caption names.",
+  "title": "Kings River at Wonder Valley, California",
+  "was": "Kings River at Wonder Valley ... California"
+ },
+ "loc:2025672124": {
+  "note": "English already; nothing to translate. Kept as written, with no detail added.",
+  "title": "Voyage - New York - Europe 7; Fine Weather Again",
+  "was": "Voyage - New York - Europe 7; Fine Weather Again"
+ },
+ "loc:2025702859": {
+  "note": "Spanish, never translated. Parque Nacional is 'National Park'; Nahuel Huapi (split by a stray spaced hyphen in the original) is one place name, and Hotel Llao Llao is a hotel name, kept as a name.",
+  "title": "Nahuel Huapi National Park: Hotel Llao Llao",
+  "was": "Parque Nacional De Nahuel - Huapi: Hotel Llao Llao"
+ },
+ "loc:2025708271": {
+  "note": "French. Exposition Coloniale Internationale was left untranslated, and Musée des Colonies is 'Museum of the Colonies' (the colonial museum built for the 1931 exposition), not 'Colony Museum'.",
+  "title": "International Colonial Exposition - Paris 1931. Museum of the Colonies",
+  "was": "Exposition Coloniale Internationale - Paris 1931. Musee des Colonies"
+ },
+ "loc:2025708703": {
+  "note": "Mixed French and English, never translated. 'en flanant' is 'strolling' (flâner), 'Perspective sur Tuileries' is a view over the Tuileries, 'A droite, detail du Louvre' is 'on the right, detail of the Louvre'. The English sentence at the end is the archive's own and is kept.",
+  "title": "Paris ... Strolling. View over the Tuileries - on the right, detail of the Louvre. A sight over the Tuileries",
+  "was": "Paris ... en Flanant. Perspective sur Tuileries - A droite, detail du Louvre. A sight over the Tuileries"
+ },
+ "loc:2025713706": {
+  "note": "Spanish/English, never translated. A jacal is a Mexican wattle-and-daub or thatched hut; it is a real word and is kept, with the archive's own English gloss.",
+  "title": "A Mexican Jacal. A Mexican home",
+  "was": "Un Jacal Mexicano. A Mexican home"
+ },
+ "loc:2025713827": {
+  "note": "French. Stade is 'stadium', not a proper name to leave in French here; 'by the Stade' read as a place. Lyautey Park and Laprade (architect) are names and are kept.",
+  "title": "Casablanca. Lyautey Park. Pergola at the edge of the Stadium (Laprade, architect)",
+  "was": "Casablanca. Le Parc Lyautey. Pergola au bord du Stade (Laprade, architecte"
+ },
+ "loc:2025714960": {
+  "note": "Portuguese. Príncipe Real is the name of the Lisbon square (Praça do Príncipe Real); the translator turned the name into 'Royal Prince's Praca'. Restored as a name.",
+  "title": "Praça do Príncipe Real",
+  "was": "Praca do Principe Real"
+ },
+ "onb:AK113_582": {
+  "note": "German. St. Bartholomä is the pilgrimage church/village on the Königssee, a place name, not 'St Bartholomew'. Königssee is a lake name and stays.",
+  "title": "St. Bartholomä on the Königssee",
+  "was": "St. Bartholomä am Königssee"
  }
 }
