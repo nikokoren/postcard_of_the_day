@@ -3138,5 +3138,180 @@
   "note": "German. St. Bartholomä is the pilgrimage church/village on the Königssee, a place name, not 'St Bartholomew'. Königssee is a lake name and stays.",
   "title": "St. Bartholomä on the Königssee",
   "was": "St. Bartholomä am Königssee"
+ },
+ "dc:commonwealth:70797t98r": {
+  "note": "Ephèse is French for Ephesus, a place, and was left as is. The archive's 'Staion' is a typo for Station. The translator turned 'châtéau' (castle, with a stray accent) into 'chestnut', apparently reading it as châtaigne; the word is château.",
+  "title": "Ephesus. Station, aqueducts, castle",
+  "was": "Ephèse. Staion, acquéducs, châtéau"
+ },
+ "dc:commonwealth:d217t916h": {
+  "note": "Never translated, so it still showed French. 'Devant' is 'in front of'. Jéni-Djami is the name of a mosque (Turkish Yeni Cami), kept as a name.",
+  "title": "Constantinople. In front of Jéni-Djami",
+  "was": "Constantinople. Devant Jéni-Djami"
+ },
+ "dc:commonwealth:qz20wc88r": {
+  "note": "Never translated; French. 'Chameliers' are camel drivers.",
+  "title": "Group of camels and camel drivers",
+  "was": "Groupe de chameaux et Chameliers"
+ },
+ "dc:commonwealth:x346fm680": {
+  "note": "Never translated, but there is nothing to translate: La Ermita is the name of a place in Cali, and the rest is place names. Kept as a name so nobody renders it as 'the hermitage'.",
+  "title": "La Ermita, Cali, Colombia",
+  "was": "La Ermita, Cali, Colombia"
+ },
+ "dc:commonwealth:x346fn618": {
+  "note": "Never translated; Spanish street name plus place names. Calle Libertad is a street name and is kept as one, not turned into 'Liberty Street'.",
+  "title": "Calle Libertad, Chihuahua, Chih., Mexico",
+  "was": "Calle Libertad, Chihuahua, Chih., Mexico"
+ },
+ "dc:commonwealth:x346fv70g": {
+  "note": "Spanish. 'de hermoso monte' was rendered 'a beautiful mountain' (the caption has no article but 'a los pies de' is the mountain just named) and 'ciudad' is city, not town. Illimani is a mountain's name. The trailing 'S. A' is South America, cut off at the full stop.",
+  "title": "El Illimani. At the foot of the beautiful mountain the city stretches out. La Paz, Bolivia, S. A.",
+  "was": "El Illimani. A los pies de hermoso monte se extiende la ciudad. La Paz, Bolivia, S. A"
+ },
+ "graz:o:gm.4735": {
+  "note": "German. Stadtpark is the name of the park in Graz, so it is kept as a name rather than 'City Park'. The archive's closing bracket is missing; supplied here.",
+  "title": "Franck Monument (founder of the Stadtpark in Graz)",
+  "was": "Franck-Monument (Gründer des Stadtparkes in Graz"
+ },
+ "loc:2012650026": {
+  "note": "Never translated. The caption is the same words three times: transliterated Russian 'Obshchiĭ vid' (general view), French 'Vue générale', and 'Moscou-Kremlin'. Given once, in English, with the Kremlin kept as a name.",
+  "title": "General view. Moscow Kremlin",
+  "was": "Obshīĭ vidʺ. Moskvaʹ-Kremlʺ Vue générale. Moscou-Kremlin"
+ },
+ "loc:2013645606": {
+  "note": "German; Grenzsoldaten are border soldiers, and Sonntagsstimmung is a Sunday mood. 'Guards' was a looser word than the caption carries.",
+  "title": "Russian border soldiers in a Sunday mood",
+  "was": "Russische grenzsoldaten in Sonntagsstimmung"
+ },
+ "loc:2020760341": {
+  "note": "Italian, not Spanish. 'bileno' is Bilen, the people of the Eritrean highlands around Keren; the translator turned it into 'Bilene', which is a place in Mozambique.",
+  "title": "79 - Bilen warrior",
+  "was": "79 - Guerriero bileno"
+ },
+ "loc:2020760732": {
+  "note": "Italian. Massaua is the Italian spelling of Massawa, a place. 'Scarico delle merci' is unloading of goods, not 'discharge'.",
+  "title": "Massawa - The Port - Unloading of goods",
+  "was": "Massaua - Il Porto - Scarico delle merci"
+ },
+ "loc:2024688249": {
+  "note": "Already English; never needed translating. Cape Elizabeth, Maine is a place name. Kept unchanged.",
+  "title": "Cape Elizabeth, Me. Might of the sea",
+  "was": "Cape Elizabeth, Me. Might of the sea"
+ },
+ "loc:2025702750": {
+  "note": "French 'priere' (prière) is prayer. The translator left it as 'priere' after an English article, and the language was detected as Italian.",
+  "title": "The prayer",
+  "was": "La priere"
+ },
+ "loc:2025703220": {
+  "note": "French. The Maisons des Corporations are the guild houses of Brussels' Grand-Place; 'corporations' in that sense is guilds. The archive's closing bracket was missing.",
+  "title": "Brussels. The Guild Houses (1695)",
+  "was": "Bruxelles. Les Maisons des Corporations (1695"
+ },
+ "loc:2025705491": {
+  "note": "French. 'Transept Sud' is the south transept; the translator put the adjective after the noun in English ('Transept South') and left 'La Cathedrale' in French.",
+  "title": "Auxerre, the Cathedral. South transept",
+  "was": "Auxerre, La Cathedrale. Transept Sud"
+ },
+ "loc:2025706772": {
+  "note": "French. 'Cloitre' is cloister and was left in French. Saint-Trophime is the name of the church and is kept.",
+  "title": "Arles, the Cloister of Saint-Trophime",
+  "was": "Arles, Le Cloitre Saint-Trophime"
+ },
+ "loc:2025708025": {
+  "note": "French. 'Imprimés' is printed books (the department's name), not prints, which would be Estampes. 'Salle de travail' is a reading or work room.",
+  "title": "Bibliothèque Nationale. Reading room of the Department of Printed Books",
+  "was": "Bibliotheque Nationale. Salle de travail du Departement des Imprimes"
+ },
+ "loc:2025708491": {
+  "note": "Notre-Dame is the cathedral's name and was rendered 'Our Lady'. 'Rosace' is a rose window and was left in French; 'Transept sud' is the south transept.",
+  "title": "Paris. Notre-Dame, rose window of the south transept",
+  "was": "Paris. Notre-Dame, Rosace du Transept sud"
+ },
+ "loc:2025709123": {
+  "note": "French followed by the archive's own English gloss. 'Splendeurs et Charmes de Versailles' is a series title left untranslated. The caption was cut off at 'of…'; the full text is given.",
+  "title": "Splendours and Charms of Versailles. Table of the Signing of the Peace Treaty (June 1919). Table used for signing of Peace Treaty",
+  "was": "Splendeurs et Charmes de Versailles. Table de la Signature du Traite de Paix (Juin 1919). Table used for signing of Peace Treaty"
+ },
+ "loc:2025709345": {
+  "note": "German, but not a car park: the card is dated 1897, long before multi-storey car parks, and a Parkhaus is the name of a building in Bremen's park. Kept as a name, since the caption does not say more.",
+  "title": "Bremen, Parkhaus",
+  "was": "Bremen, Parkhaus"
+ },
+ "loc:2025713643": {
+  "note": "Already English. The archive's 'Bereau' is a typo for Bureau, and the pool now carries it as '[i.e. Bureau]' with the closing bracket missing. Written against the current pool text.",
+  "title": "Front view of Hsinking Station, Hsinking. (right Manchurian Hotel, left Tourist Bureau)",
+  "was": "Front view of Hsinking Station, Hsinking. (right Manchurian Hotel, left Tourist Bereau [i.e. Bureau]"
+ },
+ "loc:2025713895": {
+  "note": "French. 'Porte interieure' is the inner gate; the century, 'XIIe siecle', was dropped from the published caption. Oudaias is the name of the kasbah and is kept.",
+  "title": "Rabat, Inner Gate of the Oudaias (12th century)",
+  "was": "Rabat, Porte interieure des Oudaias (XIIe siecle"
+ },
+ "loc:2025714203": {
+  "note": "Already English; never needed translating. Mangyongdae is a place and the rest are people's names. Kept unchanged.",
+  "title": "The aspen (Mangyongdae) The tree planted by Mr. Kim Hyong Jik, father of Comrade Kim Il Sung",
+  "was": "The aspen (Mangyongdae) The tree planted by Mr. Kim Hyong Jik, father of Comrade Kim Il Sung"
+ },
+ "onb:AK008_137": {
+  "note": "German. A Schutzhaus is a mountain hut or refuge, not a 'harbor'. Graf Meran is the hut's name and Hohe Veitsch the mountain.",
+  "title": "Graf Meran Hut, Hohe Veitsch",
+  "was": "Graf Meran-Schutzhaus, Hohe Veitsch"
+ },
+ "onb:AK073_460": {
+  "note": "French. 'Lac' is lake. Vosges and Fischbödle are names and are kept.",
+  "title": "Vosges, Lake Fischbödle",
+  "was": "Vosges, Lac du Fischbödle"
+ },
+ "onb:AK090_309": {
+  "note": "German. Bielitz is the German name of the town (today Bielsko-Biala), kept as a name. 'Post' is the post office here.",
+  "title": "Bielitz, Post Office, Theatre",
+  "was": "Bielitz, Post, Theater"
+ },
+ "onb:AK097_117": {
+  "note": "French. 'Place' is a square, not a place. Colonel Pein is a person's name and is kept.",
+  "title": "Bou-Saada, Colonel Pein Square",
+  "was": "Bou-Saada, Place du Colonel Pein"
+ },
+ "onb:AK101_294": {
+  "note": "Portuguese; never translated. Praça Marechal Floriano is the name of a square in Rio, left as a name rather than 'Marshal Floriano Square'.",
+  "title": "Rio de Janeiro, Praça Marechal Floriano",
+  "was": "Rio de Janeiro, Praça Marechal Floriano"
+ },
+ "onb:AK103_376": {
+  "note": "German 'Algier' is the city of Algiers; never translated.",
+  "title": "Algiers",
+  "was": "Algier"
+ },
+ "onb:AK107_252": {
+  "note": "Spanish; 'Fuente' is fountain. 'Nora' is the archive's own spelling, probably for the sculptor Lola Mora; left as catalogued.",
+  "title": "Buenos Aires, Lola Nora Fountain",
+  "was": "Buenos Aires, Fuente Lola Nora"
+ },
+ "rijks:NG-2016-50-36": {
+  "note": "Dutch. 'Trossen' are bunches. Checked and the existing English is right.",
+  "title": "Women with bunches of bananas",
+  "was": "Vrouwen met trossen bananen"
+ },
+ "rijks:NG-2016-50-50": {
+  "note": "Dutch; never translated. 'Bananenbomen' is banana trees.",
+  "title": "Banana trees",
+  "was": "Bananenbomen"
+ },
+ "rijks:RP-F-F11384": {
+  "note": "Dutch. Spaarnekerk is a church's name in Haarlem and is kept as a name. 'Gezicht op' is 'view of'.",
+  "title": "View of the Spaarnekerk in Haarlem",
+  "was": "Gezicht op de Spaarnekerk te Haarlem"
+ },
+ "rijks:RP-F-F15375-C": {
+  "note": "Dutch. Louis Dister is a person and Marouf the character and the opera, all kept as names.",
+  "title": "Portrait of the tenor Louis Dister, as Marouf in the opera Marouf",
+  "was": "Portret van de tenor Louis Dister, als Marouf in de opera Marouf"
+ },
+ "rijks:RP-F-F20964": {
+  "note": "Dutch. H.K.H. (Hare Koninklijke Hoogheid) is H.R.H.; 'rijtoer' is a drive in a carriage, not just a 'tour'.",
+  "title": "H.M. the Queen and H.R.H. Princess Juliana on a carriage ride",
+  "was": "H.M. de koningin en H.K.H prinses Juliana op een rijtoer"
  }
 }
