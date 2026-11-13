@@ -3976,5 +3976,191 @@
   "lang": "nl",
   "shown": "H.M. the Queen and H.K.H. Princess Juliana on a tour",
   "source": "H.M. de koningin en H.K.H prinses Juliana op een rijtoer"
+ },
+ {
+  "id": "dc:commonwealth:4m90hh353",
+  "lang": "el",
+  "shown": "Rechthion - Athni",
+  "source": "\u1f18\u03c1\u03ad\u03c7\u03b8\u03b5\u03b9\u03bf\u03bd - \u0386\u03b8\u1fc6\u03bd\u03b1\u03b9"
+ },
+ {
+  "id": "dc:commonwealth:9019vn25r",
+  "lang": "el",
+  "shown": "Tonight of the Samaritides Mosque",
+  "source": "\u0391\u03c0\u03bf\u03c8\u03b9\u03c2 \u03c4\u03b7\u03c2 \u039c\u03bf\u03bd\u03b7\u03c2 \u03c4\u03bf\u03c5 \u03c6\u03c1\u03b5\u03b1\u03c4\u03bf\u03c2 \u03a3\u03b1\u03bc\u03b1\u03c1\u03b5\u03b9\u03c4\u03af\u03b4\u03bf\u03c2"
+ },
+ {
+  "id": "dc:commonwealth:cj82nt77f",
+  "lang": "",
+  "shown": "Constatine. Rue des Forgerons Arabes",
+  "source": "Constatine. Rue des Forgerons Arabes"
+ },
+ {
+  "id": "dc:commonwealth:x346g1310",
+  "lang": "",
+  "shown": "Inca ruins of Sacashuam\u00e1n, Cuzco, Peru",
+  "source": "Inca ruins of Sacashuam\u00e1n, Cuzco, Peru"
+ },
+ {
+  "id": "dc:commonwealth:x346g885r",
+  "lang": "es",
+  "shown": "Lake of the Forest of Independence, Medellin, Col",
+  "source": "Lago del Bosque del la Independencia, Medellin, Col"
+ },
+ {
+  "id": "loc:2020760519",
+  "lang": "fr",
+  "shown": "A train in the Plains of Abyssinia",
+  "source": "Un train dans les Plaines d'Abyssinie"
+ },
+ {
+  "id": "loc:2020761275",
+  "lang": "",
+  "shown": "Native Houses IN Course OF Erection, Freetown",
+  "source": "Native Houses IN Course OF Erection, Freetown"
+ },
+ {
+  "id": "loc:2025703538",
+  "lang": "",
+  "shown": "Rue Richelieu Street, St. Johns, Quebec, Canada",
+  "source": "Rue Richelieu Street, St. Johns, Quebec, Canada"
+ },
+ {
+  "id": "loc:2025707998",
+  "lang": "fr",
+  "shown": "Paris. Place du Carrousel and the new Louvre",
+  "source": "Paris. La Place du Carrousel et le nouveau Louvre"
+ },
+ {
+  "id": "loc:2025708945",
+  "lang": "",
+  "shown": "Strasbourg, La Cathedrale",
+  "source": "Strasbourg, La Cathedrale"
+ },
+ {
+  "id": "loc:2025709223",
+  "lang": "nl",
+  "shown": "Helgoland. Total Night",
+  "source": "Helgoland. Totalansicht"
+ },
+ {
+  "id": "loc:2025709869",
+  "lang": "",
+  "shown": "Weihnachtsbaumchen. Friedel Ohle",
+  "source": "Weihnachtsbaumchen. Friedel Ohle"
+ },
+ {
+  "id": "loc:2025710145",
+  "lang": "de",
+  "shown": "Munchen. View of Marienplatz in Munchen. On the right the Old Town Hall",
+  "source": "Munchen. Blick auf den Marienplatz in Munchen. Rechts das Alte Rathaus, 1470 von Jorg v. Halsbach. Dahinter die Frauenkirche, 1468-88 von demselben, und das Neue Rathaus. Altmunchner Trachten (um 1830"
+ },
+ {
+  "id": "loc:2025710523",
+  "lang": "",
+  "shown": "Interior, convent of La Merced, Antigua, Guatemala",
+  "source": "Interior, convent of La Merced, Antigua, Guatemala"
+ },
+ {
+  "id": "loc:2025710823",
+  "lang": "",
+  "shown": "Valley of Aosta - Antey St. Andre m. 1080 Panoramic foreshortening - background Matterhorn m. 4484",
+  "source": "Valley of Aosta - Antey St. Andre m. 1080 Panoramic foreshortening - background Matterhorn m. 4484"
+ },
+ {
+  "id": "loc:2025710829",
+  "lang": "it",
+  "shown": "Aquileia, Mosaic of the Basilica of Theodore",
+  "source": "Aquileia, Mosaico della Basilica di Teodoro"
+ },
+ {
+  "id": "loc:2025712010",
+  "lang": "",
+  "shown": "Palermo. Porta Nuova",
+  "source": "Palermo. Porta Nuova"
+ },
+ {
+  "id": "loc:2025712043",
+  "lang": "",
+  "shown": "Il giuoco di Pallone in Perugia",
+  "source": "Il giuoco di Pallone in Perugia"
+ },
+ {
+  "id": "loc:2025713077",
+  "lang": "it",
+  "shown": "Venezia - Paper door. Entrance to the Doge's Palace",
+  "source": "Venezia - Porta della Carta. Ingresso al Palazzo Ducale"
+ },
+ {
+  "id": "loc:2025713532",
+  "lang": "",
+  "shown": "Liepaja",
+  "source": "Liepaja"
+ },
+ {
+  "id": "loc:2025713927",
+  "lang": "es",
+  "shown": "Tetuan (Marruecos) - Old Camp",
+  "source": "Tetuan (Marruecos) - Antiguo Campamento"
+ },
+ {
+  "id": "loc:2025714630",
+  "lang": "",
+  "shown": "Carti Island, San Blas, Rep. of Panama",
+  "source": "Carti Island, San Blas, Rep. of Panama"
+ },
+ {
+  "id": "loc:2025714824",
+  "lang": "",
+  "shown": "Krakow. Bibloteka Jagiellonska",
+  "source": "Krakow. Bibloteka Jagiellonska"
+ },
+ {
+  "id": "loc:2025715544",
+  "lang": "es",
+  "shown": "Zarauz. The Mirador and Palace of the Marques de Narras",
+  "source": "Zarauz. El Mirador y Palacio del Marques de Narros"
+ },
+ {
+  "id": "loc:2025716360",
+  "lang": "",
+  "shown": "Citta del Vaticano. S. Pietro. St. Peter mit obelisk. St Peter's with obelisk. St-Pierre et l'obelisque",
+  "source": "Citta del Vaticano. S. Pietro. St. Peter mit obelisk. St Peter's with obelisk. St-Pierre et l'obelisque"
+ },
+ {
+  "id": "onb:AK045_470",
+  "lang": "de",
+  "shown": "Pola, Sergus arc",
+  "source": "Pola, Sergus-Bogen"
+ },
+ {
+  "id": "onb:AK059_043",
+  "lang": "de",
+  "shown": "Budapest, University",
+  "source": "Budapest, Universit\u00e4t"
+ },
+ {
+  "id": "onb:AK076_111",
+  "lang": "",
+  "shown": "Beyrouth",
+  "source": "Beyrouth"
+ },
+ {
+  "id": "onb:AK079_038",
+  "lang": "de",
+  "shown": "Building, Giant Mountains",
+  "source": "Baude, Riesengebirge"
+ },
+ {
+  "id": "onb:AK081_046",
+  "lang": "",
+  "shown": "Z\u00fcrs, Flexenpa\u00df",
+  "source": "Z\u00fcrs, Flexenpa\u00df"
+ },
+ {
+  "id": "rijks:RP-F-00-24063",
+  "lang": "nl",
+  "shown": "Axenstrasse. Gallery gegen Fl\u00fcelen",
+  "source": "Axenstrasse. Galerie gegen Fl\u00fcelen"
  }
 ]
