@@ -3313,5 +3313,205 @@
   "note": "Dutch. H.K.H. (Hare Koninklijke Hoogheid) is H.R.H.; 'rijtoer' is a drive in a carriage, not just a 'tour'.",
   "title": "H.M. the Queen and H.R.H. Princess Juliana on a carriage ride",
   "was": "H.M. de koningin en H.K.H prinses Juliana op een rijtoer"
+ },
+ "dc:commonwealth:4m90hh353": {
+  "was": "Ἐρέχθειον - Άθῆναι",
+  "title": "Erechtheion - Athens",
+  "note": "Greek 'Ἐρέχθειον - Άθῆναι'. Erechtheion is the temple on the Acropolis and Athinai (Athens) the city; both are names, and the translator transliterated them into the non-words 'Rechthion' and 'Athni'."
+ },
+ "dc:commonwealth:9019vn25r": {
+  "was": "Αποψις της Μονης του φρεατος Σαμαρειτίδος",
+  "title": "View of the Monastery of the Well of the Samaritan Woman",
+  "note": "Greek: Αποψις = view, Μονης = of the monastery, φρεατος = of the well, Σαμαρειτίδος = of the Samaritan woman. The translator garbled 'Αποψις' into 'Tonight' and turned the monastery into a 'Mosque'. Nothing further is added beyond what the caption says."
+ },
+ "dc:commonwealth:cj82nt77f": {
+  "was": "Constatine. Rue des Forgerons Arabes",
+  "title": "Constantine. Rue des Forgerons Arabes",
+  "note": "Never translated. French: Rue des Forgerons Arabes = Street of the Arab Blacksmiths, in Constantine, Algeria. 'Constatine' is a typo for Constantine (city name). Street name kept in French as a proper name, with the sense given."
+ },
+ "dc:commonwealth:x346g1310": {
+  "was": "Inca ruins of Sacashuamán, Cuzco, Peru",
+  "title": "Inca ruins of Sacsayhuamán, Cuzco, Peru",
+  "note": "Never translated; already English. Only fix is the spelling of the site name, Sacsayhuamán (the archive has 'Sacashuamán'). Proper names kept."
+ },
+ "dc:commonwealth:x346g885r": {
+  "was": "Lago del Bosque del la Independencia, Medellin, Col",
+  "title": "Lake in the Bosque de la Independencia, Medellín, Col.",
+  "note": "Spanish. 'Bosque de la Independencia' is the name of a park in Medellín, and was translated as common nouns ('Forest of Independence'). Kept as a name; 'del la' in the source is a slip for 'de la'."
+ },
+ "loc:2020760519": {
+  "was": "Un train dans les Plaines d'Abyssinie",
+  "title": "A train on the plains of Abyssinia",
+  "note": "French 'Un train dans les Plaines d'Abyssinie'. The earlier rendering was essentially right; only the capital P on 'Plains' was dropped. Abyssinia is kept as the name the card uses."
+ },
+ "loc:2020761275": {
+  "was": "Native Houses IN Course OF Erection, Freetown",
+  "title": "Native houses in course of erection, Freetown",
+  "note": "Never translated; already English. The archive capitalised 'IN' and 'OF' in the middle of the caption; case normalised. Freetown (Sierra Leone) is a place name."
+ },
+ "loc:2025703538": {
+  "was": "Rue Richelieu Street, St. Johns, Quebec, Canada",
+  "title": "Rue Richelieu Street, St. Johns, Quebec, Canada",
+  "note": "Never translated; already English with a bilingual street name. Left as written: Rue Richelieu is a street name, St. Johns a place."
+ },
+ "loc:2025707998": {
+  "was": "Paris. La Place du Carrousel et le nouveau Louvre",
+  "title": "Paris. The Place du Carrousel and the new Louvre",
+  "note": "French 'La Place du Carrousel et le nouveau Louvre'. Place du Carrousel is a named square and is kept; the previous rendering dropped the article, which is trivial. Louvre is a name."
+ },
+ "loc:2025708945": {
+  "was": "Strasbourg, La Cathedrale",
+  "title": "Strasbourg, the Cathedral",
+  "note": "Never translated. French 'La Cathedrale' = the Cathedral (Strasbourg Cathedral); Strasbourg is the city name."
+ },
+ "loc:2025709223": {
+  "was": "Helgoland. Totalansicht",
+  "title": "Heligoland. General view",
+  "note": "German, mis-detected as Dutch. 'Totalansicht' = overall/general view, which the translator rendered as 'Total Night'. Helgoland is the German name of the island Heligoland."
+ },
+ "loc:2025709869": {
+  "was": "Weihnachtsbaumchen. Friedel Ohle",
+  "title": "Little Christmas trees. Friedel Ohle",
+  "note": "Never translated. German 'Weihnachtsbaumchen' (Weihnachtsbäumchen) = little Christmas trees; 'Friedel Ohle' is a person's name and kept as is."
+ },
+ "loc:2025710145": {
+  "was": "Munchen. Blick auf den Marienplatz in Munchen. Rechts das Alte Rathaus, 1470 von Jorg v. Halsbach. Dahinter die Frauenkirche, 1468-88 von demselben, und das Neue Rathaus. Altmunchner Trachten (um 1830",
+  "title": "Munich. View of the Marienplatz in Munich. On the right the Old Town Hall, 1470 by Jörg von Halsbach. Behind it the Frauenkirche, 1468-88 by the same, and the New Town Hall. Old Munich costumes (c. 1830)",
+  "note": "German, and the published caption stopped after 'Old Town Hall', dropping the rest. Altmünchner Trachten = traditional Old Munich costume. 'Jorg v. Halsbach' is the architect Jörg von Halsbach. The source itself is cut off at '(um 1830', so the closing bracket is only punctuation."
+ },
+ "loc:2025710523": {
+  "was": "Interior, convent of La Merced, Antigua, Guatemala",
+  "title": "Interior, convent of La Merced, Antigua, Guatemala",
+  "note": "Never translated; already English. La Merced and Antigua are names."
+ },
+ "loc:2025710823": {
+  "was": "Valley of Aosta - Antey St. Andre m. 1080 Panoramic foreshortening - background Matterhorn m. 4484",
+  "title": "Valley of Aosta - Antey St. Andre, 1080 m. Panoramic foreshortening - background Matterhorn, 4484 m",
+  "note": "Never translated; already English with heights written 'm. 1080' in the source. Heights are metres; Antey-Saint-André and the Matterhorn are names."
+ },
+ "loc:2025710829": {
+  "was": "Aquileia, Mosaico della Basilica di Teodoro",
+  "title": "Aquileia, Mosaic of the Basilica of Theodore",
+  "note": "Italian. The earlier rendering was essentially right; kept. Aquileia is a place and the Basilica di Teodoro (Theodore's basilica) a named church."
+ },
+ "loc:2025712010": {
+  "was": "Palermo. Porta Nuova",
+  "title": "Palermo. Porta Nuova",
+  "note": "Never translated. Porta Nuova ('New Gate') is the name of a gate in Palermo and is kept as a name."
+ },
+ "loc:2025712043": {
+  "was": "Il giuoco di Pallone in Perugia",
+  "title": "The game of pallone in Perugia",
+  "note": "Never translated. Italian 'Il giuoco di Pallone' = the game of pallone (a traditional ball game); Perugia is a place."
+ },
+ "loc:2025713077": {
+  "was": "Venezia - Porta della Carta. Ingresso al Palazzo Ducale",
+  "title": "Venice - Porta della Carta. Entrance to the Doge's Palace",
+  "note": "Italian. Porta della Carta is the name of the Gothic gateway of the Doge's Palace and not 'Paper door'. Venezia is Venice."
+ },
+ "loc:2025713532": {
+  "was": "Liepaja",
+  "title": "Liepaja",
+  "note": "Never translated. Liepāja is a city in Latvia; a place name, nothing to translate."
+ },
+ "loc:2025713927": {
+  "was": "Tetuan (Marruecos) - Antiguo Campamento",
+  "title": "Tetuan (Morocco) - Old Camp",
+  "note": "Spanish. 'Marruecos' is Morocco and was left untranslated in the published caption; Tetuán is a place name and kept."
+ },
+ "loc:2025714630": {
+  "was": "Carti Island, San Blas, Rep. of Panama",
+  "title": "Carti Island, San Blas, Republic of Panama",
+  "note": "Never translated; already English. Rep. expanded to Republic. Carti and San Blas are place names."
+ },
+ "loc:2025714824": {
+  "was": "Krakow. Bibloteka Jagiellonska",
+  "title": "Krakow. Jagiellonian Library",
+  "note": "Never translated. 'Bibloteka Jagiellonska' is a misspelling of Polish Biblioteka Jagiellońska = Jagiellonian Library, in Krakow."
+ },
+ "loc:2025715544": {
+  "was": "Zarauz. El Mirador y Palacio del Marques de Narros",
+  "title": "Zarauz. The Mirador and Palace of the Marqués de Narros",
+  "note": "Spanish. The Marqués de Narros is a person's title and name; the translator altered 'Narros' to 'Narras'."
+ },
+ "loc:2025716360": {
+  "was": "Citta del Vaticano. S. Pietro. St. Peter mit obelisk. St Peter's with obelisk. St-Pierre et l'obelisque",
+  "title": "Vatican City. St. Peter's with obelisk. St. Peter's with obelisk. St-Pierre et l'obélisque",
+  "note": "Never translated. The caption repeats the same words in Italian, German, English and French (S. Pietro; St. Peter mit obelisk; St Peter's with obelisk; St-Pierre et l'obelisque). Rendered in English with the repeated French retained."
+ },
+ "onb:AK045_470": {
+  "was": "Pola, Sergus-Bogen",
+  "title": "Pola, Arch of the Sergii",
+  "note": "German 'Sergus-Bogen'. The Arch of the Sergii is a Roman triumphal arch in Pula (Pola) and a name; 'Sergus' is a corrupt form of the Sergii."
+ },
+ "onb:AK059_043": {
+  "was": "Budapest, Universität",
+  "title": "Budapest, University",
+  "note": "German 'Universität'. The translation was right; kept as a faithful rendering."
+ },
+ "onb:AK076_111": {
+  "was": "Beyrouth",
+  "title": "Beirut",
+  "note": "Never translated. 'Beyrouth' is the French name of Beirut, a place name left untranslated."
+ },
+ "onb:AK079_038": {
+  "was": "Baude, Riesengebirge",
+  "title": "Baude, Giant Mountains",
+  "note": "German 'Baude' is a mountain hut/chalet in the Riesengebirge (Giant Mountains, Krkonose), not 'Building'. Hut is the English sense."
+ },
+ "onb:AK081_046": {
+  "was": "Zürs, Flexenpaß",
+  "title": "Zürs, Flexen Pass",
+  "note": "Never translated. Flexenpaß = Flexen Pass, a mountain pass in Vorarlberg; Zürs is a place."
+ },
+ "rijks:RP-F-00-24063": {
+  "was": "Axenstrasse. Galerie gegen Flüelen",
+  "title": "Axenstrasse. Gallery towards Flüelen",
+  "note": "German (mis-detected as Dutch). 'gegen' = towards, which was left as 'gegen'. Axenstrasse and Flüelen are names; 'Galerie' is the tunnel-gallery."
+ },
+ "loc:2020760271": {
+  "was": "ASMARA - Accampamento della Compagnia Cannonieri",
+  "title": "ASMARA - Camp of the Gunners' Company",
+  "note": "Italian 'Accampamento della Compagnia Cannonieri'. Cannonieri = gunners/artillerymen, not a proper name; Asmara is the city."
+ },
+ "loc:2025703283": {
+  "was": "Arredores de Santos. Guaruja. Praia das Tartarugas",
+  "title": "Surroundings of Santos. Guarujá. Turtle Beach",
+  "note": "Portuguese. 'Arredores de' = surroundings of, which was left untranslated. Praia das Tartarugas = Turtle Beach; Santos and Guarujá are places."
+ },
+ "loc:2025708462": {
+  "was": "Musee de Marine. Popofka, batterie flottante circulaire russe de 1873",
+  "title": "Naval Museum. Popofka, Russian circular floating battery of 1873",
+  "note": "French. Musée de Marine = Naval Museum, left untranslated. Popofka is the vessel's name as the archive spells it and is kept unchanged."
+ },
+ "loc:2025713539": {
+  "was": "Pulverturm zu Riga",
+  "title": "Powder Tower in Riga",
+  "note": "German 'Pulverturm zu Riga'. 'zu' = in/at, not 'to'. Pulverturm = Powder Tower, a named Riga landmark."
+ },
+ "loc:2025713748": {
+  "was": "Avenida \"A\", looking north from Calle Tercero, Tijuana, Baja Cal. Mexico",
+  "title": "Avenida \"A\", looking north from Calle Tercero, Tijuana, Baja California, Mexico",
+  "note": "Never translated; already English. Street names and Tijuana kept; Baja Cal. expanded to Baja California."
+ },
+ "loc:2025715921": {
+  "was": "Leontopodium alpinum (Edelweiss), Engadin (Berninagruppe",
+  "title": "Leontopodium alpinum (Edelweiss), Engadin (Bernina group)",
+  "note": "German. Engadin is the name of the Alpine valley and was lowercased and anglicised to 'engadine'. Berninagruppe = Bernina group, a mountain range."
+ },
+ "onb:AK082_180": {
+  "was": "Fiume, Corso Re Vittorio Emanuele III",
+  "title": "Fiume, Corso Re Vittorio Emanuele III",
+  "note": "Never translated. Italian: Corso Re Vittorio Emanuele III = King Victor Emmanuel III Avenue, a street name, kept in Italian; Fiume is the Italian name of Rijeka."
+ },
+ "onb:AK095_338": {
+  "was": "Beyrouth",
+  "title": "Beirut",
+  "note": "Never translated. 'Beyrouth' is the French name of Beirut."
+ },
+ "onb:AK114_094": {
+  "was": "Jerusalem, Stefansthor",
+  "title": "Jerusalem, St. Stephen's Gate",
+  "note": "Never translated. German 'Stefansthor' = St. Stephen's Gate (Stephen's Gate), a gate in Jerusalem."
  }
 }
