@@ -4162,5 +4162,59 @@
   "lang": "nl",
   "shown": "Axenstrasse. Gallery gegen Fl\u00fcelen",
   "source": "Axenstrasse. Galerie gegen Fl\u00fcelen"
+ },
+ {
+  "id": "loc:2020760271",
+  "lang": "it",
+  "shown": "ASMARA - Cannonieri Company camp",
+  "source": "ASMARA - Accampamento della Compagnia Cannonieri"
+ },
+ {
+  "id": "loc:2025703283",
+  "lang": "pt",
+  "shown": "Arredores de Santos. Guaruja. Turtle Beach",
+  "source": "Arredores de Santos. Guaruja. Praia das Tartarugas"
+ },
+ {
+  "id": "loc:2025708462",
+  "lang": "fr",
+  "shown": "Musee de Marine. Popofka, Russian circular floating battery from 1873",
+  "source": "Musee de Marine. Popofka, batterie flottante circulaire russe de 1873"
+ },
+ {
+  "id": "loc:2025713539",
+  "lang": "de",
+  "shown": "Powder tower to Riga",
+  "source": "Pulverturm zu Riga"
+ },
+ {
+  "id": "loc:2025713748",
+  "lang": "",
+  "shown": "Avenida \"A\", looking north from Calle Tercero, Tijuana, Baja Cal. Mexico",
+  "source": "Avenida \"A\", looking north from Calle Tercero, Tijuana, Baja Cal. Mexico"
+ },
+ {
+  "id": "loc:2025715921",
+  "lang": "de",
+  "shown": "Leontopodium alpinum (Edelweiss), engadine (Bernina group)",
+  "source": "Leontopodium alpinum (Edelweiss), Engadin (Berninagruppe"
+ },
+ {
+  "id": "onb:AK082_180",
+  "lang": "",
+  "shown": "Fiume, Corso Re Vittorio Emanuele III",
+  "source": "Fiume, Corso Re Vittorio Emanuele III"
+ },
+ {
+  "id": "onb:AK095_338",
+  "lang": "",
+  "shown": "Beyrouth",
+  "source": "Beyrouth"
+ },
+ {
+  "id": "onb:AK114_094",
+  "lang": "",
+  "shown": "Jerusalem, Stefansthor",
+  "source": "Jerusalem, Stefansthor"
  }
 ]
