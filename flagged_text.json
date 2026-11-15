@@ -4216,5 +4216,77 @@
   "lang": "",
   "shown": "Jerusalem, Stefansthor",
   "source": "Jerusalem, Stefansthor"
+ },
+ {
+  "id": "dc:commonwealth:1j92js62v",
+  "lang": "el",
+  "shown": "Admiralty Guard",
+  "source": "\u03a6\u03c1\u03bf\u03c5\u03c1\u03b9\u03bf\u03bd \u039d\u03b1\u03c5\u03c0\u03b1\u03ba\u03c4\u03bf\u03c5"
+ },
+ {
+  "id": "dc:commonwealth:x346fz42x",
+  "lang": "fr",
+  "shown": "Anse Vata beach Noum\u00e9a NC",
+  "source": "Anse Vata plage Noum\u00e9a NC"
+ },
+ {
+  "id": "graz:o:gm.2668",
+  "lang": "de",
+  "shown": "Graz. Schlossberg Anniversary Steep",
+  "source": "Graz. Schlossberg-Jubil\u00e4umssteig"
+ },
+ {
+  "id": "loc:2020760267",
+  "lang": "it",
+  "shown": "Macall\u00e8 - The Castle",
+  "source": "Macall\u00e8 - Il Castello"
+ },
+ {
+  "id": "loc:2020760431",
+  "lang": "",
+  "shown": "Addis Abeba - S'Officio Postale",
+  "source": "Addis Abeba - S'Officio Postale"
+ },
+ {
+  "id": "loc:2025703000",
+  "lang": "de",
+  "shown": "Suldenthal und Zillerthal. A trip to the Tyrolean High Alps. Achensee",
+  "source": "Suldenthal und Zillerthal. Ein Ausflug in die Tiroler Hochalpen. Achensee"
+ },
+ {
+  "id": "loc:2025706172",
+  "lang": "fr",
+  "shown": "Menars (Loir-et-Cher) Chateau de Menars. The Temple of Love",
+  "source": "Menars (Loir-et-Cher) Chateau de Menars. Le Temple de l'Amour"
+ },
+ {
+  "id": "loc:2025707299",
+  "lang": "fr",
+  "shown": "Cathedral of Chartres, The Transept",
+  "source": "Cathedrale de Chartres, Le Transept"
+ },
+ {
+  "id": "loc:2025707706",
+  "lang": "fr",
+  "shown": "Cathedral of Meaux, Trone de l'Eveque",
+  "source": "Cathedrale de Meaux, Trone de l'Eveque"
+ },
+ {
+  "id": "loc:2025713816",
+  "lang": "fr",
+  "shown": "Maroc. Moroccan Connectors",
+  "source": "Maroc. Les relieurs marocains"
+ },
+ {
+  "id": "onb:AK108_127",
+  "lang": "",
+  "shown": "La Chiffa, Les Gorges aux Mines de Cuivre",
+  "source": "La Chiffa, Les Gorges aux Mines de Cuivre"
+ },
+ {
+  "id": "rijks:RP-F-F11405",
+  "lang": "nl",
+  "shown": "View of Karlsbad or Karlovy Vary",
+  "source": "Gezicht op Karlsbad of Karlovy Vary"
  }
 ]
