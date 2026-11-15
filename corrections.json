@@ -3513,5 +3513,65 @@
   "was": "Jerusalem, Stefansthor",
   "title": "Jerusalem, St. Stephen's Gate",
   "note": "Never translated. German 'Stefansthor' = St. Stephen's Gate (Stephen's Gate), a gate in Jerusalem."
+ },
+ "dc:commonwealth:1j92js62v": {
+  "note": "Greek: Φρούριον Ναυπάκτου, 'Fortress of Nafpaktos' (the Venetian Lepanto, pl field Návpaktos). The translator took Ναυπάκτου, the genitive of the town's name, for a common word and invented 'Admiralty Guard' out of Φρούριον (fortress) -- both the place and the building type were lost.",
+  "title": "Fortress of Nafpaktos",
+  "was": "Φρουριον Ναυπακτου"
+ },
+ "dc:commonwealth:x346fz42x": {
+  "note": "French, never really translated beyond 'plage' -> beach. Anse Vata is a bay and beach at Nouméa, a place name; NC is Nouvelle-Calédonie, shown in full so the reader can place it. Names kept as names.",
+  "title": "Anse Vata Beach, Nouméa, New Caledonia",
+  "was": "Anse Vata plage Nouméa NC"
+ },
+ "graz:o:gm.2668": {
+  "note": "German: Schlossberg is the castle hill of Graz, Jubiläum is a jubilee, and -steig is a footpath. The translator rendered 'Steig' as 'Steep' (a look-alike of the English adjective) and Jubiläum as 'Anniversary'. It is the Jubilee Path up the Schlossberg.",
+  "title": "Graz. Schlossberg Jubilee Path",
+  "was": "Graz. Schlossberg-Jubiläumssteig"
+ },
+ "loc:2020760267": {
+  "note": "Italian colonial-era spelling of Macallè (Mek'ele), kept as the place name. 'Il Castello' is simply 'The Castle'. The existing English was already sound in substance; the flag was probably raised on the unfamiliar place name, so it is restated here explicitly as a name not to be touched.",
+  "title": "Macallè - The Castle",
+  "was": "Macallè - Il Castello"
+ },
+ "loc:2020760431": {
+  "note": "Never translated, so the flag changed nothing. Italian: 'S'Officio Postale' is a misprint for 'L'Ufficio Postale' (the post office); 'S'' is not a word. Addis Abeba is the Italian-era spelling of the city, kept as the name.",
+  "title": "Addis Abeba - The Post Office",
+  "was": "Addis Abeba - S'Officio Postale"
+ },
+ "loc:2025703000": {
+  "note": "German: 'Ein Ausflug' is 'an excursion', and 'in die Tiroler Hochalpen' is 'into the Tyrolean High Alps'. The old wording left 'und' untranslated and made it 'A trip to'. Suldenthal, Zillerthal and Achensee are valley/lake names in old spelling and are kept; the 'und' is kept as it is part of the printed title in that spelling.",
+  "title": "Suldenthal und Zillerthal. An Excursion into the Tyrolean High Alps. Achensee",
+  "was": "Suldenthal und Zillerthal. Ein Ausflug in die Tiroler Hochalpen. Achensee"
+ },
+ "loc:2025706172": {
+  "note": "French: Menars and the Loir-et-Cher department are places, Château de Menars a building, and the Temple of Love a garden pavilion there. The English was acceptable but 'Chateau' was left half-French and unaccented; restored as a proper name.",
+  "title": "Menars (Loir-et-Cher). Château de Menars, the Temple of Love",
+  "was": "Menars (Loir-et-Cher) Chateau de Menars. Le Temple de l'Amour"
+ },
+ "loc:2025707299": {
+  "note": "French: 'Cathédrale de Chartres' is Chartres Cathedral, a building name; 'Le Transept' is the transept. 'Cathedral of Chartres' was a literal calque; the usual English name for the building is used.",
+  "title": "Chartres Cathedral, the Transept",
+  "was": "Cathedrale de Chartres, Le Transept"
+ },
+ "loc:2025707706": {
+  "note": "French: 'Trône de l'Évêque' was left untranslated in the old caption ('Trone de l'Eveque'). It means the Bishop's Throne; Meaux is the town and the cathedral name is kept as a name.",
+  "title": "Meaux Cathedral, the Bishop's Throne",
+  "was": "Cathedrale de Meaux, Trone de l'Eveque"
+ },
+ "loc:2025713816": {
+  "note": "French: 'relieurs' are bookbinders (relieur = binder of books, from relier). The translator picked the wrong sense of the verb and produced 'Connectors'. 'Maroc' is kept as the French form of Morocco.",
+  "title": "Maroc. The Moroccan Bookbinders",
+  "was": "Maroc. Les relieurs marocains"
+ },
+ "onb:AK108_127": {
+  "note": "Never translated, so the flag changed nothing. French: 'Les Gorges aux Mines de Cuivre' is the gorge by the copper mines. La Chiffa is the place (Algeria) and is kept as the name.",
+  "title": "La Chiffa, the Gorges at the Copper Mines",
+  "was": "La Chiffa, Les Gorges aux Mines de Cuivre"
+ },
+ "rijks:RP-F-F11405": {
+  "note": "Dutch: 'Gezicht op' is 'View of'. Karlsbad (German) and Karlovy Vary (Czech) are two names of the same spa town and are both names, to be kept. The existing English was already correct; restated so the flag is cleared.",
+  "title": "View of Karlsbad or Karlovy Vary",
+  "was": "Gezicht op Karlsbad of Karlovy Vary"
  }
 }
