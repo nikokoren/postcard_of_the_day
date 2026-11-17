@@ -3573,5 +3573,90 @@
   "note": "Dutch: 'Gezicht op' is 'View of'. Karlsbad (German) and Karlovy Vary (Czech) are two names of the same spa town and are both names, to be kept. The existing English was already correct; restated so the flag is cleared.",
   "title": "View of Karlsbad or Karlovy Vary",
   "was": "Gezicht op Karlsbad of Karlovy Vary"
+ },
+ "dc:commonwealth:s75291102": {
+  "note": "French; Ste. Sophie is Hagia Sophia (St. Sophia), a building, and was rendered as a person's name 'St. Sophie' with Mosquée (mosque) dropped. Restored the mosque.",
+  "title": "Constantinople. St. Sophia Mosque",
+  "was": "Constantinople. Mosquée Ste. Sophie"
+ },
+ "dc:commonwealth:x346fp62r": {
+  "note": "Spanish; 'Al fondo' means 'in the background' and was rendered 'The Monument to...', losing the Church name's English-less 'Iglesia' and the position. Iglesia San Pedro Claver is a named church; truncated 'Col' (Colombia) is the archive's own and is kept.",
+  "title": "Church of San Pedro Claver. In the background the Monument to the Flag, Cartagena, Col",
+  "was": "Iglesia San Pedro Claver. Al fondo el Monumento a la Bandera, Cartagena, Col"
+ },
+ "dc:commonwealth:x633hm41m": {
+  "note": "French, never translated. Les sept tours = the seven towers; Yédikoulé (Yedikule) is a place name and is kept as written.",
+  "title": "Constantinople. The Seven Towers of Yédikoulé",
+  "was": "Constantinople. Les sept tours de Yédikoulé"
+ },
+ "graz:o:gm.1321": {
+  "note": "German; Personen-Dampfer is one passenger steamer (singular), rendered 'steamers'. Alter Murquai is the old Mur quay and is kept as a place name, as is Graz.",
+  "title": "Graz Alter Murquai with passenger steamer in 1889",
+  "was": "Graz Alter Murquai mit Personen-Dampfer im Jahre 1889"
+ },
+ "loc:2020760388": {
+  "note": "Italian, not German as detected. Quartiere Indigene = native quarter(s); 'Indigenous' is the wrong register for a colonial-era caption. Ambo is a town in Ethiopia and stays.",
+  "title": "AMBO - Native Quarters",
+  "was": "AMBO - Quartiere Indigene"
+ },
+ "loc:2025702771": {
+  "note": "French, never translated. Alger is Algiers; Rue de la Mer Rouge is a street name (Red Sea Street) and is kept as a name.",
+  "title": "Algiers. Rue de la Mer Rouge",
+  "was": "Alger. Rue de la Mer Rouge"
+ },
+ "loc:2025706503": {
+  "note": "French; Le Calvaire is 'the calvary' (the monumental Breton calvary); the article was dropped. Saint-Thegonnec is a place name.",
+  "title": "Saint-Thegonnec. The Calvary",
+  "was": "Saint-Thegonnec. Le Calvaire"
+ },
+ "loc:2025709099": {
+  "note": "The archive caption is already bilingual (French then English). The translator rendered the French half and appended the English half, so it appeared twice. Kept the archive's own English.",
+  "title": "Chateau de Versailles. The Orangerie and Princes' or South Wing",
+  "was": "Chateau de Versailles. L'Orangerie et l'Aile des Princes ou du Midi. The Orangerie and Princes' or South Wing"
+ },
+ "loc:2025709356": {
+  "note": "German, never translated. Rolandsäule is the Roland column in Bremen; Roland is a person's name, Bremen a place.",
+  "title": "Roland Column. Bremen",
+  "was": "Rolandsaule. Bremen"
+ },
+ "loc:2025711532": {
+  "note": "Italian, never translated. Firenze is Florence, Ercole e Cacco is Hercules and Cacus, a sculpture by Baccio Bandinelli; the archive's 'Bacico' is a typo for Baccio.",
+  "title": "Florence. Piazza della Signoria. Hercules and Cacus by Baccio Bandinelli",
+  "was": "Firenze. Piazza della Signoria. Ercole e Cacco di Bacico Bandinelli"
+ },
+ "loc:2025711566": {
+  "note": "Italian, never translated. Genova is Genoa; Via Roma is a street name and is kept.",
+  "title": "Genoa. Via Roma",
+  "was": "Genova. Via Roma"
+ },
+ "onb:AK025_255": {
+  "note": "Hungarian/German, never translated. Pöstyén is the Hungarian name of Piešťany (Slovakia), a place; fürdő = spa, Bad = spa.",
+  "title": "Bad Pöstyén Spa",
+  "was": "Bad-Pöstyén-fürdö"
+ },
+ "onb:AK076_064": {
+  "note": "Already English; the language detector flagged it wrongly. Aden is a place name. Nothing to fix.",
+  "title": "Aden, Quarantine Island",
+  "was": "Aden, Quarantine Island"
+ },
+ "onb:AK076_103": {
+  "note": "Karmel is the German name for Mount Carmel, left untranslated; Haifà has a stray accent. Haifa and Carmel are places.",
+  "title": "Haifa, Mount Carmel",
+  "was": "Haifà, Karmel"
+ },
+ "onb:AK109_397": {
+  "note": "Already English; the language detector flagged it wrongly. Bedrechen is a place name (archive's spelling) and is kept.",
+  "title": "Cairo, Palm trees at Bedrechen",
+  "was": "Cairo, Palm trees at Bedrechen"
+ },
+ "rijks:NG-2016-50-26": {
+  "note": "Dutch street name in Suriname (Heerenstraat, 'Gentlemen's Street'). A proper name; kept as written, so the flag was spurious.",
+  "title": "Heerenstraat",
+  "was": "Heerenstraat"
+ },
+ "rijks:NG-2016-50-65": {
+  "note": "Dutch, never translated. Feest = festival/feast; Tadja is the name of the festival and is kept.",
+  "title": "Tadja Festival",
+  "was": "Tadja-feest"
  }
 }
