@@ -3,12 +3,16 @@ name: Claude Code Review
 on:
   pull_request:
     types: [opened, synchronize, ready_for_review, reopened]
-    # Optional: Only run on specific file changes
-    # paths:
-    #   - "src/**/*.ts"
-    #   - "src/**/*.tsx"
-    #   - "src/**/*.js"
-    #   - "src/**/*.jsx"
+    # A pull request carrying nothing but caption corrections is not
+    # reviewable code, and the job below already declines to review the
+    # ones rewrite-captions.yml opens. Declining it here instead means
+    # no run is created at all. That matters: GitHub cannot start a
+    # workflow from a pull_request event raised with GITHUB_TOKEN, so
+    # every such run was recorded and then killed before it could read
+    # the condition below -- twenty red runs that never ran a step and
+    # never left a log, which read as if the rewrites were failing.
+    paths-ignore:
+      - corrections.json
 
 jobs:
   claude-review:
