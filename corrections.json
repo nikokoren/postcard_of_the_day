@@ -3658,5 +3658,45 @@
   "note": "Dutch, never translated. Feest = festival/feast; Tadja is the name of the festival and is kept.",
   "title": "Tadja Festival",
   "was": "Tadja-feest"
+ },
+ "dc:commonwealth:x346g0721": {
+  "note": "Spanish, never translated. Edificio de Administracion = Administration Building; Z. del C is the abbreviation of Zona del Canal (Canal Zone). Balboa is the town and is kept as a name.",
+  "title": "Panama Canal Administration Building, Balboa, Canal Zone",
+  "was": "Edificio de Administracion del Canal - Balboa, Z. del C"
+ },
+ "dc:commonwealth:x346g867t": {
+  "note": "Spanish. Published rendering left the archive abbreviation 'Col' unexpanded; it stands for Colombia, not a word. Antioquia (the department/railway) and Medellin are place names and kept.",
+  "title": "Antioquia Railway Station, Medellin, Colombia",
+  "was": "Estación del ferrocarril de Antioquia, Medellin, Col"
+ },
+ "graz:o:gm.2664": {
+  "note": "German. Jubiläumssteig is the name of a path in Graz, which the translator rendered as the common noun 'anniversary climb'. Kept as a proper name.",
+  "title": "Graz, Jubiläumssteig",
+  "was": "Graz Jubiläumssteig"
+ },
+ "loc:2020760849": {
+  "note": "English, never translated. Kumassi is the archive's spelling of Kumasi and is kept. The re-catalogued pool caption lacks its closing parenthesis, restored here; stray capital OF/west normalised.",
+  "title": "Kumassi, Capital of Ashanti (West Coast)",
+  "was": "Kumassi, Capital OF Ashanti (west Coast"
+ },
+ "loc:2025716124": {
+  "note": "French, never translated. Île de Salagnon is a named island and Dents du Midi a named mountain massif; both kept as names. The re-catalogued pool caption has the editorial bracket 'Il[e]', i.e. Île.",
+  "title": "Île de Salagnon and the Dents du Midi",
+  "was": "Il[e] de Salagnon et Dents du Midi"
+ },
+ "onb:AK082_173": {
+  "note": "Italian place name (modern Rijeka), never translated. Kept as written; a place is not vocabulary, and the caption carries nothing else to translate.",
+  "title": "Fiume",
+  "was": "Fiume"
+ },
+ "onb:AK098_112": {
+  "note": "German. Thorn is the German name of Toruń and is kept as a name. Altstädtischer Markt = the Old Town market place/square, a named square, not merely 'market'.",
+  "title": "Thorn, Old Town Market Square",
+  "was": "Thorn, Altstädtischer Markt"
+ },
+ "onb:AK109_414": {
+  "note": "French-catalogued. 'Mosque Keit Bey' is the mosque named for Keit Bey (Qaitbay); Keit Bey is a person's name and is kept, with the proper 'of' construction rather than an adjectival 'Keit Bey Mosque'.",
+  "title": "Cairo, Mosque of Keit Bey",
+  "was": "Cairo, Mosque Keit Bey"
  }
 }
