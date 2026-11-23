@@ -4390,5 +4390,53 @@
   "lang": "",
   "shown": "Tadja-feest",
   "source": "Tadja-feest"
+ },
+ {
+  "id": "dc:commonwealth:x346g0721",
+  "lang": "",
+  "shown": "Edificio de Administracion del Canal - Balboa, Z. del C",
+  "source": "Edificio de Administracion del Canal - Balboa, Z. del C"
+ },
+ {
+  "id": "dc:commonwealth:x346g867t",
+  "lang": "es",
+  "shown": "Antioquia railway station, Medellin, Col",
+  "source": "Estaci\u00f3n del ferrocarril de Antioquia, Medellin, Col"
+ },
+ {
+  "id": "graz:o:gm.2664",
+  "lang": "de",
+  "shown": "Graz anniversary climb",
+  "source": "Graz Jubil\u00e4umssteig"
+ },
+ {
+  "id": "loc:2020760849",
+  "lang": "",
+  "shown": "Kumassi, Capital OF Ashanti (west Coast)",
+  "source": "Kumassi, Capital OF Ashanti (west Coast)"
+ },
+ {
+  "id": "loc:2025716124",
+  "lang": "",
+  "shown": "Ile de Salagnon et Dents du Midi",
+  "source": "Ile de Salagnon et Dents du Midi"
+ },
+ {
+  "id": "onb:AK082_173",
+  "lang": "",
+  "shown": "Fiume",
+  "source": "Fiume"
+ },
+ {
+  "id": "onb:AK098_112",
+  "lang": "de",
+  "shown": "Thorn, Old Town Market",
+  "source": "Thorn, Altst\u00e4dtischer Markt"
+ },
+ {
+  "id": "onb:AK109_414",
+  "lang": "fr",
+  "shown": "Cairo, Keit Bey Mosque",
+  "source": "Cairo, Mosque Keit Bey"
  }
 ]
